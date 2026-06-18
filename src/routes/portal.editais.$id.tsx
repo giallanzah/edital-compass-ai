@@ -1,20 +1,25 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { editais, formatBRL, daysUntil, type Edital } from "@/data/editais";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { editais, formatBRL, daysUntil } from "@/data/editais";
 
 export const Route = createFileRoute("/portal/editais/$id")({
-  loader: ({ params }): { e: Edital } => {
-    const e = editais.find((x) => x.id === params.id);
-    if (!e) throw notFound();
-    return { e };
-  },
-  notFoundComponent: () => (
-    <div className="p-10 text-sm text-muted-foreground">Edital não encontrado.</div>
-  ),
   component: EditalDetail,
 });
 
 function EditalDetail() {
-  const { e } = Route.useLoaderData();
+  const { id } = Route.useParams();
+  const e = editais.find((x) => x.id === id);
+
+  if (!e) {
+    return (
+      <div className="p-10 text-sm text-muted-foreground">
+        Edital não encontrado.{" "}
+        <Link to="/portal/editais" className="underline">
+          Voltar ao catálogo
+        </Link>
+      </div>
+    );
+  }
+
   const d = daysUntil(e.deadline);
 
   return (
