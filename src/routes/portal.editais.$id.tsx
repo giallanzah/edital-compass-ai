@@ -1,8 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { editais, formatBRL, daysUntil } from "@/data/editais";
+import { editais, formatBRL, daysUntil, type Edital } from "@/data/editais";
 
 export const Route = createFileRoute("/portal/editais/$id")({
-  loader: ({ params }) => {
+  loader: ({ params }): { e: Edital } => {
     const e = editais.find((x) => x.id === params.id);
     if (!e) throw notFound();
     return { e };

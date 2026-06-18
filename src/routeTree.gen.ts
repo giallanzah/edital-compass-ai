@@ -9,38 +9,210 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PortalRouteImport } from './routes/portal'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PortalIndexRouteImport } from './routes/portal.index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as PortalProjetosRouteImport } from './routes/portal.projetos'
+import { Route as PortalEditaisRouteImport } from './routes/portal.editais'
+import { Route as PortalConhecimentoRouteImport } from './routes/portal.conhecimento'
+import { Route as PortalCandidaturasRouteImport } from './routes/portal.candidaturas'
+import { Route as AdminUsuariosRouteImport } from './routes/admin.usuarios'
+import { Route as AdminScrapersRouteImport } from './routes/admin.scrapers'
+import { Route as AdminEditaisRouteImport } from './routes/admin.editais'
+import { Route as AdminConfiguracoesRouteImport } from './routes/admin.configuracoes'
+import { Route as PortalEditaisIdRouteImport } from './routes/portal.editais.$id'
 
+const PortalRoute = PortalRouteImport.update({
+  id: '/portal',
+  path: '/portal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PortalIndexRoute = PortalIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PortalRoute,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const PortalProjetosRoute = PortalProjetosRouteImport.update({
+  id: '/projetos',
+  path: '/projetos',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalEditaisRoute = PortalEditaisRouteImport.update({
+  id: '/editais',
+  path: '/editais',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalConhecimentoRoute = PortalConhecimentoRouteImport.update({
+  id: '/conhecimento',
+  path: '/conhecimento',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalCandidaturasRoute = PortalCandidaturasRouteImport.update({
+  id: '/candidaturas',
+  path: '/candidaturas',
+  getParentRoute: () => PortalRoute,
+} as any)
+const AdminUsuariosRoute = AdminUsuariosRouteImport.update({
+  id: '/usuarios',
+  path: '/usuarios',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminScrapersRoute = AdminScrapersRouteImport.update({
+  id: '/scrapers',
+  path: '/scrapers',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminEditaisRoute = AdminEditaisRouteImport.update({
+  id: '/editais',
+  path: '/editais',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminConfiguracoesRoute = AdminConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
+  getParentRoute: () => AdminRoute,
+} as any)
+const PortalEditaisIdRoute = PortalEditaisIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => PortalEditaisRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/portal': typeof PortalRouteWithChildren
+  '/admin/configuracoes': typeof AdminConfiguracoesRoute
+  '/admin/editais': typeof AdminEditaisRoute
+  '/admin/scrapers': typeof AdminScrapersRoute
+  '/admin/usuarios': typeof AdminUsuariosRoute
+  '/portal/candidaturas': typeof PortalCandidaturasRoute
+  '/portal/conhecimento': typeof PortalConhecimentoRoute
+  '/portal/editais': typeof PortalEditaisRouteWithChildren
+  '/portal/projetos': typeof PortalProjetosRoute
+  '/admin/': typeof AdminIndexRoute
+  '/portal/': typeof PortalIndexRoute
+  '/portal/editais/$id': typeof PortalEditaisIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin/configuracoes': typeof AdminConfiguracoesRoute
+  '/admin/editais': typeof AdminEditaisRoute
+  '/admin/scrapers': typeof AdminScrapersRoute
+  '/admin/usuarios': typeof AdminUsuariosRoute
+  '/portal/candidaturas': typeof PortalCandidaturasRoute
+  '/portal/conhecimento': typeof PortalConhecimentoRoute
+  '/portal/editais': typeof PortalEditaisRouteWithChildren
+  '/portal/projetos': typeof PortalProjetosRoute
+  '/admin': typeof AdminIndexRoute
+  '/portal': typeof PortalIndexRoute
+  '/portal/editais/$id': typeof PortalEditaisIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/portal': typeof PortalRouteWithChildren
+  '/admin/configuracoes': typeof AdminConfiguracoesRoute
+  '/admin/editais': typeof AdminEditaisRoute
+  '/admin/scrapers': typeof AdminScrapersRoute
+  '/admin/usuarios': typeof AdminUsuariosRoute
+  '/portal/candidaturas': typeof PortalCandidaturasRoute
+  '/portal/conhecimento': typeof PortalConhecimentoRoute
+  '/portal/editais': typeof PortalEditaisRouteWithChildren
+  '/portal/projetos': typeof PortalProjetosRoute
+  '/admin/': typeof AdminIndexRoute
+  '/portal/': typeof PortalIndexRoute
+  '/portal/editais/$id': typeof PortalEditaisIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/portal'
+    | '/admin/configuracoes'
+    | '/admin/editais'
+    | '/admin/scrapers'
+    | '/admin/usuarios'
+    | '/portal/candidaturas'
+    | '/portal/conhecimento'
+    | '/portal/editais'
+    | '/portal/projetos'
+    | '/admin/'
+    | '/portal/'
+    | '/portal/editais/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/admin/configuracoes'
+    | '/admin/editais'
+    | '/admin/scrapers'
+    | '/admin/usuarios'
+    | '/portal/candidaturas'
+    | '/portal/conhecimento'
+    | '/portal/editais'
+    | '/portal/projetos'
+    | '/admin'
+    | '/portal'
+    | '/portal/editais/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/portal'
+    | '/admin/configuracoes'
+    | '/admin/editais'
+    | '/admin/scrapers'
+    | '/admin/usuarios'
+    | '/portal/candidaturas'
+    | '/portal/conhecimento'
+    | '/portal/editais'
+    | '/portal/projetos'
+    | '/admin/'
+    | '/portal/'
+    | '/portal/editais/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
+  PortalRoute: typeof PortalRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/portal': {
+      id: '/portal'
+      path: '/portal'
+      fullPath: '/portal'
+      preLoaderRoute: typeof PortalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +220,139 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/portal/': {
+      id: '/portal/'
+      path: '/'
+      fullPath: '/portal/'
+      preLoaderRoute: typeof PortalIndexRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/portal/projetos': {
+      id: '/portal/projetos'
+      path: '/projetos'
+      fullPath: '/portal/projetos'
+      preLoaderRoute: typeof PortalProjetosRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/editais': {
+      id: '/portal/editais'
+      path: '/editais'
+      fullPath: '/portal/editais'
+      preLoaderRoute: typeof PortalEditaisRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/conhecimento': {
+      id: '/portal/conhecimento'
+      path: '/conhecimento'
+      fullPath: '/portal/conhecimento'
+      preLoaderRoute: typeof PortalConhecimentoRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/candidaturas': {
+      id: '/portal/candidaturas'
+      path: '/candidaturas'
+      fullPath: '/portal/candidaturas'
+      preLoaderRoute: typeof PortalCandidaturasRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/admin/usuarios': {
+      id: '/admin/usuarios'
+      path: '/usuarios'
+      fullPath: '/admin/usuarios'
+      preLoaderRoute: typeof AdminUsuariosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/scrapers': {
+      id: '/admin/scrapers'
+      path: '/scrapers'
+      fullPath: '/admin/scrapers'
+      preLoaderRoute: typeof AdminScrapersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/editais': {
+      id: '/admin/editais'
+      path: '/editais'
+      fullPath: '/admin/editais'
+      preLoaderRoute: typeof AdminEditaisRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/configuracoes': {
+      id: '/admin/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/admin/configuracoes'
+      preLoaderRoute: typeof AdminConfiguracoesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/portal/editais/$id': {
+      id: '/portal/editais/$id'
+      path: '/$id'
+      fullPath: '/portal/editais/$id'
+      preLoaderRoute: typeof PortalEditaisIdRouteImport
+      parentRoute: typeof PortalEditaisRoute
+    }
   }
 }
 
+interface AdminRouteChildren {
+  AdminConfiguracoesRoute: typeof AdminConfiguracoesRoute
+  AdminEditaisRoute: typeof AdminEditaisRoute
+  AdminScrapersRoute: typeof AdminScrapersRoute
+  AdminUsuariosRoute: typeof AdminUsuariosRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminConfiguracoesRoute: AdminConfiguracoesRoute,
+  AdminEditaisRoute: AdminEditaisRoute,
+  AdminScrapersRoute: AdminScrapersRoute,
+  AdminUsuariosRoute: AdminUsuariosRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
+interface PortalEditaisRouteChildren {
+  PortalEditaisIdRoute: typeof PortalEditaisIdRoute
+}
+
+const PortalEditaisRouteChildren: PortalEditaisRouteChildren = {
+  PortalEditaisIdRoute: PortalEditaisIdRoute,
+}
+
+const PortalEditaisRouteWithChildren = PortalEditaisRoute._addFileChildren(
+  PortalEditaisRouteChildren,
+)
+
+interface PortalRouteChildren {
+  PortalCandidaturasRoute: typeof PortalCandidaturasRoute
+  PortalConhecimentoRoute: typeof PortalConhecimentoRoute
+  PortalEditaisRoute: typeof PortalEditaisRouteWithChildren
+  PortalProjetosRoute: typeof PortalProjetosRoute
+  PortalIndexRoute: typeof PortalIndexRoute
+}
+
+const PortalRouteChildren: PortalRouteChildren = {
+  PortalCandidaturasRoute: PortalCandidaturasRoute,
+  PortalConhecimentoRoute: PortalConhecimentoRoute,
+  PortalEditaisRoute: PortalEditaisRouteWithChildren,
+  PortalProjetosRoute: PortalProjetosRoute,
+  PortalIndexRoute: PortalIndexRoute,
+}
+
+const PortalRouteWithChildren =
+  PortalRoute._addFileChildren(PortalRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
+  PortalRoute: PortalRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
