@@ -47,7 +47,7 @@ export function PortalShell({
 
       <div className="flex">
         {/* Sidebar */}
-        <aside className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-56 shrink-0 hairline-b md:block" style={{ borderRight: "1px solid var(--hairline)" }}>
+        <aside className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-56 shrink-0 hairline-b overflow-y-auto md:block" style={{ borderRight: "1px solid var(--hairline)" }}>
           <nav className="p-3">
             {items.map((it) => {
               const active =

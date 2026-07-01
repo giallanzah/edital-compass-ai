@@ -20,10 +20,27 @@ import { Route as PortalConhecimentoRouteImport } from './routes/portal.conhecim
 import { Route as PortalCandidaturasRouteImport } from './routes/portal.candidaturas'
 import { Route as AdminUsuariosRouteImport } from './routes/admin.usuarios'
 import { Route as AdminScrapersRouteImport } from './routes/admin.scrapers'
+import { Route as AdminRelatoriosRouteImport } from './routes/admin.relatorios'
 import { Route as AdminRecuperarSenhaRouteImport } from './routes/admin.recuperar-senha'
+import { Route as AdminProjetosRouteImport } from './routes/admin.projetos'
+import { Route as AdminPermissoesRouteImport } from './routes/admin.permissoes'
+import { Route as AdminPagamentosRouteImport } from './routes/admin.pagamentos'
+import { Route as AdminMunicipiosRouteImport } from './routes/admin.municipios'
+import { Route as AdminLogsRouteImport } from './routes/admin.logs'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AdminInvestidoresRouteImport } from './routes/admin.investidores'
+import { Route as AdminIntegracoesRouteImport } from './routes/admin.integracoes'
+import { Route as AdminInstituicoesRouteImport } from './routes/admin.instituicoes'
+import { Route as AdminIndicadoresRouteImport } from './routes/admin.indicadores'
+import { Route as AdminIaRouteImport } from './routes/admin.ia'
+import { Route as AdminFinanceiroRouteImport } from './routes/admin.financeiro'
+import { Route as AdminEstadosRouteImport } from './routes/admin.estados'
+import { Route as AdminEmpresasRouteImport } from './routes/admin.empresas'
 import { Route as AdminEditaisRouteImport } from './routes/admin.editais'
+import { Route as AdminConveniosRouteImport } from './routes/admin.convenios'
 import { Route as AdminConfiguracoesRouteImport } from './routes/admin.configuracoes'
+import { Route as AdminApisRouteImport } from './routes/admin.apis'
+import { Route as AdminAnalistasRouteImport } from './routes/admin.analistas'
 import { Route as PortalEditaisIdRouteImport } from './routes/portal.editais.$id'
 
 const PortalRoute = PortalRouteImport.update({
@@ -81,9 +98,39 @@ const AdminScrapersRoute = AdminScrapersRouteImport.update({
   path: '/scrapers',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminRelatoriosRoute = AdminRelatoriosRouteImport.update({
+  id: '/relatorios',
+  path: '/relatorios',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminRecuperarSenhaRoute = AdminRecuperarSenhaRouteImport.update({
   id: '/recuperar-senha',
   path: '/recuperar-senha',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminProjetosRoute = AdminProjetosRouteImport.update({
+  id: '/projetos',
+  path: '/projetos',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPermissoesRoute = AdminPermissoesRouteImport.update({
+  id: '/permissoes',
+  path: '/permissoes',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPagamentosRoute = AdminPagamentosRouteImport.update({
+  id: '/pagamentos',
+  path: '/pagamentos',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMunicipiosRoute = AdminMunicipiosRouteImport.update({
+  id: '/municipios',
+  path: '/municipios',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLogsRoute = AdminLogsRouteImport.update({
+  id: '/logs',
+  path: '/logs',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
@@ -91,14 +138,69 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminInvestidoresRoute = AdminInvestidoresRouteImport.update({
+  id: '/investidores',
+  path: '/investidores',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminIntegracoesRoute = AdminIntegracoesRouteImport.update({
+  id: '/integracoes',
+  path: '/integracoes',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminInstituicoesRoute = AdminInstituicoesRouteImport.update({
+  id: '/instituicoes',
+  path: '/instituicoes',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminIndicadoresRoute = AdminIndicadoresRouteImport.update({
+  id: '/indicadores',
+  path: '/indicadores',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminIaRoute = AdminIaRouteImport.update({
+  id: '/ia',
+  path: '/ia',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminFinanceiroRoute = AdminFinanceiroRouteImport.update({
+  id: '/financeiro',
+  path: '/financeiro',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminEstadosRoute = AdminEstadosRouteImport.update({
+  id: '/estados',
+  path: '/estados',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminEmpresasRoute = AdminEmpresasRouteImport.update({
+  id: '/empresas',
+  path: '/empresas',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminEditaisRoute = AdminEditaisRouteImport.update({
   id: '/editais',
   path: '/editais',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminConveniosRoute = AdminConveniosRouteImport.update({
+  id: '/convenios',
+  path: '/convenios',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminConfiguracoesRoute = AdminConfiguracoesRouteImport.update({
   id: '/configuracoes',
   path: '/configuracoes',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminApisRoute = AdminApisRouteImport.update({
+  id: '/apis',
+  path: '/apis',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAnalistasRoute = AdminAnalistasRouteImport.update({
+  id: '/analistas',
+  path: '/analistas',
   getParentRoute: () => AdminRoute,
 } as any)
 const PortalEditaisIdRoute = PortalEditaisIdRouteImport.update({
@@ -111,10 +213,27 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/portal': typeof PortalRouteWithChildren
+  '/admin/analistas': typeof AdminAnalistasRoute
+  '/admin/apis': typeof AdminApisRoute
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
+  '/admin/convenios': typeof AdminConveniosRoute
   '/admin/editais': typeof AdminEditaisRoute
+  '/admin/empresas': typeof AdminEmpresasRoute
+  '/admin/estados': typeof AdminEstadosRoute
+  '/admin/financeiro': typeof AdminFinanceiroRoute
+  '/admin/ia': typeof AdminIaRoute
+  '/admin/indicadores': typeof AdminIndicadoresRoute
+  '/admin/instituicoes': typeof AdminInstituicoesRoute
+  '/admin/integracoes': typeof AdminIntegracoesRoute
+  '/admin/investidores': typeof AdminInvestidoresRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/logs': typeof AdminLogsRoute
+  '/admin/municipios': typeof AdminMunicipiosRoute
+  '/admin/pagamentos': typeof AdminPagamentosRoute
+  '/admin/permissoes': typeof AdminPermissoesRoute
+  '/admin/projetos': typeof AdminProjetosRoute
   '/admin/recuperar-senha': typeof AdminRecuperarSenhaRoute
+  '/admin/relatorios': typeof AdminRelatoriosRoute
   '/admin/scrapers': typeof AdminScrapersRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/portal/candidaturas': typeof PortalCandidaturasRoute
@@ -127,10 +246,27 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin/analistas': typeof AdminAnalistasRoute
+  '/admin/apis': typeof AdminApisRoute
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
+  '/admin/convenios': typeof AdminConveniosRoute
   '/admin/editais': typeof AdminEditaisRoute
+  '/admin/empresas': typeof AdminEmpresasRoute
+  '/admin/estados': typeof AdminEstadosRoute
+  '/admin/financeiro': typeof AdminFinanceiroRoute
+  '/admin/ia': typeof AdminIaRoute
+  '/admin/indicadores': typeof AdminIndicadoresRoute
+  '/admin/instituicoes': typeof AdminInstituicoesRoute
+  '/admin/integracoes': typeof AdminIntegracoesRoute
+  '/admin/investidores': typeof AdminInvestidoresRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/logs': typeof AdminLogsRoute
+  '/admin/municipios': typeof AdminMunicipiosRoute
+  '/admin/pagamentos': typeof AdminPagamentosRoute
+  '/admin/permissoes': typeof AdminPermissoesRoute
+  '/admin/projetos': typeof AdminProjetosRoute
   '/admin/recuperar-senha': typeof AdminRecuperarSenhaRoute
+  '/admin/relatorios': typeof AdminRelatoriosRoute
   '/admin/scrapers': typeof AdminScrapersRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/portal/candidaturas': typeof PortalCandidaturasRoute
@@ -146,10 +282,27 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/portal': typeof PortalRouteWithChildren
+  '/admin/analistas': typeof AdminAnalistasRoute
+  '/admin/apis': typeof AdminApisRoute
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
+  '/admin/convenios': typeof AdminConveniosRoute
   '/admin/editais': typeof AdminEditaisRoute
+  '/admin/empresas': typeof AdminEmpresasRoute
+  '/admin/estados': typeof AdminEstadosRoute
+  '/admin/financeiro': typeof AdminFinanceiroRoute
+  '/admin/ia': typeof AdminIaRoute
+  '/admin/indicadores': typeof AdminIndicadoresRoute
+  '/admin/instituicoes': typeof AdminInstituicoesRoute
+  '/admin/integracoes': typeof AdminIntegracoesRoute
+  '/admin/investidores': typeof AdminInvestidoresRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/logs': typeof AdminLogsRoute
+  '/admin/municipios': typeof AdminMunicipiosRoute
+  '/admin/pagamentos': typeof AdminPagamentosRoute
+  '/admin/permissoes': typeof AdminPermissoesRoute
+  '/admin/projetos': typeof AdminProjetosRoute
   '/admin/recuperar-senha': typeof AdminRecuperarSenhaRoute
+  '/admin/relatorios': typeof AdminRelatoriosRoute
   '/admin/scrapers': typeof AdminScrapersRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/portal/candidaturas': typeof PortalCandidaturasRoute
@@ -166,10 +319,27 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/portal'
+    | '/admin/analistas'
+    | '/admin/apis'
     | '/admin/configuracoes'
+    | '/admin/convenios'
     | '/admin/editais'
+    | '/admin/empresas'
+    | '/admin/estados'
+    | '/admin/financeiro'
+    | '/admin/ia'
+    | '/admin/indicadores'
+    | '/admin/instituicoes'
+    | '/admin/integracoes'
+    | '/admin/investidores'
     | '/admin/login'
+    | '/admin/logs'
+    | '/admin/municipios'
+    | '/admin/pagamentos'
+    | '/admin/permissoes'
+    | '/admin/projetos'
     | '/admin/recuperar-senha'
+    | '/admin/relatorios'
     | '/admin/scrapers'
     | '/admin/usuarios'
     | '/portal/candidaturas'
@@ -182,10 +352,27 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin/analistas'
+    | '/admin/apis'
     | '/admin/configuracoes'
+    | '/admin/convenios'
     | '/admin/editais'
+    | '/admin/empresas'
+    | '/admin/estados'
+    | '/admin/financeiro'
+    | '/admin/ia'
+    | '/admin/indicadores'
+    | '/admin/instituicoes'
+    | '/admin/integracoes'
+    | '/admin/investidores'
     | '/admin/login'
+    | '/admin/logs'
+    | '/admin/municipios'
+    | '/admin/pagamentos'
+    | '/admin/permissoes'
+    | '/admin/projetos'
     | '/admin/recuperar-senha'
+    | '/admin/relatorios'
     | '/admin/scrapers'
     | '/admin/usuarios'
     | '/portal/candidaturas'
@@ -200,10 +387,27 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/portal'
+    | '/admin/analistas'
+    | '/admin/apis'
     | '/admin/configuracoes'
+    | '/admin/convenios'
     | '/admin/editais'
+    | '/admin/empresas'
+    | '/admin/estados'
+    | '/admin/financeiro'
+    | '/admin/ia'
+    | '/admin/indicadores'
+    | '/admin/instituicoes'
+    | '/admin/integracoes'
+    | '/admin/investidores'
     | '/admin/login'
+    | '/admin/logs'
+    | '/admin/municipios'
+    | '/admin/pagamentos'
+    | '/admin/permissoes'
+    | '/admin/projetos'
     | '/admin/recuperar-senha'
+    | '/admin/relatorios'
     | '/admin/scrapers'
     | '/admin/usuarios'
     | '/portal/candidaturas'
@@ -300,11 +504,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminScrapersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/relatorios': {
+      id: '/admin/relatorios'
+      path: '/relatorios'
+      fullPath: '/admin/relatorios'
+      preLoaderRoute: typeof AdminRelatoriosRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/recuperar-senha': {
       id: '/admin/recuperar-senha'
       path: '/recuperar-senha'
       fullPath: '/admin/recuperar-senha'
       preLoaderRoute: typeof AdminRecuperarSenhaRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/projetos': {
+      id: '/admin/projetos'
+      path: '/projetos'
+      fullPath: '/admin/projetos'
+      preLoaderRoute: typeof AdminProjetosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/permissoes': {
+      id: '/admin/permissoes'
+      path: '/permissoes'
+      fullPath: '/admin/permissoes'
+      preLoaderRoute: typeof AdminPermissoesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/pagamentos': {
+      id: '/admin/pagamentos'
+      path: '/pagamentos'
+      fullPath: '/admin/pagamentos'
+      preLoaderRoute: typeof AdminPagamentosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/municipios': {
+      id: '/admin/municipios'
+      path: '/municipios'
+      fullPath: '/admin/municipios'
+      preLoaderRoute: typeof AdminMunicipiosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/logs': {
+      id: '/admin/logs'
+      path: '/logs'
+      fullPath: '/admin/logs'
+      preLoaderRoute: typeof AdminLogsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/login': {
@@ -314,6 +560,62 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/investidores': {
+      id: '/admin/investidores'
+      path: '/investidores'
+      fullPath: '/admin/investidores'
+      preLoaderRoute: typeof AdminInvestidoresRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/integracoes': {
+      id: '/admin/integracoes'
+      path: '/integracoes'
+      fullPath: '/admin/integracoes'
+      preLoaderRoute: typeof AdminIntegracoesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/instituicoes': {
+      id: '/admin/instituicoes'
+      path: '/instituicoes'
+      fullPath: '/admin/instituicoes'
+      preLoaderRoute: typeof AdminInstituicoesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/indicadores': {
+      id: '/admin/indicadores'
+      path: '/indicadores'
+      fullPath: '/admin/indicadores'
+      preLoaderRoute: typeof AdminIndicadoresRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/ia': {
+      id: '/admin/ia'
+      path: '/ia'
+      fullPath: '/admin/ia'
+      preLoaderRoute: typeof AdminIaRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/financeiro': {
+      id: '/admin/financeiro'
+      path: '/financeiro'
+      fullPath: '/admin/financeiro'
+      preLoaderRoute: typeof AdminFinanceiroRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/estados': {
+      id: '/admin/estados'
+      path: '/estados'
+      fullPath: '/admin/estados'
+      preLoaderRoute: typeof AdminEstadosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/empresas': {
+      id: '/admin/empresas'
+      path: '/empresas'
+      fullPath: '/admin/empresas'
+      preLoaderRoute: typeof AdminEmpresasRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/editais': {
       id: '/admin/editais'
       path: '/editais'
@@ -321,11 +623,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEditaisRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/convenios': {
+      id: '/admin/convenios'
+      path: '/convenios'
+      fullPath: '/admin/convenios'
+      preLoaderRoute: typeof AdminConveniosRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/configuracoes': {
       id: '/admin/configuracoes'
       path: '/configuracoes'
       fullPath: '/admin/configuracoes'
       preLoaderRoute: typeof AdminConfiguracoesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/apis': {
+      id: '/admin/apis'
+      path: '/apis'
+      fullPath: '/admin/apis'
+      preLoaderRoute: typeof AdminApisRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/analistas': {
+      id: '/admin/analistas'
+      path: '/analistas'
+      fullPath: '/admin/analistas'
+      preLoaderRoute: typeof AdminAnalistasRouteImport
       parentRoute: typeof AdminRoute
     }
     '/portal/editais/$id': {
@@ -339,20 +662,54 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminAnalistasRoute: typeof AdminAnalistasRoute
+  AdminApisRoute: typeof AdminApisRoute
   AdminConfiguracoesRoute: typeof AdminConfiguracoesRoute
+  AdminConveniosRoute: typeof AdminConveniosRoute
   AdminEditaisRoute: typeof AdminEditaisRoute
+  AdminEmpresasRoute: typeof AdminEmpresasRoute
+  AdminEstadosRoute: typeof AdminEstadosRoute
+  AdminFinanceiroRoute: typeof AdminFinanceiroRoute
+  AdminIaRoute: typeof AdminIaRoute
+  AdminIndicadoresRoute: typeof AdminIndicadoresRoute
+  AdminInstituicoesRoute: typeof AdminInstituicoesRoute
+  AdminIntegracoesRoute: typeof AdminIntegracoesRoute
+  AdminInvestidoresRoute: typeof AdminInvestidoresRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  AdminLogsRoute: typeof AdminLogsRoute
+  AdminMunicipiosRoute: typeof AdminMunicipiosRoute
+  AdminPagamentosRoute: typeof AdminPagamentosRoute
+  AdminPermissoesRoute: typeof AdminPermissoesRoute
+  AdminProjetosRoute: typeof AdminProjetosRoute
   AdminRecuperarSenhaRoute: typeof AdminRecuperarSenhaRoute
+  AdminRelatoriosRoute: typeof AdminRelatoriosRoute
   AdminScrapersRoute: typeof AdminScrapersRoute
   AdminUsuariosRoute: typeof AdminUsuariosRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAnalistasRoute: AdminAnalistasRoute,
+  AdminApisRoute: AdminApisRoute,
   AdminConfiguracoesRoute: AdminConfiguracoesRoute,
+  AdminConveniosRoute: AdminConveniosRoute,
   AdminEditaisRoute: AdminEditaisRoute,
+  AdminEmpresasRoute: AdminEmpresasRoute,
+  AdminEstadosRoute: AdminEstadosRoute,
+  AdminFinanceiroRoute: AdminFinanceiroRoute,
+  AdminIaRoute: AdminIaRoute,
+  AdminIndicadoresRoute: AdminIndicadoresRoute,
+  AdminInstituicoesRoute: AdminInstituicoesRoute,
+  AdminIntegracoesRoute: AdminIntegracoesRoute,
+  AdminInvestidoresRoute: AdminInvestidoresRoute,
   AdminLoginRoute: AdminLoginRoute,
+  AdminLogsRoute: AdminLogsRoute,
+  AdminMunicipiosRoute: AdminMunicipiosRoute,
+  AdminPagamentosRoute: AdminPagamentosRoute,
+  AdminPermissoesRoute: AdminPermissoesRoute,
+  AdminProjetosRoute: AdminProjetosRoute,
   AdminRecuperarSenhaRoute: AdminRecuperarSenhaRoute,
+  AdminRelatoriosRoute: AdminRelatoriosRoute,
   AdminScrapersRoute: AdminScrapersRoute,
   AdminUsuariosRoute: AdminUsuariosRoute,
   AdminIndexRoute: AdminIndexRoute,
