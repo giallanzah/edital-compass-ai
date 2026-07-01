@@ -14,13 +14,268 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      editais: {
+        Row: {
+          abrangencia: string | null
+          ativo: boolean
+          coletado_em: string
+          confianca_extracao: number
+          created_at: string
+          data_abertura: string | null
+          data_encerramento: string | null
+          data_publicacao: string | null
+          descricao_completa: string | null
+          descricao_curta: string | null
+          documentos_json: Json
+          elegibilidade: string | null
+          fonte: string
+          fonte_id: string | null
+          fonte_tipo: string | null
+          hash_conteudo: string
+          id: string
+          moeda: string
+          oculto: boolean
+          precisa_revisao: boolean
+          publico_alvo: string[] | null
+          slug: string
+          status: string
+          subtipo_tema: string[] | null
+          tags_json: Json
+          tema: string[] | null
+          tipo_apoio: string | null
+          titulo: string
+          uf: string | null
+          updated_at: string
+          url_canonica: string
+          url_original: string
+          valor_apoio_max: number | null
+          valor_apoio_min: number | null
+        }
+        Insert: {
+          abrangencia?: string | null
+          ativo?: boolean
+          coletado_em?: string
+          confianca_extracao?: number
+          created_at?: string
+          data_abertura?: string | null
+          data_encerramento?: string | null
+          data_publicacao?: string | null
+          descricao_completa?: string | null
+          descricao_curta?: string | null
+          documentos_json?: Json
+          elegibilidade?: string | null
+          fonte: string
+          fonte_id?: string | null
+          fonte_tipo?: string | null
+          hash_conteudo: string
+          id?: string
+          moeda?: string
+          oculto?: boolean
+          precisa_revisao?: boolean
+          publico_alvo?: string[] | null
+          slug: string
+          status?: string
+          subtipo_tema?: string[] | null
+          tags_json?: Json
+          tema?: string[] | null
+          tipo_apoio?: string | null
+          titulo: string
+          uf?: string | null
+          updated_at?: string
+          url_canonica: string
+          url_original: string
+          valor_apoio_max?: number | null
+          valor_apoio_min?: number | null
+        }
+        Update: {
+          abrangencia?: string | null
+          ativo?: boolean
+          coletado_em?: string
+          confianca_extracao?: number
+          created_at?: string
+          data_abertura?: string | null
+          data_encerramento?: string | null
+          data_publicacao?: string | null
+          descricao_completa?: string | null
+          descricao_curta?: string | null
+          documentos_json?: Json
+          elegibilidade?: string | null
+          fonte?: string
+          fonte_id?: string | null
+          fonte_tipo?: string | null
+          hash_conteudo?: string
+          id?: string
+          moeda?: string
+          oculto?: boolean
+          precisa_revisao?: boolean
+          publico_alvo?: string[] | null
+          slug?: string
+          status?: string
+          subtipo_tema?: string[] | null
+          tags_json?: Json
+          tema?: string[] | null
+          tipo_apoio?: string | null
+          titulo?: string
+          uf?: string | null
+          updated_at?: string
+          url_canonica?: string
+          url_original?: string
+          valor_apoio_max?: number | null
+          valor_apoio_min?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "editais_fonte_id_fkey"
+            columns: ["fonte_id"]
+            isOneToOne: false
+            referencedRelation: "fontes_monitoradas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      editais_historico: {
+        Row: {
+          criado_em: string
+          edital_id: string
+          hash_conteudo: string
+          id: string
+          snapshot: Json
+        }
+        Insert: {
+          criado_em?: string
+          edital_id: string
+          hash_conteudo: string
+          id?: string
+          snapshot: Json
+        }
+        Update: {
+          criado_em?: string
+          edital_id?: string
+          hash_conteudo?: string
+          id?: string
+          snapshot?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "editais_historico_edital_id_fkey"
+            columns: ["edital_id"]
+            isOneToOne: false
+            referencedRelation: "editais"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fontes_monitoradas: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          frequencia_horas: number
+          id: string
+          nome: string
+          slug: string
+          status_coleta: string
+          tipo_coleta: string
+          ultima_mensagem: string | null
+          ultimo_erro_em: string | null
+          ultimo_sucesso_em: string | null
+          updated_at: string
+          url_base: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          frequencia_horas?: number
+          id?: string
+          nome: string
+          slug: string
+          status_coleta?: string
+          tipo_coleta?: string
+          ultima_mensagem?: string | null
+          ultimo_erro_em?: string | null
+          ultimo_sucesso_em?: string | null
+          updated_at?: string
+          url_base: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          frequencia_horas?: number
+          id?: string
+          nome?: string
+          slug?: string
+          status_coleta?: string
+          tipo_coleta?: string
+          ultima_mensagem?: string | null
+          ultimo_erro_em?: string | null
+          ultimo_sucesso_em?: string | null
+          updated_at?: string
+          url_base?: string
+        }
+        Relationships: []
+      }
+      logs_coleta: {
+        Row: {
+          created_at: string
+          detalhes: Json
+          finalizado_em: string | null
+          fonte_id: string | null
+          fonte_slug: string
+          id: string
+          iniciado_em: string
+          mensagem: string | null
+          status: string
+          total_atualizados: number
+          total_ignorados: number
+          total_itens_lidos: number
+          total_novos: number
+        }
+        Insert: {
+          created_at?: string
+          detalhes?: Json
+          finalizado_em?: string | null
+          fonte_id?: string | null
+          fonte_slug: string
+          id?: string
+          iniciado_em?: string
+          mensagem?: string | null
+          status?: string
+          total_atualizados?: number
+          total_ignorados?: number
+          total_itens_lidos?: number
+          total_novos?: number
+        }
+        Update: {
+          created_at?: string
+          detalhes?: Json
+          finalizado_em?: string | null
+          fonte_id?: string | null
+          fonte_slug?: string
+          id?: string
+          iniciado_em?: string
+          mensagem?: string | null
+          status?: string
+          total_atualizados?: number
+          total_ignorados?: number
+          total_itens_lidos?: number
+          total_novos?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "logs_coleta_fonte_id_fkey"
+            columns: ["fonte_id"]
+            isOneToOne: false
+            referencedRelation: "fontes_monitoradas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
       [_ in never]: never

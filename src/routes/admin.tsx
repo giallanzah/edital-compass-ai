@@ -17,6 +17,8 @@ const MENU = [
   { to: "/admin/usuarios", label: "Usuários" },
   { to: "/admin/projetos", label: "Projetos" },
   { to: "/admin/editais", label: "Editais" },
+  { to: "/admin/fontes", label: "Fontes do robô" },
+  { to: "/admin/coletas", label: "Logs de coleta" },
   { to: "/admin/convenios", label: "Convênios" },
   { to: "/admin/municipios", label: "Municípios" },
   { to: "/admin/estados", label: "Estados" },
