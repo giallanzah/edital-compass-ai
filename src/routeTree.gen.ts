@@ -33,12 +33,14 @@ import { Route as AdminIntegracoesRouteImport } from './routes/admin.integracoes
 import { Route as AdminInstituicoesRouteImport } from './routes/admin.instituicoes'
 import { Route as AdminIndicadoresRouteImport } from './routes/admin.indicadores'
 import { Route as AdminIaRouteImport } from './routes/admin.ia'
+import { Route as AdminFontesRouteImport } from './routes/admin.fontes'
 import { Route as AdminFinanceiroRouteImport } from './routes/admin.financeiro'
 import { Route as AdminEstadosRouteImport } from './routes/admin.estados'
 import { Route as AdminEmpresasRouteImport } from './routes/admin.empresas'
 import { Route as AdminEditaisRouteImport } from './routes/admin.editais'
 import { Route as AdminConveniosRouteImport } from './routes/admin.convenios'
 import { Route as AdminConfiguracoesRouteImport } from './routes/admin.configuracoes'
+import { Route as AdminColetasRouteImport } from './routes/admin.coletas'
 import { Route as AdminApisRouteImport } from './routes/admin.apis'
 import { Route as AdminAnalistasRouteImport } from './routes/admin.analistas'
 import { Route as PortalEditaisIdRouteImport } from './routes/portal.editais.$id'
@@ -164,6 +166,11 @@ const AdminIaRoute = AdminIaRouteImport.update({
   path: '/ia',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminFontesRoute = AdminFontesRouteImport.update({
+  id: '/fontes',
+  path: '/fontes',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminFinanceiroRoute = AdminFinanceiroRouteImport.update({
   id: '/financeiro',
   path: '/financeiro',
@@ -194,6 +201,11 @@ const AdminConfiguracoesRoute = AdminConfiguracoesRouteImport.update({
   path: '/configuracoes',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminColetasRoute = AdminColetasRouteImport.update({
+  id: '/coletas',
+  path: '/coletas',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminApisRoute = AdminApisRouteImport.update({
   id: '/apis',
   path: '/apis',
@@ -221,12 +233,14 @@ export interface FileRoutesByFullPath {
   '/portal': typeof PortalRouteWithChildren
   '/admin/analistas': typeof AdminAnalistasRoute
   '/admin/apis': typeof AdminApisRoute
+  '/admin/coletas': typeof AdminColetasRoute
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
   '/admin/convenios': typeof AdminConveniosRoute
   '/admin/editais': typeof AdminEditaisRoute
   '/admin/empresas': typeof AdminEmpresasRoute
   '/admin/estados': typeof AdminEstadosRoute
   '/admin/financeiro': typeof AdminFinanceiroRoute
+  '/admin/fontes': typeof AdminFontesRoute
   '/admin/ia': typeof AdminIaRoute
   '/admin/indicadores': typeof AdminIndicadoresRoute
   '/admin/instituicoes': typeof AdminInstituicoesRoute
@@ -255,12 +269,14 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin/analistas': typeof AdminAnalistasRoute
   '/admin/apis': typeof AdminApisRoute
+  '/admin/coletas': typeof AdminColetasRoute
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
   '/admin/convenios': typeof AdminConveniosRoute
   '/admin/editais': typeof AdminEditaisRoute
   '/admin/empresas': typeof AdminEmpresasRoute
   '/admin/estados': typeof AdminEstadosRoute
   '/admin/financeiro': typeof AdminFinanceiroRoute
+  '/admin/fontes': typeof AdminFontesRoute
   '/admin/ia': typeof AdminIaRoute
   '/admin/indicadores': typeof AdminIndicadoresRoute
   '/admin/instituicoes': typeof AdminInstituicoesRoute
@@ -292,12 +308,14 @@ export interface FileRoutesById {
   '/portal': typeof PortalRouteWithChildren
   '/admin/analistas': typeof AdminAnalistasRoute
   '/admin/apis': typeof AdminApisRoute
+  '/admin/coletas': typeof AdminColetasRoute
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
   '/admin/convenios': typeof AdminConveniosRoute
   '/admin/editais': typeof AdminEditaisRoute
   '/admin/empresas': typeof AdminEmpresasRoute
   '/admin/estados': typeof AdminEstadosRoute
   '/admin/financeiro': typeof AdminFinanceiroRoute
+  '/admin/fontes': typeof AdminFontesRoute
   '/admin/ia': typeof AdminIaRoute
   '/admin/indicadores': typeof AdminIndicadoresRoute
   '/admin/instituicoes': typeof AdminInstituicoesRoute
@@ -330,12 +348,14 @@ export interface FileRouteTypes {
     | '/portal'
     | '/admin/analistas'
     | '/admin/apis'
+    | '/admin/coletas'
     | '/admin/configuracoes'
     | '/admin/convenios'
     | '/admin/editais'
     | '/admin/empresas'
     | '/admin/estados'
     | '/admin/financeiro'
+    | '/admin/fontes'
     | '/admin/ia'
     | '/admin/indicadores'
     | '/admin/instituicoes'
@@ -364,12 +384,14 @@ export interface FileRouteTypes {
     | '/'
     | '/admin/analistas'
     | '/admin/apis'
+    | '/admin/coletas'
     | '/admin/configuracoes'
     | '/admin/convenios'
     | '/admin/editais'
     | '/admin/empresas'
     | '/admin/estados'
     | '/admin/financeiro'
+    | '/admin/fontes'
     | '/admin/ia'
     | '/admin/indicadores'
     | '/admin/instituicoes'
@@ -400,12 +422,14 @@ export interface FileRouteTypes {
     | '/portal'
     | '/admin/analistas'
     | '/admin/apis'
+    | '/admin/coletas'
     | '/admin/configuracoes'
     | '/admin/convenios'
     | '/admin/editais'
     | '/admin/empresas'
     | '/admin/estados'
     | '/admin/financeiro'
+    | '/admin/fontes'
     | '/admin/ia'
     | '/admin/indicadores'
     | '/admin/instituicoes'
@@ -608,6 +632,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIaRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/fontes': {
+      id: '/admin/fontes'
+      path: '/fontes'
+      fullPath: '/admin/fontes'
+      preLoaderRoute: typeof AdminFontesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/financeiro': {
       id: '/admin/financeiro'
       path: '/financeiro'
@@ -650,6 +681,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminConfiguracoesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/coletas': {
+      id: '/admin/coletas'
+      path: '/coletas'
+      fullPath: '/admin/coletas'
+      preLoaderRoute: typeof AdminColetasRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/apis': {
       id: '/admin/apis'
       path: '/apis'
@@ -684,12 +722,14 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminAnalistasRoute: typeof AdminAnalistasRoute
   AdminApisRoute: typeof AdminApisRoute
+  AdminColetasRoute: typeof AdminColetasRoute
   AdminConfiguracoesRoute: typeof AdminConfiguracoesRoute
   AdminConveniosRoute: typeof AdminConveniosRoute
   AdminEditaisRoute: typeof AdminEditaisRoute
   AdminEmpresasRoute: typeof AdminEmpresasRoute
   AdminEstadosRoute: typeof AdminEstadosRoute
   AdminFinanceiroRoute: typeof AdminFinanceiroRoute
+  AdminFontesRoute: typeof AdminFontesRoute
   AdminIaRoute: typeof AdminIaRoute
   AdminIndicadoresRoute: typeof AdminIndicadoresRoute
   AdminInstituicoesRoute: typeof AdminInstituicoesRoute
@@ -711,12 +751,14 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAnalistasRoute: AdminAnalistasRoute,
   AdminApisRoute: AdminApisRoute,
+  AdminColetasRoute: AdminColetasRoute,
   AdminConfiguracoesRoute: AdminConfiguracoesRoute,
   AdminConveniosRoute: AdminConveniosRoute,
   AdminEditaisRoute: AdminEditaisRoute,
   AdminEmpresasRoute: AdminEmpresasRoute,
   AdminEstadosRoute: AdminEstadosRoute,
   AdminFinanceiroRoute: AdminFinanceiroRoute,
+  AdminFontesRoute: AdminFontesRoute,
   AdminIaRoute: AdminIaRoute,
   AdminIndicadoresRoute: AdminIndicadoresRoute,
   AdminInstituicoesRoute: AdminInstituicoesRoute,
