@@ -20,6 +20,8 @@ import { Route as PortalConhecimentoRouteImport } from './routes/portal.conhecim
 import { Route as PortalCandidaturasRouteImport } from './routes/portal.candidaturas'
 import { Route as AdminUsuariosRouteImport } from './routes/admin.usuarios'
 import { Route as AdminScrapersRouteImport } from './routes/admin.scrapers'
+import { Route as AdminRecuperarSenhaRouteImport } from './routes/admin.recuperar-senha'
+import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminEditaisRouteImport } from './routes/admin.editais'
 import { Route as AdminConfiguracoesRouteImport } from './routes/admin.configuracoes'
 import { Route as PortalEditaisIdRouteImport } from './routes/portal.editais.$id'
@@ -79,6 +81,16 @@ const AdminScrapersRoute = AdminScrapersRouteImport.update({
   path: '/scrapers',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminRecuperarSenhaRoute = AdminRecuperarSenhaRouteImport.update({
+  id: '/recuperar-senha',
+  path: '/recuperar-senha',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminEditaisRoute = AdminEditaisRouteImport.update({
   id: '/editais',
   path: '/editais',
@@ -101,6 +113,8 @@ export interface FileRoutesByFullPath {
   '/portal': typeof PortalRouteWithChildren
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
   '/admin/editais': typeof AdminEditaisRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/recuperar-senha': typeof AdminRecuperarSenhaRoute
   '/admin/scrapers': typeof AdminScrapersRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/portal/candidaturas': typeof PortalCandidaturasRoute
@@ -115,6 +129,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
   '/admin/editais': typeof AdminEditaisRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/recuperar-senha': typeof AdminRecuperarSenhaRoute
   '/admin/scrapers': typeof AdminScrapersRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/portal/candidaturas': typeof PortalCandidaturasRoute
@@ -132,6 +148,8 @@ export interface FileRoutesById {
   '/portal': typeof PortalRouteWithChildren
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
   '/admin/editais': typeof AdminEditaisRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/recuperar-senha': typeof AdminRecuperarSenhaRoute
   '/admin/scrapers': typeof AdminScrapersRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/portal/candidaturas': typeof PortalCandidaturasRoute
@@ -150,6 +168,8 @@ export interface FileRouteTypes {
     | '/portal'
     | '/admin/configuracoes'
     | '/admin/editais'
+    | '/admin/login'
+    | '/admin/recuperar-senha'
     | '/admin/scrapers'
     | '/admin/usuarios'
     | '/portal/candidaturas'
@@ -164,6 +184,8 @@ export interface FileRouteTypes {
     | '/'
     | '/admin/configuracoes'
     | '/admin/editais'
+    | '/admin/login'
+    | '/admin/recuperar-senha'
     | '/admin/scrapers'
     | '/admin/usuarios'
     | '/portal/candidaturas'
@@ -180,6 +202,8 @@ export interface FileRouteTypes {
     | '/portal'
     | '/admin/configuracoes'
     | '/admin/editais'
+    | '/admin/login'
+    | '/admin/recuperar-senha'
     | '/admin/scrapers'
     | '/admin/usuarios'
     | '/portal/candidaturas'
@@ -276,6 +300,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminScrapersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/recuperar-senha': {
+      id: '/admin/recuperar-senha'
+      path: '/recuperar-senha'
+      fullPath: '/admin/recuperar-senha'
+      preLoaderRoute: typeof AdminRecuperarSenhaRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/editais': {
       id: '/admin/editais'
       path: '/editais'
@@ -303,6 +341,8 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminConfiguracoesRoute: typeof AdminConfiguracoesRoute
   AdminEditaisRoute: typeof AdminEditaisRoute
+  AdminLoginRoute: typeof AdminLoginRoute
+  AdminRecuperarSenhaRoute: typeof AdminRecuperarSenhaRoute
   AdminScrapersRoute: typeof AdminScrapersRoute
   AdminUsuariosRoute: typeof AdminUsuariosRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -311,6 +351,8 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminConfiguracoesRoute: AdminConfiguracoesRoute,
   AdminEditaisRoute: AdminEditaisRoute,
+  AdminLoginRoute: AdminLoginRoute,
+  AdminRecuperarSenhaRoute: AdminRecuperarSenhaRoute,
   AdminScrapersRoute: AdminScrapersRoute,
   AdminUsuariosRoute: AdminUsuariosRoute,
   AdminIndexRoute: AdminIndexRoute,
@@ -357,13 +399,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
