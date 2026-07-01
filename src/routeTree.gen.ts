@@ -42,6 +42,7 @@ import { Route as AdminConfiguracoesRouteImport } from './routes/admin.configura
 import { Route as AdminApisRouteImport } from './routes/admin.apis'
 import { Route as AdminAnalistasRouteImport } from './routes/admin.analistas'
 import { Route as PortalEditaisIdRouteImport } from './routes/portal.editais.$id'
+import { Route as ApiPublicCronScrapeRouteImport } from './routes/api/public/cron/scrape'
 
 const PortalRoute = PortalRouteImport.update({
   id: '/portal',
@@ -208,6 +209,11 @@ const PortalEditaisIdRoute = PortalEditaisIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => PortalEditaisRoute,
 } as any)
+const ApiPublicCronScrapeRoute = ApiPublicCronScrapeRouteImport.update({
+  id: '/api/public/cron/scrape',
+  path: '/api/public/cron/scrape',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -243,6 +249,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/portal/': typeof PortalIndexRoute
   '/portal/editais/$id': typeof PortalEditaisIdRoute
+  '/api/public/cron/scrape': typeof ApiPublicCronScrapeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -276,6 +283,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/portal': typeof PortalIndexRoute
   '/portal/editais/$id': typeof PortalEditaisIdRoute
+  '/api/public/cron/scrape': typeof ApiPublicCronScrapeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -312,6 +320,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/portal/': typeof PortalIndexRoute
   '/portal/editais/$id': typeof PortalEditaisIdRoute
+  '/api/public/cron/scrape': typeof ApiPublicCronScrapeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -349,6 +358,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/portal/'
     | '/portal/editais/$id'
+    | '/api/public/cron/scrape'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -382,6 +392,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/portal'
     | '/portal/editais/$id'
+    | '/api/public/cron/scrape'
   id:
     | '__root__'
     | '/'
@@ -417,12 +428,14 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/portal/'
     | '/portal/editais/$id'
+    | '/api/public/cron/scrape'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
   PortalRoute: typeof PortalRouteWithChildren
+  ApiPublicCronScrapeRoute: typeof ApiPublicCronScrapeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -658,6 +671,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalEditaisIdRouteImport
       parentRoute: typeof PortalEditaisRoute
     }
+    '/api/public/cron/scrape': {
+      id: '/api/public/cron/scrape'
+      path: '/api/public/cron/scrape'
+      fullPath: '/api/public/cron/scrape'
+      preLoaderRoute: typeof ApiPublicCronScrapeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -752,6 +772,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   PortalRoute: PortalRouteWithChildren,
+  ApiPublicCronScrapeRoute: ApiPublicCronScrapeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
