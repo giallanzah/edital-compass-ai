@@ -132,7 +132,7 @@ function AccessDenied({ session }: { session: AdminSession }) {
           <button
             onClick={() => {
               adminLogout();
-              navigate({ to: "/admin/login" });
+              navigate({ to: "/admin/login", search: { reason: "unauthorized" } });
             }}
             className="inline-flex h-9 items-center rounded-sm bg-foreground px-4 text-sm font-medium text-background"
           >
