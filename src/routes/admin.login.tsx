@@ -15,16 +15,24 @@ function AdminLogin() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setLoading(true);
     try {
-      adminLogin(email, password);
+      const session = adminLogin(email, password);
+      // Verificação explícita do role antes de redirecionar
+      if (!hasAdminAccess(session.role)) {
+        adminLogout();
+        throw new Error(
+          "Sua conta não possui perfil ADMIN ou SUPER_ADMIN.",
+        );
+      }
+      // Pequeno delay para garantir que a sessão foi persistida
+      await new Promise((r) => setTimeout(r, 50));
       navigate({ to: "/admin" });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao autenticar.");
-    } finally {
       setLoading(false);
     }
   }
