@@ -100,6 +100,20 @@ function AdminLayout() {
   );
 }
 
+function AdminLoading({ label }: { label: string }) {
+  return (
+    <div className="flex min-h-screen items-center justify-center px-6">
+      <div className="flex flex-col items-center gap-4">
+        <Logo />
+        <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+          <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-foreground" />
+          {label}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AccessDenied({ session }: { session: AdminSession }) {
   const navigate = useNavigate();
   return (
