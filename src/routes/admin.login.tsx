@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { adminLogin } from "@/lib/adminAuth";
+import { adminLogin, hasAdminAccess, adminLogout } from "@/lib/adminAuth";
 import { Logo } from "@/components/Logo";
 
 export const Route = createFileRoute("/admin/login")({
