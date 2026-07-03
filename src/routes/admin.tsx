@@ -49,6 +49,7 @@ function AdminLayout() {
   const isPublic = PUBLIC.some((p) => pathname === p);
 
   useEffect(() => {
+    // Só redireciona quando temos certeza que não há sessão (não durante hidratação)
     if (!isPublic && session === null) {
       navigate({ to: "/admin/login" });
     }
@@ -58,8 +59,18 @@ function AdminLayout() {
     return <Outlet />;
   }
 
-  if (session === undefined || session === null) return null;
+  // Estado de carregamento explícito enquanto a sessão está sendo hidratada
+  if (session === undefined) {
+    return <AdminLoading label="Verificando sessão…" />;
+  }
 
+  // Sessão inexistente — o useEffect acima já disparou o redirect;
+  // enquanto navega, mantemos o loading para evitar flash de conteúdo protegido
+  if (session === null) {
+    return <AdminLoading label="Redirecionando para login…" />;
+  }
+
+  // Confirmação explícita do role antes de renderizar o backoffice
   if (!hasAdminAccess(session.role)) {
     return <AccessDenied session={session} />;
   }
@@ -86,6 +97,20 @@ function AdminLayout() {
       }
       items={MENU}
     />
+  );
+}
+
+function AdminLoading({ label }: { label: string }) {
+  return (
+    <div className="flex min-h-screen items-center justify-center px-6">
+      <div className="flex flex-col items-center gap-4">
+        <Logo />
+        <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+          <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-foreground" />
+          {label}
+        </div>
+      </div>
+    </div>
   );
 }
 
