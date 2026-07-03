@@ -48,18 +48,17 @@ function AdminLayout() {
 
   const isPublic = PUBLIC.some((p) => pathname === p);
 
+  useEffect(() => {
+    if (!isPublic && session === null) {
+      navigate({ to: "/admin/login" });
+    }
+  }, [isPublic, session, navigate]);
+
   if (isPublic) {
     return <Outlet />;
   }
 
-  if (session === undefined) return null; // hydrating
-
-  if (!session) {
-    if (typeof window !== "undefined") {
-      navigate({ to: "/admin/login" });
-    }
-    return null;
-  }
+  if (session === undefined || session === null) return null;
 
   if (!hasAdminAccess(session.role)) {
     return <AccessDenied session={session} />;
