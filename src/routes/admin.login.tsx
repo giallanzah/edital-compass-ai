@@ -96,6 +96,31 @@ function AdminLogin() {
             <span className="font-mono">SUPER_ADMIN</span>.
           </p>
 
+          {/* Estado: verificando sessão existente */}
+          {sessionStatus === "checking" && (
+            <div className="mt-6 flex items-center gap-3 rounded-sm border border-[var(--hairline)] bg-secondary px-4 py-3">
+              <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-foreground" />
+              <span className="text-sm text-muted-foreground">Verificando sua sessão…</span>
+            </div>
+          )}
+
+          {/* Motivo do redirect: sessão expirada ou ausente */}
+          {sessionStatus === "no_session" && reason === "no_session" && (
+            <div className="mt-6 rounded-sm border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-700 dark:text-amber-400">
+              Sua sessão expirou ou você não está autenticado. Faça login novamente para continuar.
+            </div>
+          )}
+
+          {/* Motivo do redirect: role insuficiente */}
+          {(sessionStatus === "unauthorized" || reason === "unauthorized") && (
+            <div className="mt-6 rounded-sm border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+              <strong className="block mb-1">Acesso negado</strong>
+              Sua conta não possui perfil de administrador. O acesso ao backoffice é restrito a perfis{" "}
+              <span className="font-mono">ADMIN</span> ou <span className="font-mono">SUPER_ADMIN</span>.
+              Entre em contato com o responsável pela plataforma para solicitar acesso.
+            </div>
+          )}
+
           <form onSubmit={onSubmit} className="mt-8 space-y-5">
             <div>
               <label className="eyebrow mb-1.5 block">E-mail</label>
