@@ -51,7 +51,7 @@ function AdminLayout() {
   useEffect(() => {
     // Só redireciona quando temos certeza que não há sessão (não durante hidratação)
     if (!isPublic && session === null) {
-      navigate({ to: "/admin/login" });
+      navigate({ to: "/admin/login", search: { reason: "no_session" } });
     }
   }, [isPublic, session, navigate]);
 
