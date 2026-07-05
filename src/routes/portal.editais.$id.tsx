@@ -22,9 +22,23 @@ const STATUS_LABEL: Record<string, string> = {
 function EditalDetail() {
   const { id } = Route.useParams();
   const fn = useServerFn(getEdital);
+  const matchFn = useServerFn(computeMatch);
   const { data, isLoading } = useQuery({
     queryKey: ["edital", id],
     queryFn: () => fn({ data: { id } }),
+  });
+
+  const [session, setSession] = useState<Session | null | undefined>(undefined);
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setSession(data.session));
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setSession(s));
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  const matchQ = useQuery({
+    queryKey: ["match", id, session?.user?.id ?? ""],
+    queryFn: () => matchFn({ data: { editalId: id } }),
+    enabled: !!session,
   });
 
   if (isLoading) return <div className="p-10 text-sm text-muted-foreground">Carregando…</div>;
