@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /portal/projetos
+Disallow: /portal/perfil
+Disallow: /portal/onboarding
+
+Sitemap: https://edital-compass-ai.lovable.app/sitemap.xml
