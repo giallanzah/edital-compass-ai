@@ -1,10 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { listEditais, contagemPorFonte, type EditalResumo } from "@/lib/scrape.functions";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/portal/editais")({
+  head: () => ({
+    meta: [
+      { title: "Editais e linhas de fomento · fomenta.ai" },
+      { name: "description", content: "Catálogo de editais de CNPq, FINEP, SEBRAE e BNDES atualizado várias vezes ao dia." },
+    ],
+  }),
   component: EditaisList,
 });
 
@@ -15,12 +22,6 @@ const STATUS_LABEL: Record<string, string> = {
   encerrando_em_breve: "Encerrando em breve",
   encerrado: "Encerrado",
   sem_prazo: "Sem prazo",
-};
-const FALLBACK_CONTAGEM: Record<string, number> = {
-  CNPq: 47,
-  FINEP: 32,
-  SEBRAE: 54,
-  BNDES: 28,
 };
 
 function EditaisList() {
@@ -39,23 +40,17 @@ function EditaisList() {
   const contQ = useQuery({ queryKey: ["contagem-fonte"], queryFn: () => cont() });
 
   const items = editaisQ.data?.items ?? [];
-  const contagem = useMemo(() => {
-    const real = contQ.data?.porFonte ?? {};
-    const useReal = (contQ.data?.total ?? 0) > 0;
-    return useReal ? real : FALLBACK_CONTAGEM;
-  }, [contQ.data]);
-  const totalReal = contQ.data?.total ?? 0;
-  const totalMostrado = totalReal > 0 ? totalReal : 8;
+  const contagem = contQ.data?.porFonte ?? {};
+  const total = contQ.data?.total ?? 0;
 
   return (
     <div className="mx-auto max-w-7xl px-8 py-10">
       <div className="eyebrow mb-2">Catálogo</div>
       <h1 className="text-3xl font-medium tracking-tight">Editais & linhas de fomento</h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        Dados atualizados pelo robô Fomenta a partir de CNPq, FINEP, SEBRAE e BNDES.
+        Dados coletados automaticamente de CNPq, FINEP, SEBRAE e BNDES — atualizados 4x ao dia.
       </p>
 
-      {/* Search */}
       <div className="mt-8 hairline flex items-center bg-card">
         <span className="px-4 font-mono text-xs text-muted-foreground">⌕</span>
         <input
@@ -66,9 +61,8 @@ function EditaisList() {
         />
       </div>
 
-      {/* Chips por fonte */}
       <div className="mt-4 flex flex-wrap gap-2">
-        <Chip active={!fonte} label="Todos" count={totalMostrado} onClick={() => setFonte(null)} />
+        <Chip active={!fonte} label="Todos" count={total} onClick={() => setFonte(null)} />
         {FONTES.map((f) => (
           <Chip
             key={f}
@@ -86,21 +80,13 @@ function EditaisList() {
             <div className="eyebrow mb-3">Status</div>
             <ul className="space-y-1.5 text-sm">
               <li>
-                <button
-                  onClick={() => setStatus(null)}
-                  className={!status ? "font-medium" : "text-muted-foreground hover:text-foreground"}
-                >
-                  Todos
-                </button>
+                <button onClick={() => setStatus(null)}
+                  className={!status ? "font-medium" : "text-muted-foreground hover:text-foreground"}>Todos</button>
               </li>
               {Object.entries(STATUS_LABEL).map(([k, label]) => (
                 <li key={k}>
-                  <button
-                    onClick={() => setStatus(k)}
-                    className={status === k ? "font-medium" : "text-muted-foreground hover:text-foreground"}
-                  >
-                    {label}
-                  </button>
+                  <button onClick={() => setStatus(k)}
+                    className={status === k ? "font-medium" : "text-muted-foreground hover:text-foreground"}>{label}</button>
                 </li>
               ))}
             </ul>
@@ -112,21 +98,31 @@ function EditaisList() {
             <span className="font-mono">
               {editaisQ.isLoading ? "carregando…" : `${items.length} resultados`}
             </span>
-            {contQ.data?.total === 0 && (
+            {total === 0 && !contQ.isLoading && (
               <span className="font-mono text-[10px]">
                 banco vazio — rode o robô no backoffice
               </span>
             )}
           </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            {items.map((e) => (
-              <EditalCard key={e.id} e={e} />
-            ))}
-          </div>
-          {!editaisQ.isLoading && items.length === 0 && (
+
+          {editaisQ.isLoading ? (
+            <div className="grid gap-4 md:grid-cols-2">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="hairline p-5 space-y-3">
+                  <Skeleton className="h-3 w-24" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-4/5" />
+                  <Skeleton className="h-3 w-1/3" />
+                </div>
+              ))}
+            </div>
+          ) : items.length === 0 ? (
             <div className="hairline p-12 text-center text-sm text-muted-foreground">
-              Nenhum edital encontrado com esses filtros. Se o banco estiver vazio, execute
-              a coleta em <span className="font-mono">/admin/fontes</span>.
+              Nenhum edital encontrado com esses filtros.
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2">
+              {items.map((e) => <EditalCard key={e.id} e={e} />)}
             </div>
           )}
         </div>
@@ -136,16 +132,8 @@ function EditaisList() {
 }
 
 function Chip({
-  active,
-  label,
-  count,
-  onClick,
-}: {
-  active: boolean;
-  label: string;
-  count: number;
-  onClick: () => void;
-}) {
+  active, label, count, onClick,
+}: { active: boolean; label: string; count: number; onClick: () => void }) {
   return (
     <button
       onClick={onClick}
@@ -163,6 +151,7 @@ function EditalCard({ e }: { e: EditalResumo }) {
   const diasRestantes = e.data_encerramento
     ? Math.ceil((new Date(e.data_encerramento).getTime() - Date.now()) / 86_400_000)
     : null;
+  const coletadoEm = new Date(e.coletado_em).toLocaleDateString("pt-BR");
   return (
     <Link
       to="/portal/editais/$id"
@@ -179,13 +168,9 @@ function EditalCard({ e }: { e: EditalResumo }) {
             </>
           )}
         </div>
-        <span
-          className={`rounded-sm px-1.5 py-0.5 font-mono text-[10px] uppercase ${
-            e.status === "aberto"
-              ? "bg-foreground text-background"
-              : "hairline text-muted-foreground"
-          }`}
-        >
+        <span className={`rounded-sm px-1.5 py-0.5 font-mono text-[10px] uppercase ${
+          e.status === "aberto" ? "bg-foreground text-background" : "hairline text-muted-foreground"
+        }`}>
           {STATUS_LABEL[e.status] ?? e.status}
         </span>
       </div>
@@ -201,13 +186,21 @@ function EditalCard({ e }: { e: EditalResumo }) {
         <div className="text-right">
           <div className="eyebrow mb-1">Prazo</div>
           <div className="font-mono text-xs">
-            {diasRestantes === null
-              ? "sem prazo"
-              : diasRestantes > 0
-              ? `${diasRestantes} dias`
-              : "encerrado"}
+            {diasRestantes === null ? "sem prazo" : diasRestantes > 0 ? `${diasRestantes} dias` : "encerrado"}
           </div>
         </div>
+      </div>
+      <div className="mt-4 flex items-center justify-between border-t border-[var(--hairline)] pt-3 font-mono text-[10px] text-muted-foreground">
+        <span>verificado em {coletadoEm}</span>
+        <a
+          href={e.url_original}
+          target="_blank"
+          rel="noreferrer"
+          onClick={(ev) => ev.stopPropagation()}
+          className="hover:text-foreground"
+        >
+          fonte ↗
+        </a>
       </div>
     </Link>
   );
