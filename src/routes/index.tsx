@@ -54,6 +54,18 @@ const features = [
 ];
 
 function Landing() {
+  const statsFn = useServerFn(publicStats);
+  const destFn = useServerFn(editaisDestaque);
+  const statsQ = useQuery({ queryKey: ["landing", "stats"], queryFn: () => statsFn() });
+  const destQ = useQuery({ queryKey: ["landing", "destaque"], queryFn: () => destFn() });
+
+  const stats = [
+    { k: "Editais ativos", v: statsQ.data ? String(statsQ.data.editaisAtivos) : "—" },
+    { k: "Fontes monitoradas", v: statsQ.data ? String(statsQ.data.fontesMonitoradas) : "—" },
+    { k: "Atualização", v: statsQ.data?.frequenciaAtualizacao ?? "—" },
+    { k: "Cobertura", v: "Nacional" },
+  ];
+  const destaques = destQ.data ?? [];
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
