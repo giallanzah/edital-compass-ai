@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { EditalCard } from "@/components/EditalCard";
-import { editais, agencies } from "@/data/editais";
+import { agencies } from "@/data/editais";
+import { publicStats, editaisDestaque } from "@/lib/portal.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -11,19 +13,12 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Descubra, organize e acompanhe editais e linhas de fomento de CNPq, FINEP, SEBRAE, BNDES, FAPs e Lei do Bem em uma única plataforma.",
+          "Descubra, organize e acompanhe editais e linhas de fomento de CNPq, FINEP, SEBRAE e BNDES em uma única plataforma.",
       },
     ],
   }),
   component: Landing,
 });
-
-const stats = [
-  { k: "Editais ativos", v: "400+" },
-  { k: "Órgãos fomentadores", v: "90+" },
-  { k: "Recursos disponíveis", v: "R$ 19B" },
-  { k: "Empresas elegíveis", v: "600K+" },
-];
 
 const features = [
   {
@@ -59,6 +54,18 @@ const features = [
 ];
 
 function Landing() {
+  const statsFn = useServerFn(publicStats);
+  const destFn = useServerFn(editaisDestaque);
+  const statsQ = useQuery({ queryKey: ["landing", "stats"], queryFn: () => statsFn() });
+  const destQ = useQuery({ queryKey: ["landing", "destaque"], queryFn: () => destFn() });
+
+  const stats = [
+    { k: "Editais ativos", v: statsQ.data ? String(statsQ.data.editaisAtivos) : "—" },
+    { k: "Fontes monitoradas", v: statsQ.data ? String(statsQ.data.fontesMonitoradas) : "—" },
+    { k: "Atualização", v: statsQ.data?.frequenciaAtualizacao ?? "—" },
+    { k: "Cobertura", v: "Nacional" },
+  ];
+  const destaques = destQ.data ?? [];
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
@@ -169,9 +176,48 @@ function Landing() {
             </Link>
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {editais.slice(0, 6).map((e) => (
-              <EditalCard key={e.id} e={e} />
-            ))}
+            {destQ.isLoading && destaques.length === 0
+              ? Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="hairline p-5">
+                    <div className="h-3 w-24 animate-pulse bg-secondary" />
+                    <div className="mt-3 h-4 w-full animate-pulse bg-secondary" />
+                    <div className="mt-2 h-4 w-3/4 animate-pulse bg-secondary" />
+                  </div>
+                ))
+              : destaques.map((e) => (
+                  <Link
+                    key={e.id}
+                    to="/portal/editais/$id"
+                    params={{ id: e.id }}
+                    className="hairline block bg-card p-5 hover:border-foreground"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="eyebrow">{e.fonte}</span>
+                      {e.tipo_apoio && (
+                        <>
+                          <span className="h-1 w-1 rounded-full bg-border" />
+                          <span className="eyebrow">{e.tipo_apoio}</span>
+                        </>
+                      )}
+                    </div>
+                    <h3 className="mt-3 line-clamp-2 text-[15px] font-medium leading-snug">
+                      {e.titulo}
+                    </h3>
+                    {e.descricao_curta && (
+                      <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
+                        {e.descricao_curta}
+                      </p>
+                    )}
+                    <div className="mt-4 font-mono text-[10px] text-muted-foreground">
+                      {e.abrangencia ?? "—"} · {e.status}
+                    </div>
+                  </Link>
+                ))}
+            {!destQ.isLoading && destaques.length === 0 && (
+              <div className="col-span-full hairline p-12 text-center text-sm text-muted-foreground">
+                Nenhum edital em destaque no momento.
+              </div>
+            )}
           </div>
         </div>
       </section>
