@@ -8,6 +8,32 @@ import { computeMatch } from "@/lib/portal.functions";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/portal/editais/$id")({
+  // Loader server-side: o HTML inicial já vem com o conteúdo do edital (SSR/SEO).
+  loader: async ({ params }) => {
+    return await getEdital({ data: { id: params.id } });
+  },
+  head: ({ loaderData }) => {
+    const e = loaderData?.edital as
+      | { titulo: string; descricao_curta: string | null; fonte: string }
+      | undefined;
+    if (!e) {
+      return { meta: [{ title: "Edital não encontrado · fomenta.ai" }] };
+    }
+    const title = `${e.titulo} — prazo, valores e elegibilidade | fomenta.ai`;
+    const description =
+      e.descricao_curta ??
+      `${e.titulo} (${e.fonte}): datas, valores, elegibilidade e link para a fonte oficial.`;
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+      ],
+    };
+  },
   component: EditalDetail,
 });
 
@@ -21,12 +47,8 @@ const STATUS_LABEL: Record<string, string> = {
 
 function EditalDetail() {
   const { id } = Route.useParams();
-  const fn = useServerFn(getEdital);
+  const data = Route.useLoaderData();
   const matchFn = useServerFn(computeMatch);
-  const { data, isLoading } = useQuery({
-    queryKey: ["edital", id],
-    queryFn: () => fn({ data: { id } }),
-  });
 
   const [session, setSession] = useState<Session | null | undefined>(undefined);
   useEffect(() => {
@@ -37,11 +59,10 @@ function EditalDetail() {
 
   const matchQ = useQuery({
     queryKey: ["match", id, session?.user?.id ?? ""],
-    queryFn: () => matchFn({ data: { editalId: id } }),
-    enabled: !!session,
+    queryFn: () => matchFn({ data: { editalId: (data?.edital as { id: string }).id } }),
+    enabled: !!session && !!data?.edital,
   });
 
-  if (isLoading) return <div className="p-10 text-sm text-muted-foreground">Carregando…</div>;
   if (!data) {
     return (
       <div className="p-10 text-sm text-muted-foreground">
@@ -233,9 +254,12 @@ function EditalDetail() {
           ) : null}
 
           <div className="hairline mt-6 p-4 text-xs text-muted-foreground">
-            <div className="eyebrow mb-2">Coleta</div>
-            <div className="font-mono">
-              Coletado em {new Date(e.coletado_em).toLocaleString("pt-BR")}
+            <div className="eyebrow mb-2">Fonte oficial</div>
+            <a href={e.url_original} target="_blank" rel="noreferrer" className="break-all underline">
+              {e.url_original}
+            </a>
+            <div className="mt-2 font-mono">
+              Verificado em {new Date(e.coletado_em).toLocaleString("pt-BR")}
             </div>
             <div className="mt-1 font-mono">Fonte: {e.fonte}</div>
             <div className="mt-1 font-mono">Publicação: {fmt(e.data_publicacao)}</div>
