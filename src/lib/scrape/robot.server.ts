@@ -75,23 +75,50 @@ function getFirecrawl(): Firecrawl {
   return new Firecrawl({ apiKey });
 }
 
+const MAX_TENTATIVAS = 3;
+const RETRYABLE_RE = /5\d{2}|timeout|timed?[ _-]?out|ECONN|ETIMEDOUT|network|socket|rate.?limit|429/i;
+
+function sleep(ms: number) {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
 async function extractFromUrl(url: string): Promise<ExtractedEdital[]> {
   const fc = getFirecrawl();
-  const result: unknown = await fc.scrape(url, {
-    formats: [
-      {
-        type: "json",
-        schema: EXTRACTION_SCHEMA,
-        prompt:
-          "Extraia todos os editais, chamadas públicas ou oportunidades de fomento listados. Ignore itens de navegação e notícias.",
-      },
-    ],
-    onlyMainContent: true,
-  });
-  const json =
-    (result as { json?: { editais?: ExtractedEdital[] } })?.json ??
-    (result as { data?: { json?: { editais?: ExtractedEdital[] } } })?.data?.json;
-  return json?.editais ?? [];
+  let lastError: unknown;
+
+  for (let tentativa = 1; tentativa <= MAX_TENTATIVAS; tentativa++) {
+    try {
+      const result: unknown = await fc.scrape(url, {
+        formats: [
+          {
+            type: "json",
+            schema: EXTRACTION_SCHEMA,
+            prompt:
+              "Extraia todos os editais, chamadas públicas ou oportunidades de fomento listados. Ignore itens de navegação e notícias.",
+          },
+        ],
+        onlyMainContent: true,
+        // Páginas gov.br são pesadas e lentas (CNPq responde 524 via proxy):
+        // espera o JS renderizar e dá folga generosa antes de desistir.
+        waitFor: 5000,
+        timeout: 120000,
+      });
+      const json =
+        (result as { json?: { editais?: ExtractedEdital[] } })?.json ??
+        (result as { data?: { json?: { editais?: ExtractedEdital[] } } })?.data?.json;
+      return json?.editais ?? [];
+    } catch (e) {
+      lastError = e;
+      const msg = e instanceof Error ? e.message : String(e);
+      const retryable = RETRYABLE_RE.test(msg);
+      console.warn(
+        `[scraper] tentativa ${tentativa}/${MAX_TENTATIVAS} falhou para ${url}: ${msg}${retryable && tentativa < MAX_TENTATIVAS ? " — aguardando retry" : ""}`,
+      );
+      if (!retryable || tentativa === MAX_TENTATIVAS) throw e;
+      await sleep(tentativa * 15000); // backoff: 15s, 30s
+    }
+  }
+  throw lastError;
 }
 
 export async function runScrape(fonteSlug: FonteSlug | "todas"): Promise<{
