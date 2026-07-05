@@ -137,7 +137,7 @@ export const updateProjeto = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { id: string; nome?: string; descricao?: string | null }) => input)
   .handler(async ({ data, context }) => {
-    const patch: Record<string, unknown> = {};
+    const patch: { nome?: string; descricao?: string | null } = {};
     if (data.nome !== undefined) patch.nome = data.nome;
     if (data.descricao !== undefined) patch.descricao = data.descricao;
     const { data: row, error } = await context.supabase
