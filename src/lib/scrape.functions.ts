@@ -71,21 +71,25 @@ export const contagemPorFonte = createServerFn({ method: "GET" }).handler(async 
   return { total: data?.length ?? 0, porFonte: map };
 });
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export const getEdital = createServerFn({ method: "GET" })
   .inputValidator((input: { id: string }) => input)
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // Aceita UUID ou slug — URLs públicas usam slug (SEO).
+    const coluna = UUID_RE.test(data.id) ? "id" : "slug";
     const { data: edital, error } = await supabaseAdmin
       .from("editais")
       .select("*")
-      .eq("id", data.id)
+      .eq(coluna, data.id)
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!edital) return null;
     const { data: historico } = await supabaseAdmin
       .from("editais_historico")
       .select("id, hash_conteudo, criado_em")
-      .eq("edital_id", data.id)
+      .eq("edital_id", edital.id)
       .order("criado_em", { ascending: false })
       .limit(10);
     return { edital, historico: historico ?? [] };
