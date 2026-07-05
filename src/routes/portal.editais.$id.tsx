@@ -180,6 +180,58 @@ function EditalDetail() {
           >
             Ver edital na fonte ↗
           </a>
+
+          {/* Match score */}
+          {session === null ? (
+            <div className="hairline p-4">
+              <div className="eyebrow mb-2">Match score</div>
+              <p className="text-xs text-muted-foreground">
+                Entre para calcular a compatibilidade deste edital com sua empresa.
+              </p>
+              <Link
+                to="/portal/login"
+                className="mt-3 inline-flex h-9 w-full items-center justify-center rounded-sm hairline text-xs font-medium hover:bg-secondary"
+              >
+                Entrar
+              </Link>
+            </div>
+          ) : session === undefined || matchQ.isLoading ? (
+            <div className="hairline p-4 text-xs text-muted-foreground">Calculando…</div>
+          ) : matchQ.data && "needsProfile" in matchQ.data ? (
+            <div className="hairline p-4">
+              <div className="eyebrow mb-2">Match score</div>
+              <p className="text-xs text-muted-foreground">
+                Complete seu perfil para ver seu match com este edital.
+              </p>
+              <Link
+                to="/portal/onboarding"
+                className="mt-3 inline-flex h-9 w-full items-center justify-center rounded-sm bg-foreground text-xs font-medium text-background"
+              >
+                Completar perfil
+              </Link>
+            </div>
+          ) : matchQ.data ? (
+            <div className="hairline p-4">
+              <div className="flex items-baseline justify-between">
+                <div className="eyebrow">Match score</div>
+                <div className="font-mono text-3xl">{matchQ.data.score}</div>
+              </div>
+              <ul className="mt-4 space-y-2 text-xs">
+                {matchQ.data.detalhes.map((d) => (
+                  <li key={d.rotulo} className="flex items-start gap-2">
+                    <span className={d.ok ? "text-foreground" : "text-destructive/70"}>
+                      {d.ok ? "✓" : "✗"}
+                    </span>
+                    <span>
+                      <span className="font-medium">{d.rotulo}</span>
+                      {d.nota && <span className="text-muted-foreground"> · {d.nota}</span>}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
           <div className="hairline mt-6 p-4 text-xs text-muted-foreground">
             <div className="eyebrow mb-2">Coleta</div>
             <div className="font-mono">
