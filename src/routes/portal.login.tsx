@@ -17,7 +17,7 @@ function PortalLogin() {
   const [msg, setMsg] = useState<{ tone: "err" | "ok"; text: string } | null>(null);
   const navigate = useNavigate();
 
-  const search = useRouterState({ select: (s) => s.location.search }) as Record<string, unknown>;
+  const search = useRouterState({ select: (s) => s.location.search }) as unknown as Record<string, unknown>;
   const redirectTo = typeof search?.redirect === "string" ? (search.redirect as string) : "/portal";
 
   useEffect(() => {

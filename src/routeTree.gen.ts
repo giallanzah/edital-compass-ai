@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as PortalIndexRouteImport } from './routes/portal.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as PortalProjetosRouteImport } from './routes/portal.projetos'
+import { Route as PortalLoginRouteImport } from './routes/portal.login'
 import { Route as PortalEditaisRouteImport } from './routes/portal.editais'
 import { Route as PortalConhecimentoRouteImport } from './routes/portal.conhecimento'
 import { Route as PortalCandidaturasRouteImport } from './routes/portal.candidaturas'
@@ -74,6 +75,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const PortalProjetosRoute = PortalProjetosRouteImport.update({
   id: '/projetos',
   path: '/projetos',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalLoginRoute = PortalLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => PortalRoute,
 } as any)
 const PortalEditaisRoute = PortalEditaisRouteImport.update({
@@ -259,6 +265,7 @@ export interface FileRoutesByFullPath {
   '/portal/candidaturas': typeof PortalCandidaturasRoute
   '/portal/conhecimento': typeof PortalConhecimentoRoute
   '/portal/editais': typeof PortalEditaisRouteWithChildren
+  '/portal/login': typeof PortalLoginRoute
   '/portal/projetos': typeof PortalProjetosRoute
   '/admin/': typeof AdminIndexRoute
   '/portal/': typeof PortalIndexRoute
@@ -295,6 +302,7 @@ export interface FileRoutesByTo {
   '/portal/candidaturas': typeof PortalCandidaturasRoute
   '/portal/conhecimento': typeof PortalConhecimentoRoute
   '/portal/editais': typeof PortalEditaisRouteWithChildren
+  '/portal/login': typeof PortalLoginRoute
   '/portal/projetos': typeof PortalProjetosRoute
   '/admin': typeof AdminIndexRoute
   '/portal': typeof PortalIndexRoute
@@ -334,6 +342,7 @@ export interface FileRoutesById {
   '/portal/candidaturas': typeof PortalCandidaturasRoute
   '/portal/conhecimento': typeof PortalConhecimentoRoute
   '/portal/editais': typeof PortalEditaisRouteWithChildren
+  '/portal/login': typeof PortalLoginRoute
   '/portal/projetos': typeof PortalProjetosRoute
   '/admin/': typeof AdminIndexRoute
   '/portal/': typeof PortalIndexRoute
@@ -374,6 +383,7 @@ export interface FileRouteTypes {
     | '/portal/candidaturas'
     | '/portal/conhecimento'
     | '/portal/editais'
+    | '/portal/login'
     | '/portal/projetos'
     | '/admin/'
     | '/portal/'
@@ -410,6 +420,7 @@ export interface FileRouteTypes {
     | '/portal/candidaturas'
     | '/portal/conhecimento'
     | '/portal/editais'
+    | '/portal/login'
     | '/portal/projetos'
     | '/admin'
     | '/portal'
@@ -448,6 +459,7 @@ export interface FileRouteTypes {
     | '/portal/candidaturas'
     | '/portal/conhecimento'
     | '/portal/editais'
+    | '/portal/login'
     | '/portal/projetos'
     | '/admin/'
     | '/portal/'
@@ -504,6 +516,13 @@ declare module '@tanstack/react-router' {
       path: '/projetos'
       fullPath: '/portal/projetos'
       preLoaderRoute: typeof PortalProjetosRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/login': {
+      id: '/portal/login'
+      path: '/login'
+      fullPath: '/portal/login'
+      preLoaderRoute: typeof PortalLoginRouteImport
       parentRoute: typeof PortalRoute
     }
     '/portal/editais': {
@@ -795,6 +814,7 @@ interface PortalRouteChildren {
   PortalCandidaturasRoute: typeof PortalCandidaturasRoute
   PortalConhecimentoRoute: typeof PortalConhecimentoRoute
   PortalEditaisRoute: typeof PortalEditaisRouteWithChildren
+  PortalLoginRoute: typeof PortalLoginRoute
   PortalProjetosRoute: typeof PortalProjetosRoute
   PortalIndexRoute: typeof PortalIndexRoute
 }
@@ -803,6 +823,7 @@ const PortalRouteChildren: PortalRouteChildren = {
   PortalCandidaturasRoute: PortalCandidaturasRoute,
   PortalConhecimentoRoute: PortalConhecimentoRoute,
   PortalEditaisRoute: PortalEditaisRouteWithChildren,
+  PortalLoginRoute: PortalLoginRoute,
   PortalProjetosRoute: PortalProjetosRoute,
   PortalIndexRoute: PortalIndexRoute,
 }
