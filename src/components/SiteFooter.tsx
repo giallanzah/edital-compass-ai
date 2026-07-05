@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { Logo } from "./Logo";
 
 export function SiteFooter() {
@@ -10,29 +11,49 @@ export function SiteFooter() {
             A camada de inteligência sobre o ecossistema brasileiro de fomento à inovação.
           </p>
         </div>
-        {[
-          { title: "Produto", links: ["Portal", "Backoffice", "API", "Changelog"] },
-          { title: "Editais", links: ["CNPq", "FINEP", "SEBRAE", "Lei do Bem"] },
-          { title: "Empresa", links: ["Sobre", "Parcerias", "Imprensa", "Contato"] },
-        ].map((col) => (
-          <div key={col.title}>
-            <div className="eyebrow mb-4">{col.title}</div>
-            <ul className="space-y-2.5 text-sm">
-              {col.links.map((l) => (
-                <li key={l}>
-                  <a href="#" className="text-muted-foreground hover:text-foreground">
-                    {l}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+        <div>
+          <div className="eyebrow mb-4">Produto</div>
+          <ul className="space-y-2.5 text-sm">
+            <li>
+              <Link to="/portal" className="text-muted-foreground hover:text-foreground">
+                Portal
+              </Link>
+            </li>
+            <li>
+              <Link to="/portal/editais" className="text-muted-foreground hover:text-foreground">
+                Catálogo de editais
+              </Link>
+            </li>
+            <li>
+              <Link to="/admin" className="text-muted-foreground hover:text-foreground">
+                Backoffice
+              </Link>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <div className="eyebrow mb-4">Fontes monitoradas</div>
+          <ul className="space-y-2.5 text-sm text-muted-foreground">
+            <li>CNPq</li>
+            <li>FINEP</li>
+            <li>SEBRAE</li>
+            <li>BNDES</li>
+          </ul>
+        </div>
+        <div>
+          <div className="eyebrow mb-4">Conta</div>
+          <ul className="space-y-2.5 text-sm">
+            <li>
+              <Link to="/portal/login" className="text-muted-foreground hover:text-foreground">
+                Entrar / Cadastrar
+              </Link>
+            </li>
+          </ul>
+        </div>
       </div>
       <div className="hairline-t">
-        <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-2 px-6 py-6 text-xs text-muted-foreground md:flex-row md:items-center">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6 text-xs text-muted-foreground">
           <span>© 2026 fomenta.ai — Brasil</span>
-          <span className="font-mono">v0.1.0 · wireframe</span>
         </div>
       </div>
     </footer>
