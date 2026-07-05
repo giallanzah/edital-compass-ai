@@ -176,9 +176,48 @@ function Landing() {
             </Link>
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {editais.slice(0, 6).map((e) => (
-              <EditalCard key={e.id} e={e} />
-            ))}
+            {destQ.isLoading && destaques.length === 0
+              ? Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="hairline p-5">
+                    <div className="h-3 w-24 animate-pulse bg-secondary" />
+                    <div className="mt-3 h-4 w-full animate-pulse bg-secondary" />
+                    <div className="mt-2 h-4 w-3/4 animate-pulse bg-secondary" />
+                  </div>
+                ))
+              : destaques.map((e) => (
+                  <Link
+                    key={e.id}
+                    to="/portal/editais/$id"
+                    params={{ id: e.id }}
+                    className="hairline block bg-card p-5 hover:border-foreground"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="eyebrow">{e.fonte}</span>
+                      {e.tipo_apoio && (
+                        <>
+                          <span className="h-1 w-1 rounded-full bg-border" />
+                          <span className="eyebrow">{e.tipo_apoio}</span>
+                        </>
+                      )}
+                    </div>
+                    <h3 className="mt-3 line-clamp-2 text-[15px] font-medium leading-snug">
+                      {e.titulo}
+                    </h3>
+                    {e.descricao_curta && (
+                      <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
+                        {e.descricao_curta}
+                      </p>
+                    )}
+                    <div className="mt-4 font-mono text-[10px] text-muted-foreground">
+                      {e.abrangencia ?? "—"} · {e.status}
+                    </div>
+                  </Link>
+                ))}
+            {!destQ.isLoading && destaques.length === 0 && (
+              <div className="col-span-full hairline p-12 text-center text-sm text-muted-foreground">
+                Nenhum edital em destaque no momento.
+              </div>
+            )}
           </div>
         </div>
       </section>
