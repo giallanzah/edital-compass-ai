@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      candidaturas: {
+        Row: {
+          created_at: string
+          edital_id: string
+          estagio: string
+          id: string
+          progresso: number
+          projeto_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          edital_id: string
+          estagio?: string
+          id?: string
+          progresso?: number
+          projeto_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          edital_id?: string
+          estagio?: string
+          id?: string
+          progresso?: number
+          projeto_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "candidaturas_edital_id_fkey"
+            columns: ["edital_id"]
+            isOneToOne: false
+            referencedRelation: "editais"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "candidaturas_projeto_id_fkey"
+            columns: ["projeto_id"]
+            isOneToOne: false
+            referencedRelation: "projetos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       editais: {
         Row: {
           abrangencia: string | null
@@ -165,6 +213,51 @@ export type Database = {
           },
         ]
       }
+      empresas_perfil: {
+        Row: {
+          cnpj: string | null
+          created_at: string
+          estagio: string | null
+          faturamento_faixa: string | null
+          id: string
+          nome_empresa: string
+          porte: string | null
+          setor: string | null
+          temas: string[]
+          uf: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cnpj?: string | null
+          created_at?: string
+          estagio?: string | null
+          faturamento_faixa?: string | null
+          id?: string
+          nome_empresa: string
+          porte?: string | null
+          setor?: string | null
+          temas?: string[]
+          uf?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cnpj?: string | null
+          created_at?: string
+          estagio?: string | null
+          faturamento_faixa?: string | null
+          id?: string
+          nome_empresa?: string
+          porte?: string | null
+          setor?: string | null
+          temas?: string[]
+          uf?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       fontes_monitoradas: {
         Row: {
           ativo: boolean
@@ -268,6 +361,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      projetos: {
+        Row: {
+          created_at: string
+          descricao: string | null
+          id: string
+          nome: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          nome: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          nome?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
     }
     Views: {
