@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as PortalIndexRouteImport } from './routes/portal.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as PortalProjetosRouteImport } from './routes/portal.projetos'
+import { Route as PortalPerfilRouteImport } from './routes/portal.perfil'
 import { Route as PortalOnboardingRouteImport } from './routes/portal.onboarding'
 import { Route as PortalLoginRouteImport } from './routes/portal.login'
 import { Route as PortalEditaisRouteImport } from './routes/portal.editais'
@@ -76,6 +77,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const PortalProjetosRoute = PortalProjetosRouteImport.update({
   id: '/projetos',
   path: '/projetos',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalPerfilRoute = PortalPerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
   getParentRoute: () => PortalRoute,
 } as any)
 const PortalOnboardingRoute = PortalOnboardingRouteImport.update({
@@ -273,6 +279,7 @@ export interface FileRoutesByFullPath {
   '/portal/editais': typeof PortalEditaisRouteWithChildren
   '/portal/login': typeof PortalLoginRoute
   '/portal/onboarding': typeof PortalOnboardingRoute
+  '/portal/perfil': typeof PortalPerfilRoute
   '/portal/projetos': typeof PortalProjetosRoute
   '/admin/': typeof AdminIndexRoute
   '/portal/': typeof PortalIndexRoute
@@ -311,6 +318,7 @@ export interface FileRoutesByTo {
   '/portal/editais': typeof PortalEditaisRouteWithChildren
   '/portal/login': typeof PortalLoginRoute
   '/portal/onboarding': typeof PortalOnboardingRoute
+  '/portal/perfil': typeof PortalPerfilRoute
   '/portal/projetos': typeof PortalProjetosRoute
   '/admin': typeof AdminIndexRoute
   '/portal': typeof PortalIndexRoute
@@ -352,6 +360,7 @@ export interface FileRoutesById {
   '/portal/editais': typeof PortalEditaisRouteWithChildren
   '/portal/login': typeof PortalLoginRoute
   '/portal/onboarding': typeof PortalOnboardingRoute
+  '/portal/perfil': typeof PortalPerfilRoute
   '/portal/projetos': typeof PortalProjetosRoute
   '/admin/': typeof AdminIndexRoute
   '/portal/': typeof PortalIndexRoute
@@ -394,6 +403,7 @@ export interface FileRouteTypes {
     | '/portal/editais'
     | '/portal/login'
     | '/portal/onboarding'
+    | '/portal/perfil'
     | '/portal/projetos'
     | '/admin/'
     | '/portal/'
@@ -432,6 +442,7 @@ export interface FileRouteTypes {
     | '/portal/editais'
     | '/portal/login'
     | '/portal/onboarding'
+    | '/portal/perfil'
     | '/portal/projetos'
     | '/admin'
     | '/portal'
@@ -472,6 +483,7 @@ export interface FileRouteTypes {
     | '/portal/editais'
     | '/portal/login'
     | '/portal/onboarding'
+    | '/portal/perfil'
     | '/portal/projetos'
     | '/admin/'
     | '/portal/'
@@ -528,6 +540,13 @@ declare module '@tanstack/react-router' {
       path: '/projetos'
       fullPath: '/portal/projetos'
       preLoaderRoute: typeof PortalProjetosRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/perfil': {
+      id: '/portal/perfil'
+      path: '/perfil'
+      fullPath: '/portal/perfil'
+      preLoaderRoute: typeof PortalPerfilRouteImport
       parentRoute: typeof PortalRoute
     }
     '/portal/onboarding': {
@@ -835,6 +854,7 @@ interface PortalRouteChildren {
   PortalEditaisRoute: typeof PortalEditaisRouteWithChildren
   PortalLoginRoute: typeof PortalLoginRoute
   PortalOnboardingRoute: typeof PortalOnboardingRoute
+  PortalPerfilRoute: typeof PortalPerfilRoute
   PortalProjetosRoute: typeof PortalProjetosRoute
   PortalIndexRoute: typeof PortalIndexRoute
 }
@@ -845,6 +865,7 @@ const PortalRouteChildren: PortalRouteChildren = {
   PortalEditaisRoute: PortalEditaisRouteWithChildren,
   PortalLoginRoute: PortalLoginRoute,
   PortalOnboardingRoute: PortalOnboardingRoute,
+  PortalPerfilRoute: PortalPerfilRoute,
   PortalProjetosRoute: PortalProjetosRoute,
   PortalIndexRoute: PortalIndexRoute,
 }
