@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { EditalCard } from "@/components/EditalCard";
-import { editais, agencies } from "@/data/editais";
+import { agencies } from "@/data/editais";
+import { publicStats, editaisDestaque } from "@/lib/portal.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -11,19 +13,12 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Descubra, organize e acompanhe editais e linhas de fomento de CNPq, FINEP, SEBRAE, BNDES, FAPs e Lei do Bem em uma única plataforma.",
+          "Descubra, organize e acompanhe editais e linhas de fomento de CNPq, FINEP, SEBRAE e BNDES em uma única plataforma.",
       },
     ],
   }),
   component: Landing,
 });
-
-const stats = [
-  { k: "Editais ativos", v: "400+" },
-  { k: "Órgãos fomentadores", v: "90+" },
-  { k: "Recursos disponíveis", v: "R$ 19B" },
-  { k: "Empresas elegíveis", v: "600K+" },
-];
 
 const features = [
   {
