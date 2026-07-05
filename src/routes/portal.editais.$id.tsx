@@ -1,7 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useEffect, useState } from "react";
+import type { Session } from "@supabase/supabase-js";
 import { getEdital } from "@/lib/scrape.functions";
+import { computeMatch } from "@/lib/portal.functions";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/portal/editais/$id")({
   component: EditalDetail,
