@@ -1,21 +1,48 @@
-import { Link, useRouterState, Outlet } from "@tanstack/react-router";
-import type { ReactNode } from "react";
+import { Link, useRouterState, Outlet, useNavigate } from "@tanstack/react-router";
+import { useState, type ReactNode } from "react";
+import type { Session } from "@supabase/supabase-js";
 import { Logo } from "./Logo";
+import { supabase } from "@/integrations/supabase/client";
 
 type Item = { to: string; label: string };
+
+function initials(name: string, email: string) {
+  const src = name?.trim() || email;
+  if (!src) return "··";
+  const parts = src.split(/[\s@.]+/).filter(Boolean);
+  const first = parts[0]?.[0] ?? "";
+  const second = parts[1]?.[0] ?? "";
+  return (first + second).toUpperCase() || src.slice(0, 2).toUpperCase();
+}
 
 export function PortalShell({
   items,
   title,
   badge,
   rightSlot,
+  session,
 }: {
   items: Item[];
   title: string;
   badge?: string;
   rightSlot?: ReactNode;
+  session?: Session | null;
 }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const user = session?.user;
+  const meta = (user?.user_metadata ?? {}) as { full_name?: string };
+  const name = meta.full_name ?? "";
+  const email = user?.email ?? "";
+  const showAccount = Boolean(user);
+
+  async function signOut() {
+    setOpen(false);
+    await supabase.auth.signOut();
+    navigate({ to: "/portal/login" });
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -38,42 +65,81 @@ export function PortalShell({
           </div>
           <div className="flex items-center gap-3">
             {rightSlot}
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground font-mono text-xs text-background">
-              HG
-            </div>
+            {showAccount ? (
+              <div className="relative">
+                <button
+                  onClick={() => setOpen((v) => !v)}
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground font-mono text-xs text-background"
+                  aria-label="Conta"
+                >
+                  {initials(name, email)}
+                </button>
+                {open && (
+                  <div
+                    onMouseLeave={() => setOpen(false)}
+                    className="absolute right-0 top-10 z-50 w-56 hairline bg-background p-2 shadow-lg"
+                  >
+                    <div className="px-2 py-2">
+                      <div className="truncate text-sm font-medium">{name || email}</div>
+                      {name && (
+                        <div className="truncate text-xs text-muted-foreground">{email}</div>
+                      )}
+                    </div>
+                    <hr className="my-1 border-[var(--hairline)]" />
+                    <Link
+                      to="/portal/perfil"
+                      onClick={() => setOpen(false)}
+                      className="block rounded-sm px-2 py-1.5 text-sm hover:bg-secondary"
+                    >
+                      Perfil da empresa
+                    </Link>
+                    <button
+                      onClick={signOut}
+                      className="block w-full rounded-sm px-2 py-1.5 text-left text-sm hover:bg-secondary"
+                    >
+                      Sair
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                to="/portal/login"
+                className="inline-flex h-8 items-center rounded-sm bg-foreground px-3 text-xs font-medium text-background hover:opacity-90"
+              >
+                Entrar
+              </Link>
+            )}
           </div>
         </div>
       </header>
 
-      <div className="flex">
-        {/* Sidebar */}
-        <aside className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-56 shrink-0 hairline-b overflow-y-auto md:block" style={{ borderRight: "1px solid var(--hairline)" }}>
-          <nav className="p-3">
-            {items.map((it) => {
-              const active =
-                it.to === pathname ||
-                (it.to !== "/portal" && it.to !== "/admin" && pathname.startsWith(it.to));
-              return (
-                <Link
-                  key={it.to}
-                  to={it.to}
-                  className={`block rounded-sm px-3 py-2 text-sm transition-colors ${
-                    active
-                      ? "bg-secondary text-foreground"
-                      : "text-muted-foreground hover:bg-secondary hover:text-foreground"
-                  }`}
-                >
-                  {it.label}
-                </Link>
-              );
-            })}
-          </nav>
-        </aside>
+      {/* Nav */}
+      <nav className="hairline-b bg-background">
+        <div className="mx-auto flex max-w-7xl gap-6 overflow-x-auto px-6">
+          {items.map((it) => {
+            const active =
+              it.to === "/portal"
+                ? pathname === "/portal"
+                : pathname === it.to || pathname.startsWith(it.to + "/");
+            return (
+              <Link
+                key={it.to}
+                to={it.to}
+                className={`whitespace-nowrap border-b-2 px-1 py-3 text-sm transition-colors ${
+                  active
+                    ? "border-foreground text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {it.label}
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
 
-        <main className="min-w-0 flex-1">
-          <Outlet />
-        </main>
-      </div>
+      <Outlet />
     </div>
   );
 }
