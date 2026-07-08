@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as PortalRouteImport } from './routes/portal'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
@@ -49,6 +50,11 @@ import { Route as AdminAnalistasRouteImport } from './routes/admin.analistas'
 import { Route as PortalEditaisIdRouteImport } from './routes/portal.editais.$id'
 import { Route as ApiPublicCronScrapeRouteImport } from './routes/api/public/cron/scrape'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PortalRoute = PortalRouteImport.update({
   id: '/portal',
   path: '/portal',
@@ -249,6 +255,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/portal': typeof PortalRouteWithChildren
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/analistas': typeof AdminAnalistasRoute
   '/admin/apis': typeof AdminApisRoute
   '/admin/coletas': typeof AdminColetasRoute
@@ -288,6 +295,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/analistas': typeof AdminAnalistasRoute
   '/admin/apis': typeof AdminApisRoute
   '/admin/coletas': typeof AdminColetasRoute
@@ -330,6 +338,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/portal': typeof PortalRouteWithChildren
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/analistas': typeof AdminAnalistasRoute
   '/admin/apis': typeof AdminApisRoute
   '/admin/coletas': typeof AdminColetasRoute
@@ -373,6 +382,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/portal'
+    | '/sitemap.xml'
     | '/admin/analistas'
     | '/admin/apis'
     | '/admin/coletas'
@@ -412,6 +422,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/sitemap.xml'
     | '/admin/analistas'
     | '/admin/apis'
     | '/admin/coletas'
@@ -453,6 +464,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/portal'
+    | '/sitemap.xml'
     | '/admin/analistas'
     | '/admin/apis'
     | '/admin/coletas'
@@ -495,11 +507,19 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
   PortalRoute: typeof PortalRouteWithChildren
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiPublicCronScrapeRoute: typeof ApiPublicCronScrapeRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/portal': {
       id: '/portal'
       path: '/portal'
@@ -877,8 +897,19 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   PortalRoute: PortalRouteWithChildren,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiPublicCronScrapeRoute: ApiPublicCronScrapeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
