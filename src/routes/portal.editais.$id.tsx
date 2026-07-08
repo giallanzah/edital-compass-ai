@@ -57,6 +57,8 @@ function EditalDetail() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
+  const [modalOpen, setModalOpen] = useState(false);
+
   const matchQ = useQuery({
     queryKey: ["match", id, session?.user?.id ?? ""],
     queryFn: () => matchFn({ data: { editalId: (data?.edital as { id: string }).id } }),
