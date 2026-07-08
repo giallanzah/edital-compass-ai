@@ -6,6 +6,7 @@ import type { Session } from "@supabase/supabase-js";
 import { getEdital } from "@/lib/scrape.functions";
 import { computeMatch } from "@/lib/portal.functions";
 import { supabase } from "@/integrations/supabase/client";
+import { CandidatarModal } from "@/components/CandidatarModal";
 
 export const Route = createFileRoute("/portal/editais/$id")({
   // Loader server-side: o HTML inicial já vem com o conteúdo do edital (SSR/SEO).
