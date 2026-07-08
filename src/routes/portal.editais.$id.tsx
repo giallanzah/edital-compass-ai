@@ -278,6 +278,13 @@ function EditalDetail() {
           </div>
         </aside>
       </div>
+
+      {modalOpen && (
+        <CandidatarModal
+          editalId={(data.edital as { id: string }).id}
+          onClose={() => setModalOpen(false)}
+        />
+      )}
     </div>
   );
 }
