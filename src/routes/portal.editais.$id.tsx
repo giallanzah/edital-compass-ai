@@ -202,6 +202,15 @@ function EditalDetail() {
             Ver edital na fonte ↗
           </a>
 
+          {session ? (
+            <button
+              onClick={() => setModalOpen(true)}
+              className="inline-flex h-11 w-full items-center justify-center rounded-sm hairline text-sm font-medium hover:bg-secondary"
+            >
+              Candidatar-se com um projeto
+            </button>
+          ) : null}
+
           {/* Match score */}
           {session === null ? (
             <div className="hairline p-4">
