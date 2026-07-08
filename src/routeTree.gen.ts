@@ -48,6 +48,7 @@ import { Route as AdminColetasRouteImport } from './routes/admin.coletas'
 import { Route as AdminApisRouteImport } from './routes/admin.apis'
 import { Route as AdminAnalistasRouteImport } from './routes/admin.analistas'
 import { Route as PortalEditaisIdRouteImport } from './routes/portal.editais.$id'
+import { Route as PortalCandidaturasIdRouteImport } from './routes/portal.candidaturas.$id'
 import { Route as ApiPublicCronScrapeRouteImport } from './routes/api/public/cron/scrape'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -245,6 +246,11 @@ const PortalEditaisIdRoute = PortalEditaisIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => PortalEditaisRoute,
 } as any)
+const PortalCandidaturasIdRoute = PortalCandidaturasIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => PortalCandidaturasRoute,
+} as any)
 const ApiPublicCronScrapeRoute = ApiPublicCronScrapeRouteImport.update({
   id: '/api/public/cron/scrape',
   path: '/api/public/cron/scrape',
@@ -281,7 +287,7 @@ export interface FileRoutesByFullPath {
   '/admin/relatorios': typeof AdminRelatoriosRoute
   '/admin/scrapers': typeof AdminScrapersRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
-  '/portal/candidaturas': typeof PortalCandidaturasRoute
+  '/portal/candidaturas': typeof PortalCandidaturasRouteWithChildren
   '/portal/conhecimento': typeof PortalConhecimentoRoute
   '/portal/editais': typeof PortalEditaisRouteWithChildren
   '/portal/login': typeof PortalLoginRoute
@@ -290,6 +296,7 @@ export interface FileRoutesByFullPath {
   '/portal/projetos': typeof PortalProjetosRoute
   '/admin/': typeof AdminIndexRoute
   '/portal/': typeof PortalIndexRoute
+  '/portal/candidaturas/$id': typeof PortalCandidaturasIdRoute
   '/portal/editais/$id': typeof PortalEditaisIdRoute
   '/api/public/cron/scrape': typeof ApiPublicCronScrapeRoute
 }
@@ -321,7 +328,7 @@ export interface FileRoutesByTo {
   '/admin/relatorios': typeof AdminRelatoriosRoute
   '/admin/scrapers': typeof AdminScrapersRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
-  '/portal/candidaturas': typeof PortalCandidaturasRoute
+  '/portal/candidaturas': typeof PortalCandidaturasRouteWithChildren
   '/portal/conhecimento': typeof PortalConhecimentoRoute
   '/portal/editais': typeof PortalEditaisRouteWithChildren
   '/portal/login': typeof PortalLoginRoute
@@ -330,6 +337,7 @@ export interface FileRoutesByTo {
   '/portal/projetos': typeof PortalProjetosRoute
   '/admin': typeof AdminIndexRoute
   '/portal': typeof PortalIndexRoute
+  '/portal/candidaturas/$id': typeof PortalCandidaturasIdRoute
   '/portal/editais/$id': typeof PortalEditaisIdRoute
   '/api/public/cron/scrape': typeof ApiPublicCronScrapeRoute
 }
@@ -364,7 +372,7 @@ export interface FileRoutesById {
   '/admin/relatorios': typeof AdminRelatoriosRoute
   '/admin/scrapers': typeof AdminScrapersRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
-  '/portal/candidaturas': typeof PortalCandidaturasRoute
+  '/portal/candidaturas': typeof PortalCandidaturasRouteWithChildren
   '/portal/conhecimento': typeof PortalConhecimentoRoute
   '/portal/editais': typeof PortalEditaisRouteWithChildren
   '/portal/login': typeof PortalLoginRoute
@@ -373,6 +381,7 @@ export interface FileRoutesById {
   '/portal/projetos': typeof PortalProjetosRoute
   '/admin/': typeof AdminIndexRoute
   '/portal/': typeof PortalIndexRoute
+  '/portal/candidaturas/$id': typeof PortalCandidaturasIdRoute
   '/portal/editais/$id': typeof PortalEditaisIdRoute
   '/api/public/cron/scrape': typeof ApiPublicCronScrapeRoute
 }
@@ -417,6 +426,7 @@ export interface FileRouteTypes {
     | '/portal/projetos'
     | '/admin/'
     | '/portal/'
+    | '/portal/candidaturas/$id'
     | '/portal/editais/$id'
     | '/api/public/cron/scrape'
   fileRoutesByTo: FileRoutesByTo
@@ -457,6 +467,7 @@ export interface FileRouteTypes {
     | '/portal/projetos'
     | '/admin'
     | '/portal'
+    | '/portal/candidaturas/$id'
     | '/portal/editais/$id'
     | '/api/public/cron/scrape'
   id:
@@ -499,6 +510,7 @@ export interface FileRouteTypes {
     | '/portal/projetos'
     | '/admin/'
     | '/portal/'
+    | '/portal/candidaturas/$id'
     | '/portal/editais/$id'
     | '/api/public/cron/scrape'
   fileRoutesById: FileRoutesById
@@ -786,6 +798,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalEditaisIdRouteImport
       parentRoute: typeof PortalEditaisRoute
     }
+    '/portal/candidaturas/$id': {
+      id: '/portal/candidaturas/$id'
+      path: '/$id'
+      fullPath: '/portal/candidaturas/$id'
+      preLoaderRoute: typeof PortalCandidaturasIdRouteImport
+      parentRoute: typeof PortalCandidaturasRoute
+    }
     '/api/public/cron/scrape': {
       id: '/api/public/cron/scrape'
       path: '/api/public/cron/scrape'
@@ -856,6 +875,17 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface PortalCandidaturasRouteChildren {
+  PortalCandidaturasIdRoute: typeof PortalCandidaturasIdRoute
+}
+
+const PortalCandidaturasRouteChildren: PortalCandidaturasRouteChildren = {
+  PortalCandidaturasIdRoute: PortalCandidaturasIdRoute,
+}
+
+const PortalCandidaturasRouteWithChildren =
+  PortalCandidaturasRoute._addFileChildren(PortalCandidaturasRouteChildren)
+
 interface PortalEditaisRouteChildren {
   PortalEditaisIdRoute: typeof PortalEditaisIdRoute
 }
@@ -869,7 +899,7 @@ const PortalEditaisRouteWithChildren = PortalEditaisRoute._addFileChildren(
 )
 
 interface PortalRouteChildren {
-  PortalCandidaturasRoute: typeof PortalCandidaturasRoute
+  PortalCandidaturasRoute: typeof PortalCandidaturasRouteWithChildren
   PortalConhecimentoRoute: typeof PortalConhecimentoRoute
   PortalEditaisRoute: typeof PortalEditaisRouteWithChildren
   PortalLoginRoute: typeof PortalLoginRoute
@@ -880,7 +910,7 @@ interface PortalRouteChildren {
 }
 
 const PortalRouteChildren: PortalRouteChildren = {
-  PortalCandidaturasRoute: PortalCandidaturasRoute,
+  PortalCandidaturasRoute: PortalCandidaturasRouteWithChildren,
   PortalConhecimentoRoute: PortalConhecimentoRoute,
   PortalEditaisRoute: PortalEditaisRouteWithChildren,
   PortalLoginRoute: PortalLoginRoute,
