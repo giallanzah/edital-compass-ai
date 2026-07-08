@@ -1,63 +1,70 @@
-# Fomenta AI — Backend de editais + Robô de coleta
+# Status atual — o que já ficou pronto e o que sobrou
 
-Vou transformar o wireframe atual em um portal com dados reais, alimentado por um robô que coleta editais das fontes públicas (CNPq, FINEP, SEBRAE, BNDES) periodicamente.
+## Já entregue nas últimas iterações
+- **Robô de coleta**: Firecrawl + `/api/public/cron/scrape` + pg_cron 6/6h; parsers CNPq/FINEP/SEBRAE/BNDES; histórico e logs.
+- **Admin real**: `/admin/fontes`, `/admin/coletas`, `/admin/editais` operando sobre banco. Login com verificação de role ADMIN/SUPER_ADMIN e mensagens claras.
+- **Portal Bloco 1**: Supabase Auth em `/portal/login`, guard em `/portal/*` (catálogo público), onboarding 5 passos, perfil de empresa, match score real (Tema 40 / Porte 25 / Região 20 / Status 15), dashboard com "recomendados", CRUD de projetos, catálogo e detalhe consumindo banco.
 
-## Escopo desta entrega
+## Pendências identificadas
+1. **Candidaturas ainda são casca**: existe tabela `candidaturas` e listagem, mas não há fluxo para criar uma candidatura a partir do edital, mudar estágio, calcular progresso, nem herdar prazo.
+2. **Detalhe do edital não conecta com projeto**: falta CTA "candidatar este edital" que abra seletor de projeto e crie a candidatura.
+3. **Sem IA aplicada**: o robô traz texto bruto; não há resumo executivo, checklist de requisitos, nem análise de aderência (o match hoje é só heurístico por tags).
+4. **Backoffice ainda tem 13 stubs** (`admin.empresas`, `admin.projetos`, `admin.usuarios` etc.) — os 3 primeiros são os que travam operação real.
+5. **Onboarding não é obrigatório**: usuário sem perfil consegue ver o dashboard vazio em vez de ser levado ao onboarding.
+6. **Sem notificação de prazo**: candidaturas com edital encerrando em ≤7 dias não sinalizam nada.
 
-### 1. Lovable Cloud (banco + jobs)
-Ativar Cloud para ter Postgres, autenticação e execução server-side. Os dados de editais passam a vir do banco (não mais do mock `src/data/editais.ts`).
+---
 
-### 2. Modelo de dados
-Migrations com as tabelas:
-- `fontes_monitoradas` — CNPq, FINEP, SEBRAE, BNDES (seed inicial), com `url_base`, `ativo`, `frequencia_horas`, `ultimo_sucesso_em`, `status_coleta`.
-- `editais` — todos os campos do prompt (título, slug, fonte, url_original, url_canonica, descrição, datas, status, público, abrangência, tipo_apoio, valor, tags_json, documentos_json, hash_conteudo, confianca_extracao, ativo).
-- `editais_historico` — versão anterior salva quando o `hash_conteudo` muda.
-- `logs_coleta` — execução por fonte (início, fim, total lido/novo/atualizado, mensagem_erro).
-- RLS: leitura pública em `editais` e `fontes_monitoradas`; escrita apenas por role admin. Roles ficam em tabela `user_roles` separada com função `has_role()`.
+# Próximo passo evolutivo — Bloco 2
 
-### 3. Robô de coleta (Firecrawl + server functions)
-- Usar **Firecrawl** como conector (scraping robusto, lida com JS, respeita rate limits — melhor que rodar Puppeteer em Worker).
-- Um **server route público** `/api/public/cron/scrape` protegido por `CRON_SECRET`, chamável por scheduler externo a cada 6 h.
-- Um parser por fonte em `src/lib/scrapers/<fonte>.ts`:
-  - `cnpq.ts` — `gov.br/cnpq/pt-br/chamadas/abertas-para-submissao`
-  - `finep.ts` — chamadas públicas FINEP
-  - `sebrae.ts` — `observatorio.sebraestartups.com.br/oportunidades`
-  - `bndes.ts` — chamadas de inovação BNDES
-- Pipeline por edital: normalizar → calcular `hash_conteudo` → upsert por (`fonte`, `url_canonica`) → se hash mudou, salvar histórico + atualizar → deduplicar por título normalizado + órgão + período → classificar status (`aberto` / `abre em breve` / `encerrando em breve` / `encerrado` / `sem prazo`) → calcular `confianca_extracao` (1.0 / 0.7 / 0.4 / <0.4 revisão).
-- Classificação heurística por palavras-chave (subvenção, incubadora, startups, ICT, PD&I) → `tipo_apoio`, `publico_alvo`, `tema`.
-- Execução manual: botão no admin dispara server fn `runScrape({ fonte })`.
+Foco: fechar o loop **descobrir → candidatar → acompanhar** e introduzir IA onde ela muda o produto.
 
-### 4. Frontend do portal (dados reais)
-- `/portal/editais` — hoje lê mock; passa a consumir server fn `listEditais({ busca, fonte, status, area, uf, tipoApoio })` com filtros server-side.
-- Chips CNPq/FINEP/SEBRAE/BNDES com **contagem dinâmica** vinda do banco (fallback para os números do wireframe se banco vazio).
-- Seções "novos editais" e "encerrando em breve" na home do portal.
-- `/portal/editais/$id` — detalhe completo do edital + timeline de versões.
+## 1. Fluxo de candidatura ponta-a-ponta
+- No `/portal/editais/$id`: botão **"Candidatar-se com um projeto"** abre modal listando projetos do usuário (ou permite criar um novo inline). Ao confirmar, cria linha em `candidaturas` com `estagio='rascunho'`, `progresso=0`, herda `data_encerramento` do edital.
+- `/portal/candidaturas` vira kanban simples com 6 colunas (`rascunho`, `aplicando`, `em_revisao`, `submetido`, `aprovado`, `reprovado`). Drag-and-drop atualiza estágio; progresso calculado por estágio (0/25/50/75/100/100).
+- Detalhe da candidatura em `/portal/candidaturas/$id`: mostra edital, projeto, checklist de tarefas, dias restantes, botão para trocar estágio, campo de observações.
+- Badge no topo do portal quando ≥1 candidatura tem edital encerrando em ≤7 dias.
 
-### 5. Backoffice
-Adicionar em `/admin`:
-- `/admin/fontes` — CRUD de fontes monitoradas, toggle ativo, botão "coletar agora" por fonte, último status.
-- `/admin/coletas` — logs de execução com totais e erros.
-- `/admin/editais` (já existe stub) — passa a listar dados reais, com ação "revisar" para editais com `confianca_extracao < 0.4`, e toggle `ativo`/oculto.
+## 2. IA aplicada (Lovable AI Gateway, sem chave do usuário)
+Três server functions novas, chamadas sob demanda e resultado cacheado em coluna JSON dos `editais`:
+- `resumirEdital(id)` → `resumo_ia`: 3 bullets — objetivo, quem pode, valor/prazo.
+- `extrairRequisitos(id)` → `requisitos_ia[]`: checklist normalizada ("Empresa com CNPJ ativo", "Faturamento até X", "Projeto em TRL 4-7"…). Vira o checklist inicial da candidatura.
+- `analisarAderencia(editalId, projetoId)` → parecer textual + score refinado que sobrepõe o match heurístico quando existir perfil + descrição de projeto.
 
-### 6. Fora de escopo desta entrega
-- Autenticação de empresa/portal (o wireframe segue mock por enquanto).
-- Agendamento cron automático hospedado: entrego o endpoint pronto + instruções para plugar em pg_cron/cron-job.org. Rodar cron dentro do Worker não é confiável.
-- Playwright/Puppeteer próprio: Firecrawl já cobre JS-rendering; se uma fonte específica falhar, tratamos depois.
+Cache: só recomputa se `hash_conteudo` do edital mudou. Custo controlado (só editais visualizados/candidatados).
 
-## Detalhes técnicos
+## 3. Onboarding obrigatório + estados vazios
+- Após login, se `empresas_perfil` não existe → redirect forçado para `/portal/onboarding`.
+- Dashboard e "recomendados" mostram CTA claro quando perfil vazio, em vez de lista vazia.
 
-- **Stack**: mantém TanStack Start + Cloud (Supabase). Sem edge functions do Supabase — toda lógica em `createServerFn` e server routes, como manda a stack.
-- **Conector Firecrawl**: linkar via `standard_connectors--connect`. Chave fica em `FIRECRAWL_API_KEY` no runtime server.
-- **Secret**: `CRON_SECRET` para autenticar o endpoint público.
-- **Roles admin**: `app_role` enum + `user_roles` + `has_role()` (padrão seguro, não em `profiles`).
+## 4. Backoffice — 3 telas que passam de stub para real
+- `/admin/empresas`: lista `empresas_perfil` com busca por CNPJ/nome, ver detalhe, contagem de projetos/candidaturas por empresa.
+- `/admin/usuarios`: lista de `auth.users` via service role, com role atual (`user_roles`) e ação de promover/rebaixar ADMIN.
+- `/admin/projetos`: visão consolidada dos projetos de todos os usuários, com filtro por status de candidatura.
+
+## 5. SEO e polimento
+- `og:image` dinâmico no detalhe do edital (usa título + fonte).
+- Sitemap inclui todos os editais ativos (já existe `sitemap.xml.ts`; validar).
+
+## Fora deste bloco
+Pagamentos/Stripe, envio real de emails, geração automatizada do documento de projeto pela IA, integrações com plataformas externas de submissão (CNPq/FINEP não têm API pública de envio).
+
+---
+
+# Detalhes técnicos
+
+- **Migração**: adicionar colunas `resumo_ia jsonb`, `requisitos_ia jsonb`, `resumo_ia_hash text` em `editais`; tabela `candidatura_tarefas (id, candidatura_id, titulo, feito bool, ordem int)` com RLS por dono.
+- **IA**: `createServerFn` chamando Lovable AI Gateway (`google/gemini-2.5-flash` para resumo/extração, `google/gemini-2.5-pro` para aderência). Middleware `requireSupabaseAuth`. Resposta forçada em JSON via schema Zod.
+- **Kanban**: `@dnd-kit/core` (leve, já suportado). Otimista com `useMutation` + `queryClient.setQueryData`.
+- **Admin usuários**: server fn com `supabaseAdmin` (import dinâmico dentro do handler), gate por `has_role(auth.uid(),'ADMIN')`.
+- **Onboarding gate**: verificação server-side em `beforeLoad` de `/portal/_authenticated`, redirect via `throw redirect({ to: '/portal/onboarding' })`.
 
 ## Ordem de execução
-1. Enable Cloud + migrations (tabelas, RLS, grants, roles, seed das 4 fontes).
-2. Firecrawl + secret CRON_SECRET.
-3. Scrapers por fonte + pipeline de normalização/dedupe/histórico.
-4. Server route `/api/public/cron/scrape` + server fn `runScrape`.
-5. Server fns de leitura (`listEditais`, `getEdital`, `listFontes`, `listLogs`).
-6. Trocar mocks no portal por dados reais + contagens dinâmicas.
-7. Telas admin de fontes e coletas + ações de revisão.
+1. Migração (colunas IA + `candidatura_tarefas`) e gate de onboarding.
+2. Fluxo de candidatura (modal no detalhe, criação, kanban, detalhe da candidatura).
+3. IA de resumo e extração de requisitos + integração com o checklist.
+4. IA de aderência sobrepondo o match no dashboard.
+5. Três telas admin reais (empresas, usuários, projetos).
+6. Polimento SEO e badge de prazo.
 
-Confirma que posso ativar o Cloud e conectar o Firecrawl (necessários para o robô funcionar de verdade)?
+Posso seguir com esse Bloco 2?
