@@ -179,7 +179,7 @@ function EditalDetail() {
               <p className="text-sm text-muted-foreground">Nenhuma versão anterior registrada.</p>
             ) : (
               <ul className="space-y-2 text-sm">
-                {data.historico.map((h) => (
+                {(data.historico as Array<{ id: string; hash_conteudo: string; criado_em: string }>).map((h) => (
                   <li key={h.id} className="flex justify-between hairline-b pb-2">
                     <span className="font-mono text-xs">{h.hash_conteudo.slice(0, 12)}</span>
                     <span className="font-mono text-xs text-muted-foreground">
