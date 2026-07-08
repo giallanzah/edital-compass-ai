@@ -75,17 +75,22 @@ function Candidaturas() {
               </div>
               <div className="space-y-2">
                 {items.map((r) => (
-                  <div key={r.id} className="hairline bg-card p-3">
+                  <Link
+                    key={r.id}
+                    to="/portal/candidaturas/$id"
+                    params={{ id: r.id }}
+                    className="block hairline bg-card p-3 hover:border-foreground"
+                  >
                     <div className="text-xs font-medium leading-snug">
                       {(r.projeto as { nome: string } | null)?.nome ?? "—"}
                     </div>
-                    <div className="mt-1 text-[11px] text-muted-foreground">
+                    <div className="mt-1 text-[11px] text-muted-foreground line-clamp-2">
                       {(r.edital as { titulo: string } | null)?.titulo ?? "—"}
                     </div>
                     <div className="mt-2 font-mono text-[10px] text-muted-foreground">
                       {r.progresso}%
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>

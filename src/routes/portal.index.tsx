@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getMyProfile, getRecomendados, listMyProjetos } from "@/lib/portal.functions";
+import { alertasPrazo } from "@/lib/candidatura.functions";
 
 export const Route = createFileRoute("/portal/")({
   component: Dashboard,

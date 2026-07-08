@@ -6,6 +6,7 @@ import type { Session } from "@supabase/supabase-js";
 import { getEdital } from "@/lib/scrape.functions";
 import { computeMatch } from "@/lib/portal.functions";
 import { supabase } from "@/integrations/supabase/client";
+import { CandidatarModal } from "@/components/CandidatarModal";
 
 export const Route = createFileRoute("/portal/editais/$id")({
   // Loader server-side: o HTML inicial já vem com o conteúdo do edital (SSR/SEO).
@@ -56,6 +57,8 @@ function EditalDetail() {
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setSession(s));
     return () => sub.subscription.unsubscribe();
   }, []);
+
+  const [modalOpen, setModalOpen] = useState(false);
 
   const matchQ = useQuery({
     queryKey: ["match", id, session?.user?.id ?? ""],
@@ -179,7 +182,7 @@ function EditalDetail() {
               <p className="text-sm text-muted-foreground">Nenhuma versão anterior registrada.</p>
             ) : (
               <ul className="space-y-2 text-sm">
-                {data.historico.map((h) => (
+                {(data.historico as Array<{ id: string; hash_conteudo: string; criado_em: string }>).map((h) => (
                   <li key={h.id} className="flex justify-between hairline-b pb-2">
                     <span className="font-mono text-xs">{h.hash_conteudo.slice(0, 12)}</span>
                     <span className="font-mono text-xs text-muted-foreground">
@@ -201,6 +204,15 @@ function EditalDetail() {
           >
             Ver edital na fonte ↗
           </a>
+
+          {session ? (
+            <button
+              onClick={() => setModalOpen(true)}
+              className="inline-flex h-11 w-full items-center justify-center rounded-sm hairline text-sm font-medium hover:bg-secondary"
+            >
+              Candidatar-se com um projeto
+            </button>
+          ) : null}
 
           {/* Match score */}
           {session === null ? (
@@ -266,6 +278,13 @@ function EditalDetail() {
           </div>
         </aside>
       </div>
+
+      {modalOpen && (
+        <CandidatarModal
+          editalId={(data.edital as { id: string }).id}
+          onClose={() => setModalOpen(false)}
+        />
+      )}
     </div>
   );
 }
