@@ -3,7 +3,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useNavigate } from "@tanstack/react-router";
 import { listMyProjetos, createProjeto } from "@/lib/portal.functions";
-import { criarCandidatura } from "@/lib/candidatura.functions";
+import { criarCandidatura, criarTarefa } from "@/lib/candidatura.functions";
+import { extrairRequisitos } from "@/lib/ai.functions";
 
 export function CandidatarModal({
   editalId,
@@ -17,11 +18,15 @@ export function CandidatarModal({
   const listFn = useServerFn(listMyProjetos);
   const criarFn = useServerFn(createProjeto);
   const candFn = useServerFn(criarCandidatura);
+  const requisitosFn = useServerFn(extrairRequisitos);
+  const criarTarefaFn = useServerFn(criarTarefa);
   const [modo, setModo] = useState<"lista" | "novo">("lista");
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
   const [selecionado, setSelecionado] = useState<string | null>(null);
+  const [importarChecklist, setImportarChecklist] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
+  const [statusImport, setStatusImport] = useState<string | null>(null);
 
   const projetosQ = useQuery({ queryKey: ["me", "projetos"], queryFn: () => listFn() });
 
@@ -37,11 +42,30 @@ export function CandidatarModal({
   const candMut = useMutation({
     mutationFn: async () => {
       if (!selecionado) throw new Error("selecione um projeto");
-      return candFn({ data: { editalId, projetoId: selecionado } });
+      const r = await candFn({ data: { editalId, projetoId: selecionado } });
+      const candidaturaId = (r as { id: string }).id;
+
+      if (importarChecklist) {
+        setStatusImport("Extraindo requisitos com IA…");
+        try {
+          const req = await requisitosFn({ data: { editalId } });
+          const itens = (req as { itens: string[] }).itens ?? [];
+          if (itens.length > 0) {
+            setStatusImport(`Criando ${itens.length} tarefas…`);
+            for (const t of itens) {
+              await criarTarefaFn({ data: { candidaturaId, titulo: t } });
+            }
+          }
+        } catch {
+          // Falha na IA não deve bloquear a criação da candidatura.
+          setStatusImport("IA indisponível — candidatura criada sem checklist.");
+        }
+      }
+      return { id: candidaturaId };
     },
     onSuccess: (r) => {
       qc.invalidateQueries({ queryKey: ["me", "candidaturas"] });
-      navigate({ to: "/portal/candidaturas/$id", params: { id: (r as { id: string }).id } });
+      navigate({ to: "/portal/candidaturas/$id", params: { id: r.id } });
     },
     onError: (e) => setErro((e as Error).message),
   });
@@ -142,6 +166,23 @@ export function CandidatarModal({
           </div>
         )}
 
+        <label className="mt-5 flex cursor-pointer items-start gap-2 text-xs text-muted-foreground">
+          <input
+            type="checkbox"
+            checked={importarChecklist}
+            onChange={(e) => setImportarChecklist(e.target.checked)}
+            className="mt-0.5"
+          />
+          <span>
+            Importar requisitos do edital como checklist inicial <span className="font-mono">(IA)</span>.
+          </span>
+        </label>
+
+        {statusImport && (
+          <div className="mt-3 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            {statusImport}
+          </div>
+        )}
         {erro && <div className="mt-4 text-xs text-destructive">{erro}</div>}
 
         <div className="mt-6 flex items-center justify-end gap-2 border-t border-[var(--hairline)] pt-4">
