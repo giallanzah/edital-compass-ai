@@ -16,6 +16,11 @@ const STAGES = [
   ["reprovado", "Reprovado"],
 ] as const;
 
+function daysUntil(iso: string | null | undefined): number | null {
+  if (!iso) return null;
+  return Math.ceil((new Date(iso).getTime() - Date.now()) / 86_400_000);
+}
+
 function Candidaturas() {
   const fn = useServerFn(listMyCandidaturas);
   const { data = [], isLoading } = useQuery({
@@ -74,24 +79,40 @@ function Candidaturas() {
                 <span className="font-mono text-[10px] text-muted-foreground">{items.length}</span>
               </div>
               <div className="space-y-2">
-                {items.map((r) => (
-                  <Link
-                    key={r.id}
-                    to="/portal/candidaturas/$id"
-                    params={{ id: r.id }}
-                    className="block hairline bg-card p-3 hover:border-foreground"
-                  >
-                    <div className="text-xs font-medium leading-snug">
-                      {(r.projeto as { nome: string } | null)?.nome ?? "—"}
-                    </div>
-                    <div className="mt-1 text-[11px] text-muted-foreground line-clamp-2">
-                      {(r.edital as { titulo: string } | null)?.titulo ?? "—"}
-                    </div>
-                    <div className="mt-2 font-mono text-[10px] text-muted-foreground">
-                      {r.progresso}%
-                    </div>
-                  </Link>
-                ))}
+                {items.map((r) => {
+                  const ed = r.edital as { titulo: string; data_encerramento: string | null } | null;
+                  const dias = daysUntil(ed?.data_encerramento);
+                  const urgente =
+                    dias !== null &&
+                    dias >= 0 &&
+                    dias <= 7 &&
+                    !["submetido", "aprovado", "reprovado"].includes(r.estagio);
+                  return (
+                    <Link
+                      key={r.id}
+                      to="/portal/candidaturas/$id"
+                      params={{ id: r.id }}
+                      className="block hairline bg-card p-3 hover:border-foreground"
+                    >
+                      <div className="text-xs font-medium leading-snug">
+                        {(r.projeto as { nome: string } | null)?.nome ?? "—"}
+                      </div>
+                      <div className="mt-1 text-[11px] text-muted-foreground line-clamp-2">
+                        {ed?.titulo ?? "—"}
+                      </div>
+                      <div className="mt-2 flex items-center justify-between gap-2">
+                        <span className="font-mono text-[10px] text-muted-foreground">
+                          {r.progresso}%
+                        </span>
+                        {urgente && (
+                          <span className="rounded-sm bg-destructive/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-destructive">
+                            {dias === 0 ? "hoje" : `${dias}d`}
+                          </span>
+                        )}
+                      </div>
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           );
