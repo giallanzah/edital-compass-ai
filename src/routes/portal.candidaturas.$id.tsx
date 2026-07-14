@@ -137,6 +137,12 @@ function CandidaturaDetalhe() {
     | { score: number; parecer: string; pontos_fortes: string[]; riscos: string[] }
     | undefined;
 
+  const urgente =
+    dias !== null &&
+    dias >= 0 &&
+    dias <= 7 &&
+    !["submetido", "aprovado", "reprovado"].includes(c.estagio);
+
   return (
     <div className="mx-auto max-w-5xl px-8 py-10">
       <button
@@ -145,6 +151,18 @@ function CandidaturaDetalhe() {
       >
         ← Candidaturas
       </button>
+
+      {urgente && (
+        <div className="mt-4 flex items-center gap-3 rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-destructive" />
+          <div>
+            <strong>Prazo curto:</strong>{" "}
+            {dias === 0
+              ? "o edital encerra hoje."
+              : `restam ${dias} dia${dias === 1 ? "" : "s"} até o encerramento.`}
+          </div>
+        </div>
+      )}
 
       <div className="mt-6 flex flex-wrap items-start justify-between gap-4">
         <div>
@@ -161,6 +179,7 @@ function CandidaturaDetalhe() {
           </div>
         </div>
       </div>
+
 
       <div className="mt-8 grid gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-8">

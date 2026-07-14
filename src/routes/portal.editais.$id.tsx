@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { getEdital } from "@/lib/scrape.functions";
 import { computeMatch } from "@/lib/portal.functions";
+import { resumirEdital, extrairRequisitos } from "@/lib/ai.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { CandidatarModal } from "@/components/CandidatarModal";
 
@@ -50,6 +51,8 @@ function EditalDetail() {
   const { id } = Route.useParams();
   const data = Route.useLoaderData();
   const matchFn = useServerFn(computeMatch);
+  const resumoFn = useServerFn(resumirEdital);
+  const requisitosFn = useServerFn(extrairRequisitos);
 
   const [session, setSession] = useState<Session | null | undefined>(undefined);
   useEffect(() => {
@@ -60,11 +63,21 @@ function EditalDetail() {
 
   const [modalOpen, setModalOpen] = useState(false);
 
+  const editalId = (data?.edital as { id: string } | undefined)?.id;
+
   const matchQ = useQuery({
     queryKey: ["match", id, session?.user?.id ?? ""],
-    queryFn: () => matchFn({ data: { editalId: (data?.edital as { id: string }).id } }),
-    enabled: !!session && !!data?.edital,
+    queryFn: () => matchFn({ data: { editalId: editalId! } }),
+    enabled: !!session && !!editalId,
   });
+
+  const resumoMut = useMutation({
+    mutationFn: async () => resumoFn({ data: { editalId: editalId! } }),
+  });
+  const requisitosMut = useMutation({
+    mutationFn: async () => requisitosFn({ data: { editalId: editalId! } }),
+  });
+
 
   if (!data) {
     return (
@@ -144,8 +157,83 @@ function EditalDetail() {
         ))}
       </div>
 
+      {session && (
+        <section className="mt-10">
+          <div className="mb-3 flex items-center justify-between">
+            <div className="eyebrow">Análise com IA</div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => resumoMut.mutate()}
+                disabled={resumoMut.isPending}
+                className="inline-flex h-8 items-center rounded-sm hairline px-3 text-xs hover:bg-secondary disabled:opacity-40"
+              >
+                {resumoMut.isPending ? "Resumindo…" : "Resumir com IA"}
+              </button>
+              <button
+                onClick={() => requisitosMut.mutate()}
+                disabled={requisitosMut.isPending}
+                className="inline-flex h-8 items-center rounded-sm hairline px-3 text-xs hover:bg-secondary disabled:opacity-40"
+              >
+                {requisitosMut.isPending ? "Extraindo…" : "Extrair requisitos"}
+              </button>
+            </div>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="hairline p-4">
+              <div className="eyebrow mb-2">Resumo executivo</div>
+              {resumoMut.data ? (
+                <dl className="space-y-2 text-xs">
+                  <div>
+                    <dt className="eyebrow">Objetivo</dt>
+                    <dd>{(resumoMut.data as { objetivo: string }).objetivo}</dd>
+                  </div>
+                  <div>
+                    <dt className="eyebrow">Quem pode</dt>
+                    <dd>{(resumoMut.data as { publico: string }).publico}</dd>
+                  </div>
+                  <div>
+                    <dt className="eyebrow">Valor / prazo</dt>
+                    <dd>{(resumoMut.data as { valor_prazo: string }).valor_prazo}</dd>
+                  </div>
+                </dl>
+              ) : resumoMut.error ? (
+                <div className="text-[11px] text-destructive">
+                  {(resumoMut.error as Error).message}
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  Clique em "Resumir com IA" para gerar 3 bullets — objetivo, público-alvo e valor/prazo.
+                </p>
+              )}
+            </div>
+            <div className="hairline p-4">
+              <div className="eyebrow mb-2">Checklist de requisitos</div>
+              {requisitosMut.data ? (
+                <ul className="space-y-1.5 text-xs">
+                  {((requisitosMut.data as { itens: string[] }).itens ?? []).map((r, i) => (
+                    <li key={i} className="flex items-start gap-2">
+                      <span className="mt-0.5">□</span>
+                      <span>{r}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : requisitosMut.error ? (
+                <div className="text-[11px] text-destructive">
+                  {(requisitosMut.error as Error).message}
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  Extraia automaticamente a lista de requisitos objetivos do edital.
+                </p>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
       <div className="mt-10 grid gap-10 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-10">
+
           {e.descricao_completa && (
             <section>
               <div className="eyebrow mb-3">Descrição</div>

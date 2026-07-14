@@ -21,12 +21,14 @@ export function PortalShell({
   badge,
   rightSlot,
   session,
+  alertasPrazo = 0,
 }: {
   items: Item[];
   title: string;
   badge?: string;
   rightSlot?: ReactNode;
   session?: Session | null;
+  alertasPrazo?: number;
 }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
@@ -64,6 +66,16 @@ export function PortalShell({
             </div>
           </div>
           <div className="flex items-center gap-3">
+            {alertasPrazo > 0 && (
+              <Link
+                to="/portal/candidaturas"
+                title={`${alertasPrazo} candidatura(s) com prazo em ≤7 dias`}
+                className="inline-flex h-7 items-center gap-1.5 rounded-sm border border-destructive/40 bg-destructive/10 px-2 font-mono text-[10px] uppercase tracking-wider text-destructive hover:bg-destructive/15"
+              >
+                <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-destructive" />
+                {alertasPrazo} prazo{alertasPrazo > 1 ? "s" : ""} ≤7d
+              </Link>
+            )}
             {rightSlot}
             {showAccount ? (
               <div className="relative">
