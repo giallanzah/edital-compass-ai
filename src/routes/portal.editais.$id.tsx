@@ -157,8 +157,83 @@ function EditalDetail() {
         ))}
       </div>
 
+      {session && (
+        <section className="mt-10">
+          <div className="mb-3 flex items-center justify-between">
+            <div className="eyebrow">Análise com IA</div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => resumoMut.mutate()}
+                disabled={resumoMut.isPending}
+                className="inline-flex h-8 items-center rounded-sm hairline px-3 text-xs hover:bg-secondary disabled:opacity-40"
+              >
+                {resumoMut.isPending ? "Resumindo…" : "Resumir com IA"}
+              </button>
+              <button
+                onClick={() => requisitosMut.mutate()}
+                disabled={requisitosMut.isPending}
+                className="inline-flex h-8 items-center rounded-sm hairline px-3 text-xs hover:bg-secondary disabled:opacity-40"
+              >
+                {requisitosMut.isPending ? "Extraindo…" : "Extrair requisitos"}
+              </button>
+            </div>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="hairline p-4">
+              <div className="eyebrow mb-2">Resumo executivo</div>
+              {resumoMut.data ? (
+                <dl className="space-y-2 text-xs">
+                  <div>
+                    <dt className="eyebrow">Objetivo</dt>
+                    <dd>{(resumoMut.data as { objetivo: string }).objetivo}</dd>
+                  </div>
+                  <div>
+                    <dt className="eyebrow">Quem pode</dt>
+                    <dd>{(resumoMut.data as { publico: string }).publico}</dd>
+                  </div>
+                  <div>
+                    <dt className="eyebrow">Valor / prazo</dt>
+                    <dd>{(resumoMut.data as { valor_prazo: string }).valor_prazo}</dd>
+                  </div>
+                </dl>
+              ) : resumoMut.error ? (
+                <div className="text-[11px] text-destructive">
+                  {(resumoMut.error as Error).message}
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  Clique em "Resumir com IA" para gerar 3 bullets — objetivo, público-alvo e valor/prazo.
+                </p>
+              )}
+            </div>
+            <div className="hairline p-4">
+              <div className="eyebrow mb-2">Checklist de requisitos</div>
+              {requisitosMut.data ? (
+                <ul className="space-y-1.5 text-xs">
+                  {((requisitosMut.data as { itens: string[] }).itens ?? []).map((r, i) => (
+                    <li key={i} className="flex items-start gap-2">
+                      <span className="mt-0.5">□</span>
+                      <span>{r}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : requisitosMut.error ? (
+                <div className="text-[11px] text-destructive">
+                  {(requisitosMut.error as Error).message}
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  Extraia automaticamente a lista de requisitos objetivos do edital.
+                </p>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
       <div className="mt-10 grid gap-10 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-10">
+
           {e.descricao_completa && (
             <section>
               <div className="eyebrow mb-3">Descrição</div>
