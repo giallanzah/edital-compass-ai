@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   getCandidatura,
   mudarEstagio,
@@ -9,8 +9,9 @@ import {
   criarTarefa,
   toggleTarefa,
   removerTarefa,
+  salvarProposta,
 } from "@/lib/candidatura.functions";
-import { extrairRequisitos, analisarAderencia } from "@/lib/ai.functions";
+import { extrairRequisitos, analisarAderencia, gerarProposta } from "@/lib/ai.functions";
 
 export const Route = createFileRoute("/portal/candidaturas/$id")({
   head: () => ({ meta: [{ title: "Candidatura · fomenta.ai" }] }),
@@ -39,15 +40,20 @@ function CandidaturaDetalhe() {
   const removerFn = useServerFn(removerTarefa);
   const requisitosFn = useServerFn(extrairRequisitos);
   const aderenciaFn = useServerFn(analisarAderencia);
+  const propostaFn = useServerFn(gerarProposta);
+  const salvarPropostaFn = useServerFn(salvarProposta);
 
   const q = useQuery({ queryKey: ["candidatura", id], queryFn: () => getFn({ data: { id } }) });
 
   const [obs, setObs] = useState("");
   const [novaTarefa, setNovaTarefa] = useState("");
+  const [propostaMd, setPropostaMd] = useState("");
+  const [confirmandoRegen, setConfirmandoRegen] = useState(false);
 
   useEffect(() => {
     if (q.data?.observacoes != null) setObs(q.data.observacoes ?? "");
-  }, [q.data?.observacoes]);
+    if (q.data?.proposta_md != null) setPropostaMd(q.data.proposta_md ?? "");
+  }, [q.data?.observacoes, q.data?.proposta_md]);
 
   const estMut = useMutation({
     mutationFn: async (estagio: string) => estFn({ data: { id, estagio } }),
@@ -99,6 +105,20 @@ function CandidaturaDetalhe() {
       if (!edId || !prId) throw new Error("dados incompletos");
       return aderenciaFn({ data: { editalId: edId, projetoId: prId } });
     },
+  });
+
+  const propostaMut = useMutation({
+    mutationFn: async () => propostaFn({ data: { candidaturaId: id } }),
+    onSuccess: (r) => {
+      setPropostaMd((r as { markdown: string }).markdown);
+      setConfirmandoRegen(false);
+      qc.invalidateQueries({ queryKey: ["candidatura", id] });
+    },
+  });
+
+  const salvarPropostaMut = useMutation({
+    mutationFn: async () => salvarPropostaFn({ data: { id, proposta_md: propostaMd } }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["candidatura", id] }),
   });
 
   if (q.isLoading) {
@@ -278,6 +298,106 @@ function CandidaturaDetalhe() {
               <div className="mt-1 text-[10px] font-mono text-muted-foreground">salvando…</div>
             )}
           </section>
+
+          <section>
+            <div className="mb-3 flex items-center justify-between">
+              <div className="eyebrow">Rascunho de proposta (IA)</div>
+              <div className="flex items-center gap-2">
+                {c.proposta_gerada_em && (
+                  <span className="font-mono text-[10px] text-muted-foreground">
+                    gerado {new Date(c.proposta_gerada_em).toLocaleString("pt-BR")}
+                  </span>
+                )}
+                {!propostaMd && !propostaMut.isPending && (
+                  <button
+                    onClick={() => propostaMut.mutate()}
+                    className="inline-flex h-8 items-center rounded-sm bg-foreground px-3 text-xs font-medium text-background"
+                  >
+                    Gerar rascunho com IA
+                  </button>
+                )}
+                {propostaMd && !confirmandoRegen && (
+                  <button
+                    onClick={() => setConfirmandoRegen(true)}
+                    className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground hover:text-foreground"
+                  >
+                    regenerar
+                  </button>
+                )}
+                {confirmandoRegen && (
+                  <>
+                    <span className="font-mono text-[10px] text-muted-foreground">
+                      sobrescreve o texto atual —
+                    </span>
+                    <button
+                      onClick={() => propostaMut.mutate()}
+                      disabled={propostaMut.isPending}
+                      className="font-mono text-[10px] uppercase tracking-wider text-destructive hover:underline disabled:opacity-40"
+                    >
+                      {propostaMut.isPending ? "gerando…" : "confirmar"}
+                    </button>
+                    <button
+                      onClick={() => setConfirmandoRegen(false)}
+                      className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground hover:text-foreground"
+                    >
+                      cancelar
+                    </button>
+                  </>
+                )}
+                {propostaMut.isPending && !confirmandoRegen && (
+                  <span className="font-mono text-[10px] text-muted-foreground">gerando…</span>
+                )}
+              </div>
+            </div>
+
+            {!propostaMd && !propostaMut.isPending ? (
+              <div className="hairline p-6 text-center text-xs text-muted-foreground">
+                Combina edital, requisitos e perfil da empresa em um documento com sumário
+                executivo, aderência, metodologia, cronograma, equipe e orçamento indicativo.
+              </div>
+            ) : (
+              <div className="grid gap-3 md:grid-cols-2">
+                <textarea
+                  value={propostaMd}
+                  onChange={(e) => setPropostaMd(e.target.value)}
+                  rows={22}
+                  className="w-full rounded-sm hairline bg-background p-3 font-mono text-[11px] leading-relaxed"
+                  placeholder="Markdown da proposta…"
+                />
+                <div className="hairline overflow-auto p-4 text-sm leading-relaxed">
+                  {propostaMd ? renderMarkdown(propostaMd) : (
+                    <span className="text-muted-foreground">preview aparecerá aqui</span>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {propostaMd && (
+              <div className="mt-3 flex items-center gap-3">
+                <button
+                  onClick={() => salvarPropostaMut.mutate()}
+                  disabled={salvarPropostaMut.isPending}
+                  className="inline-flex h-8 items-center rounded-sm bg-foreground px-3 text-xs font-medium text-background disabled:opacity-40"
+                >
+                  {salvarPropostaMut.isPending ? "Salvando…" : "Salvar"}
+                </button>
+                <button
+                  onClick={() => navigator.clipboard.writeText(propostaMd)}
+                  className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground hover:text-foreground"
+                >
+                  copiar
+                </button>
+                {salvarPropostaMut.isSuccess && (
+                  <span className="text-[10px] font-mono text-muted-foreground">salvo ✓</span>
+                )}
+              </div>
+            )}
+            {propostaMut.error && (
+              <div className="mt-3 text-[11px] text-destructive">
+                {(propostaMut.error as Error).message}
+              </div>
+            )}
+          </section>
         </div>
 
         <aside className="space-y-4">
@@ -353,4 +473,79 @@ function CandidaturaDetalhe() {
       </div>
     </div>
   );
+}
+
+// Renderizador de markdown minimalista (subset: h1/h2/h3, listas, negrito, itálico, parágrafo).
+function renderMarkdown(md: string) {
+  const lines = md.split("\n");
+  const nodes: React.ReactNode[] = [];
+  let buffer: string[] = [];
+  let inList = false;
+  const flushPara = () => {
+    if (buffer.length) {
+      nodes.push(
+        <p key={nodes.length} className="mb-3">
+          {inline(buffer.join(" "))}
+        </p>,
+      );
+      buffer = [];
+    }
+  };
+  const flushList = (items: string[]) => {
+    nodes.push(
+      <ul key={nodes.length} className="mb-3 list-disc space-y-1 pl-5">
+        {items.map((it, i) => (
+          <li key={i}>{inline(it)}</li>
+        ))}
+      </ul>,
+    );
+  };
+  let listBuf: string[] = [];
+  for (const raw of lines) {
+    const l = raw.trimEnd();
+    if (/^###\s+/.test(l)) {
+      flushPara();
+      if (inList) { flushList(listBuf); listBuf = []; inList = false; }
+      nodes.push(<h4 key={nodes.length} className="mb-2 mt-4 text-sm font-medium">{l.replace(/^###\s+/, "")}</h4>);
+    } else if (/^##\s+/.test(l)) {
+      flushPara();
+      if (inList) { flushList(listBuf); listBuf = []; inList = false; }
+      nodes.push(<h3 key={nodes.length} className="mb-2 mt-5 text-base font-medium tracking-tight">{l.replace(/^##\s+/, "")}</h3>);
+    } else if (/^#\s+/.test(l)) {
+      flushPara();
+      if (inList) { flushList(listBuf); listBuf = []; inList = false; }
+      nodes.push(<h2 key={nodes.length} className="mb-2 mt-5 text-lg font-medium tracking-tight">{l.replace(/^#\s+/, "")}</h2>);
+    } else if (/^[-*]\s+/.test(l)) {
+      flushPara();
+      inList = true;
+      listBuf.push(l.replace(/^[-*]\s+/, ""));
+    } else if (!l.trim()) {
+      flushPara();
+      if (inList) { flushList(listBuf); listBuf = []; inList = false; }
+    } else {
+      if (inList) { flushList(listBuf); listBuf = []; inList = false; }
+      buffer.push(l);
+    }
+  }
+  flushPara();
+  if (inList) flushList(listBuf);
+  return <>{nodes}</>;
+}
+
+function inline(s: string): React.ReactNode {
+  const parts: React.ReactNode[] = [];
+  const re = /(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g;
+  let last = 0;
+  let m: RegExpExecArray | null;
+  let k = 0;
+  while ((m = re.exec(s)) !== null) {
+    if (m.index > last) parts.push(s.slice(last, m.index));
+    const tok = m[0];
+    if (tok.startsWith("**")) parts.push(<strong key={k++}>{tok.slice(2, -2)}</strong>);
+    else if (tok.startsWith("`")) parts.push(<code key={k++} className="rounded bg-secondary px-1 font-mono text-[11px]">{tok.slice(1, -1)}</code>);
+    else parts.push(<em key={k++}>{tok.slice(1, -1)}</em>);
+    last = m.index + tok.length;
+  }
+  if (last < s.length) parts.push(s.slice(last));
+  return parts;
 }

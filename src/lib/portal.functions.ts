@@ -215,3 +215,41 @@ export const editaisDestaque = createServerFn({ method: "GET" }).handler(async (
   if (error) throw new Error(error.message);
   return data ?? [];
 });
+
+// ---------- Notificações ----------
+export type NotifPrefs = {
+  email: string;
+  alertas_prazo: boolean;
+  alertas_novos_editais: boolean;
+  min_score: number;
+};
+
+export const getNotifPrefs = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase
+      .from("notif_preferencias")
+      .select("email, alertas_prazo, alertas_novos_editais, min_score")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    return data;
+  });
+
+export const saveNotifPrefs = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: NotifPrefs) => input)
+  .handler(async ({ data, context }) => {
+    const payload = {
+      user_id: context.userId,
+      email: data.email,
+      alertas_prazo: data.alertas_prazo,
+      alertas_novos_editais: data.alertas_novos_editais,
+      min_score: Math.max(0, Math.min(100, data.min_score | 0)),
+    };
+    const { error } = await context.supabase
+      .from("notif_preferencias")
+      .upsert(payload, { onConflict: "user_id" });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });

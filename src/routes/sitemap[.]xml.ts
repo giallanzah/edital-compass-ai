@@ -1,4 +1,4 @@
-// Sitemap dinâmico: landing, catálogo e todos os editais ativos.
+// Sitemap dinâmico: landing, catálogo e todos os editais abertos ou por abrir.
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/sitemap.xml")({
@@ -10,9 +10,10 @@ export const Route = createFileRoute("/sitemap.xml")({
 
         const { data: rows } = await supabaseAdmin
           .from("editais")
-          .select("slug, updated_at")
+          .select("slug, updated_at, status")
           .eq("ativo", true)
           .eq("oculto", false)
+          .in("status", ["aberto", "abre_em_breve", "encerrando_em_breve"])
           .order("updated_at", { ascending: false })
           .limit(5000);
 
