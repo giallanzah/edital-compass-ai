@@ -84,7 +84,7 @@ export const getCandidatura = createServerFn({ method: "GET" })
     const { data: row, error } = await context.supabase
       .from("candidaturas")
       .select(
-        "id, estagio, progresso, observacoes, created_at, updated_at, projeto:projetos(id, nome, descricao), edital:editais(id, titulo, slug, fonte, data_encerramento, url_original, tipo_apoio, status)",
+        "id, estagio, progresso, observacoes, proposta_md, proposta_gerada_em, created_at, updated_at, projeto:projetos(id, nome, descricao), edital:editais(id, titulo, slug, fonte, data_encerramento, url_original, tipo_apoio, status)",
       )
       .eq("id", data.id)
       .eq("user_id", context.userId)
@@ -97,6 +97,19 @@ export const getCandidatura = createServerFn({ method: "GET" })
       .eq("candidatura_id", data.id)
       .order("ordem", { ascending: true });
     return { ...row, tarefas: tarefas ?? [] };
+  });
+
+export const salvarProposta = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { id: string; proposta_md: string }) => input)
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase
+      .from("candidaturas")
+      .update({ proposta_md: data.proposta_md })
+      .eq("id", data.id)
+      .eq("user_id", context.userId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
   });
 
 export const criarTarefa = createServerFn({ method: "POST" })

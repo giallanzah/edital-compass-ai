@@ -50,6 +50,8 @@ import { Route as AdminAnalistasRouteImport } from './routes/admin.analistas'
 import { Route as PortalEditaisIdRouteImport } from './routes/portal.editais.$id'
 import { Route as PortalCandidaturasIdRouteImport } from './routes/portal.candidaturas.$id'
 import { Route as ApiPublicCronScrapeRouteImport } from './routes/api/public/cron/scrape'
+import { Route as ApiPublicCronNotificarRouteImport } from './routes/api/public/cron/notificar'
+import { Route as ApiOgEditalIdRouteImport } from './routes/api/og.edital.$id'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -256,6 +258,16 @@ const ApiPublicCronScrapeRoute = ApiPublicCronScrapeRouteImport.update({
   path: '/api/public/cron/scrape',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicCronNotificarRoute = ApiPublicCronNotificarRouteImport.update({
+  id: '/api/public/cron/notificar',
+  path: '/api/public/cron/notificar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiOgEditalIdRoute = ApiOgEditalIdRouteImport.update({
+  id: '/api/og/edital/$id',
+  path: '/api/og/edital/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -298,6 +310,8 @@ export interface FileRoutesByFullPath {
   '/portal/': typeof PortalIndexRoute
   '/portal/candidaturas/$id': typeof PortalCandidaturasIdRoute
   '/portal/editais/$id': typeof PortalEditaisIdRoute
+  '/api/og/edital/$id': typeof ApiOgEditalIdRoute
+  '/api/public/cron/notificar': typeof ApiPublicCronNotificarRoute
   '/api/public/cron/scrape': typeof ApiPublicCronScrapeRoute
 }
 export interface FileRoutesByTo {
@@ -339,6 +353,8 @@ export interface FileRoutesByTo {
   '/portal': typeof PortalIndexRoute
   '/portal/candidaturas/$id': typeof PortalCandidaturasIdRoute
   '/portal/editais/$id': typeof PortalEditaisIdRoute
+  '/api/og/edital/$id': typeof ApiOgEditalIdRoute
+  '/api/public/cron/notificar': typeof ApiPublicCronNotificarRoute
   '/api/public/cron/scrape': typeof ApiPublicCronScrapeRoute
 }
 export interface FileRoutesById {
@@ -383,6 +399,8 @@ export interface FileRoutesById {
   '/portal/': typeof PortalIndexRoute
   '/portal/candidaturas/$id': typeof PortalCandidaturasIdRoute
   '/portal/editais/$id': typeof PortalEditaisIdRoute
+  '/api/og/edital/$id': typeof ApiOgEditalIdRoute
+  '/api/public/cron/notificar': typeof ApiPublicCronNotificarRoute
   '/api/public/cron/scrape': typeof ApiPublicCronScrapeRoute
 }
 export interface FileRouteTypes {
@@ -428,6 +446,8 @@ export interface FileRouteTypes {
     | '/portal/'
     | '/portal/candidaturas/$id'
     | '/portal/editais/$id'
+    | '/api/og/edital/$id'
+    | '/api/public/cron/notificar'
     | '/api/public/cron/scrape'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -469,6 +489,8 @@ export interface FileRouteTypes {
     | '/portal'
     | '/portal/candidaturas/$id'
     | '/portal/editais/$id'
+    | '/api/og/edital/$id'
+    | '/api/public/cron/notificar'
     | '/api/public/cron/scrape'
   id:
     | '__root__'
@@ -512,6 +534,8 @@ export interface FileRouteTypes {
     | '/portal/'
     | '/portal/candidaturas/$id'
     | '/portal/editais/$id'
+    | '/api/og/edital/$id'
+    | '/api/public/cron/notificar'
     | '/api/public/cron/scrape'
   fileRoutesById: FileRoutesById
 }
@@ -520,6 +544,8 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   PortalRoute: typeof PortalRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ApiOgEditalIdRoute: typeof ApiOgEditalIdRoute
+  ApiPublicCronNotificarRoute: typeof ApiPublicCronNotificarRoute
   ApiPublicCronScrapeRoute: typeof ApiPublicCronScrapeRoute
 }
 
@@ -812,6 +838,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCronScrapeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/cron/notificar': {
+      id: '/api/public/cron/notificar'
+      path: '/api/public/cron/notificar'
+      fullPath: '/api/public/cron/notificar'
+      preLoaderRoute: typeof ApiPublicCronNotificarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/og/edital/$id': {
+      id: '/api/og/edital/$id'
+      path: '/api/og/edital/$id'
+      fullPath: '/api/og/edital/$id'
+      preLoaderRoute: typeof ApiOgEditalIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -928,18 +968,10 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   PortalRoute: PortalRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ApiOgEditalIdRoute: ApiOgEditalIdRoute,
+  ApiPublicCronNotificarRoute: ApiPublicCronNotificarRoute,
   ApiPublicCronScrapeRoute: ApiPublicCronScrapeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

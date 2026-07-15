@@ -1,63 +1,88 @@
-# Bloco 3 — Fechamento do loop e backoffice real
 
-O backend do Bloco 2 (candidaturas, IA, tarefas, roles) já está no ar. Este ciclo transforma isso em experiência visível para o usuário final e para o administrador, além de resolver as 3 pendências de UX que ficaram em aberto.
+# Bloco 4 — Distribuição, notificação e produção de conteúdo
+
+Bloco 3 fechou o loop de UX (onboarding, alertas, IA no detalhe, backoffice real). Falta o que faz o portal **crescer** (SEO dos editais públicos), **reter** (notificações que trazem o usuário de volta) e **produzir valor tangível** (documento de projeto gerado por IA a partir do edital + perfil da empresa).
 
 ## Objetivos
-1. Ninguém usa o portal sem perfil de empresa preenchido.
-2. Toda candidatura ativa com prazo curto grita na interface.
-3. IA de resumo/requisitos aparece no detalhe do edital com 1 clique e alimenta o checklist da candidatura.
-4. Backoffice deixa de ter stub em Empresas, Usuários e Projetos.
-5. Links compartilhados de edital têm preview decente (og:image dinâmico).
+1. Editais públicos viram links compartilháveis com preview visual — pendência declarada do Bloco 3.
+2. Usuário recebe alerta por email quando um edital com fit alto abre ou quando prazo de candidatura ativa se aproxima.
+3. Um clique no detalhe da candidatura gera um rascunho de proposta técnica em markdown, editável, salvo no banco.
+4. Kanban de candidaturas deixa de ser dropdown-only e ganha visão por estágio.
 
 ---
 
-## 1. Onboarding obrigatório
-- `beforeLoad` em `src/routes/portal.tsx` (layout autenticado): se usuário logado e `empresas_perfil` não existe, `throw redirect({ to: '/portal/onboarding' })`.
-- Exceção: a própria rota `/portal/onboarding` e `/portal/editais*` (públicas) não redirecionam.
-- Após concluir onboarding, redirect para `/portal` (dashboard).
-- Estado vazio do dashboard (sem projetos ou sem candidaturas) ganha CTA claro em vez de lista vazia.
+## 1. SEO dinâmico dos editais (pendência do Bloco 3)
+- Nova rota `src/routes/api/og.edital.$id.ts`: retorna SVG (image/svg+xml) com título, órgão, prazo e branding minimalista do projeto. Sem dep nativa; SVG é aceito por WhatsApp/LinkedIn/Twitter como og:image.
+- `head()` de `/portal/editais/$id` adiciona `og:image` e `twitter:image` apontando para `${origin}/api/og/edital/${id}` (URL absoluta, derivada do loader).
+- `sitemap.xml.ts` amplia a listagem: inclui todos os editais com `status ∈ {aberto, abre_em_breve}` (hoje só lista home + rotas fixas).
+- Meta `description` do detalhe passa a usar `resumo_ia` quando disponível, com fallback para os primeiros 155 chars do texto do edital.
 
-## 2. Alertas de prazo no portal
-- Hook único chamando `alertasPrazo()` (já existe em `candidatura.functions.ts`).
-- Badge no header do `PortalShell` quando ≥1 candidatura com edital encerrando em ≤7 dias, clicável → `/portal/candidaturas`.
-- Na lista `/portal/candidaturas`, cada card com prazo ≤7d recebe pill vermelha "Encerra em X dias".
-- No detalhe da candidatura, banner de alerta no topo quando aplicável.
+## 2. Notificações por email (opt-in)
+Modelo: **preferência do usuário + job diário**, sem broker externo — usa Resend via connector.
+- Nova tabela `notif_preferencias` (user_id, alertas_prazo bool, alertas_novos_editais bool, min_score int). RLS por user_id. GRANT completo.
+- Nova tabela `notif_enviadas` (user_id, tipo, ref_id, enviado_em) para deduplicar.
+- Server route `src/routes/api/public/cron/notificar.ts` (pg_cron diário) que, para cada usuário com preferências ativas:
+  - **Prazo**: se alguma candidatura ativa tem edital encerrando em ≤3d e ainda não notificado hoje, envia email.
+  - **Novos editais**: cruza editais abertos nas últimas 24h com `empresas_perfil` do usuário via `computeScore` (`src/lib/match.ts`); se ≥1 acima do `min_score`, envia digest.
+- Seção "Notificações" em `/portal/perfil` para editar preferências.
+- Templates de email em HTML mínimo (paleta do projeto), enviados por Resend (secret `RESEND_API_KEY` — solicitar via add_secret na hora).
 
-## 3. IA no detalhe do edital
-- Em `/portal/editais/$id`: dois botões — "Resumir com IA" e "Extrair requisitos".
-- Chamam `resumirEdital` / `extrairRequisitos` (já existentes). Cache automático via `ia_hash`.
-- Resultado renderizado em card dedicado. Se já cacheado, aparece imediatamente ao abrir a página.
-- No modal `CandidatarModal`, ao criar candidatura, opção "importar requisitos como checklist" → cria tarefas a partir de `requisitos_ia.itens`.
-- No detalhe da candidatura, botão "Analisar aderência" chama `analisarAderencia` (já existente) e mostra parecer + score.
+## 3. Geração de proposta técnica por IA
+Em `/portal/candidaturas/$id`, novo card "Rascunho de proposta":
+- Botão "Gerar rascunho com IA" chama nova server fn `gerarProposta` (em `src/lib/ai.functions.ts`).
+- Prompt combina: `editais.texto` + `editais.requisitos_ia` + `empresas_perfil` + `projetos.descricao` da candidatura.
+- Modelo `openai/gpt-5.5`, saída markdown com seções fixas (Sumário Executivo, Aderência ao Edital, Metodologia, Cronograma, Equipe, Orçamento indicativo).
+- Persistência: nova coluna `candidaturas.proposta_md` (text) + `proposta_gerada_em` (timestamptz).
+- UI: editor textarea simples com preview markdown ao lado, botão "Salvar" e "Regenerar" (regenerar exige confirmação).
 
-## 4. Backoffice — 3 telas reais
-Cada uma substitui o `AdminStubPage` correspondente e usa `admin.functions.ts` já existente, com gate por `has_role(auth.uid(),'ADMIN')`.
-
-- **`/admin/empresas`**: tabela de `empresas_perfil` com busca por nome/CNPJ, colunas (empresa, porte, UF, setor, #projetos, #candidaturas, criado em). Linha clicável abre drawer com detalhes.
-- **`/admin/usuarios`**: lista `auth.users` (via `supabaseAdmin` no server fn), mostra email, role atual, data de criação. Ação "promover a ADMIN" / "rebaixar" via `promover_usuario` RPC. Confirmação inline.
-- **`/admin/projetos`**: visão consolidada de `projetos` de todos os usuários, com filtro por status de candidatura e coluna com edital vinculado (se houver).
-
-Bootstrap do primeiro admin: seção discreta em `/admin/login` que chama `bootstrap_admin()` quando não existe nenhum ADMIN — some depois do primeiro.
-
-## 5. SEO dinâmico
-- `head()` de `/portal/editais/$id` gera `og:image` via rota `/api/og/edital/$id` (SVG→PNG server-side simples: título + fonte + prazo, tipografia do projeto).
-- `sitemap.xml.ts`: incluir todos os editais com `status ∈ {aberto, abre_em_breve}`.
+## 4. Kanban de candidaturas
+- `/portal/candidaturas` ganha toggle "Lista / Kanban".
+- Kanban: 6 colunas fixas (rascunho, aplicando, em_revisao, submetido, aprovado, reprovado), cards enxutos (título do edital, prazo, pill se ≤7d).
+- Mudança de estágio via drag-and-drop usa `@dnd-kit/core` (leve, sem dep nativa). Chama `atualizarEstagioCandidatura` já existente.
+- Persistência de preferência de visualização em `localStorage` (não em banco).
 
 ---
 
 ## Fora deste ciclo
-Pagamentos, envio de email, geração de documento de projeto pela IA, kanban drag-and-drop (mudança de estágio segue por dropdown), integrações de submissão externa.
+Pagamentos/Stripe, submissão externa automatizada aos portais dos editais, geração de PDF (fica em markdown), notificações push/webhook, mudanças no robô de coleta, redesign visual.
 
 ## Ordem de execução
-1. Onboarding gate + estados vazios do dashboard.
-2. Alertas de prazo (header badge + pills + banner).
-3. IA no detalhe do edital + import de checklist no modal + aderência no detalhe da candidatura.
-4. Admin: Empresas → Projetos → Usuários (nessa ordem; usuários por último por envolver service role).
-5. `og:image` dinâmico e sitemap ampliado.
+1. SEO: rota og.edital + head() + sitemap ampliado. (Rápido, entrega imediata.)
+2. Kanban (front-end puro, sem migração).
+3. Geração de proposta: migração `proposta_md` + server fn + UI.
+4. Notificações: migrações + preferências no perfil + cron + templates. (Último por depender de secret Resend e ter mais superfície.)
 
 ## Detalhes técnicos
-- Gate de onboarding: `beforeLoad` em `portal.tsx` faz `supabase.from('empresas_perfil').select('id').eq('user_id', user.id).maybeSingle()` client-side (layout já é `ssr:false` sob `_authenticated` se aplicável; caso contrário usar server fn `getPerfil`).
-- Alertas: `useQuery(['alertas-prazo'])` no `PortalShell`, refetch a cada 5 min.
-- OG image: rota `src/routes/api/og.edital.$id.ts` retornando `image/svg+xml` (sem dependência nativa; SVG é aceito por WhatsApp/Twitter como preview quando servido com o header correto — se precisar PNG, usar `@vercel/og` compatível com Worker).
-- Admin usuários: server fn com `await import('@/integrations/supabase/client.server')` dentro do handler + checagem `has_role`.
-- Nenhuma mudança no robô de coleta nem no design system.
+
+**og:image via SVG**
+```text
+src/routes/api/og.edital.$id.ts
+  loader lê edital pelo id (server publishable client, política TO anon já existe)
+  retorna new Response(svg, { headers: { 'content-type': 'image/svg+xml', 'cache-control': 'public, max-age=3600' } })
+```
+
+**Notificações — arquitetura**
+```text
+pg_cron (Supabase) → GET https://project--{id}.lovable.app/api/public/cron/notificar
+  header x-cron-secret (valida com timingSafeEqual)
+  supabaseAdmin (dentro do handler, via await import)
+  para cada usuário: monta payload → Resend REST → grava notif_enviadas
+```
+Se `RESEND_API_KEY` não existir no momento da execução, pedir via `secrets--add_secret` antes de escrever o handler.
+
+**Kanban**
+```text
+bun add @dnd-kit/core @dnd-kit/sortable
+DndContext com 6 <Column>; onDragEnd → atualizarEstagioCandidatura({ id, estagio })
+optimistic update via queryClient.setQueryData
+```
+
+**Proposta IA**
+```text
+gerarProposta.handler:
+  const gateway = createLovableAiGatewayProvider(process.env.LOVABLE_API_KEY!)
+  generateText({ model: gateway('openai/gpt-5.5'), prompt: buildPrompt(...) })
+  update candidaturas set proposta_md=..., proposta_gerada_em=now() where id=... and user_id=auth
+```
+
+Nenhuma mudança em: design system, robô de coleta, autenticação, RLS existente das tabelas atuais.

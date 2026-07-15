@@ -2,7 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
-import { getMyProfile, upsertMyProfile, type PerfilInput } from "@/lib/portal.functions";
+import {
+  getMyProfile,
+  upsertMyProfile,
+  getNotifPrefs,
+  saveNotifPrefs,
+  type PerfilInput,
+  type NotifPrefs,
+} from "@/lib/portal.functions";
 
 export const Route = createFileRoute("/portal/perfil")({
   head: () => ({ meta: [{ title: "Perfil · fomenta.ai" }] }),
@@ -164,6 +171,128 @@ function Perfil() {
           {saved && <span className="text-xs text-muted-foreground">salvo ✓</span>}
         </div>
       </form>
+
+      <NotifPrefsSection />
     </div>
+  );
+}
+
+function NotifPrefsSection() {
+  const qc = useQueryClient();
+  const getFn = useServerFn(getNotifPrefs);
+  const saveFn = useServerFn(saveNotifPrefs);
+  const { data } = useQuery({ queryKey: ["me", "notif-prefs"], queryFn: () => getFn() });
+  const [prefs, setPrefs] = useState<NotifPrefs>({
+    email: "",
+    alertas_prazo: true,
+    alertas_novos_editais: false,
+    min_score: 70,
+  });
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    if (data) setPrefs(data);
+  }, [data]);
+
+  const mut = useMutation({
+    mutationFn: (p: NotifPrefs) => saveFn({ data: p }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["me", "notif-prefs"] });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    },
+  });
+
+  return (
+    <section className="mt-16 border-t border-[var(--hairline)] pt-10">
+      <div className="eyebrow mb-2">Notificações</div>
+      <h2 className="text-2xl font-medium tracking-tight">Alertas por e-mail</h2>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Um digest diário. Sem spam, sem marketing — apenas o que exige ação sua.
+      </p>
+
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          mut.mutate(prefs);
+        }}
+        className="mt-6 space-y-5"
+      >
+        <label className="block max-w-md">
+          <span className="eyebrow mb-1.5 block">E-mail para envio</span>
+          <input
+            type="email"
+            required
+            value={prefs.email}
+            onChange={(e) => setPrefs({ ...prefs, email: e.target.value })}
+            placeholder="voce@empresa.com"
+            className="h-11 w-full hairline bg-transparent px-3 text-sm outline-none focus:border-foreground"
+          />
+        </label>
+
+        <label className="flex items-start gap-3">
+          <input
+            type="checkbox"
+            checked={prefs.alertas_prazo}
+            onChange={(e) => setPrefs({ ...prefs, alertas_prazo: e.target.checked })}
+            className="mt-1"
+          />
+          <div>
+            <div className="text-sm font-medium">Alertas de prazo</div>
+            <div className="text-xs text-muted-foreground">
+              Enviamos e-mail quando alguma candidatura ativa tem edital encerrando em ≤ 3 dias.
+            </div>
+          </div>
+        </label>
+
+        <label className="flex items-start gap-3">
+          <input
+            type="checkbox"
+            checked={prefs.alertas_novos_editais}
+            onChange={(e) => setPrefs({ ...prefs, alertas_novos_editais: e.target.checked })}
+            className="mt-1"
+          />
+          <div>
+            <div className="text-sm font-medium">Novos editais compatíveis</div>
+            <div className="text-xs text-muted-foreground">
+              Digest diário dos editais abertos nas últimas 24h com match acima do limiar abaixo.
+            </div>
+          </div>
+        </label>
+
+        <label className="block max-w-md">
+          <span className="eyebrow mb-1.5 block">
+            Match mínimo — {prefs.min_score}
+          </span>
+          <input
+            type="range"
+            min={0}
+            max={100}
+            step={5}
+            value={prefs.min_score}
+            onChange={(e) => setPrefs({ ...prefs, min_score: Number(e.target.value) })}
+            disabled={!prefs.alertas_novos_editais}
+            className="w-full"
+          />
+        </label>
+
+        {mut.isError && (
+          <div className="hairline border-destructive/40 p-3 text-xs text-destructive">
+            {(mut.error as Error).message}
+          </div>
+        )}
+
+        <div className="flex items-center gap-3">
+          <button
+            type="submit"
+            disabled={mut.isPending}
+            className="inline-flex h-11 items-center rounded-sm bg-foreground px-6 text-sm font-medium text-background hover:opacity-90 disabled:opacity-50"
+          >
+            {mut.isPending ? "Salvando…" : "Salvar preferências"}
+          </button>
+          {saved && <span className="text-xs text-muted-foreground">salvo ✓</span>}
+        </div>
+      </form>
+    </section>
   );
 }

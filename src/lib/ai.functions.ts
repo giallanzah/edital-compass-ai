@@ -172,3 +172,76 @@ Responda em JSON: {"score": 0-100, "parecer": "1-2 parágrafos", "pontos_fortes"
     if (!parsed) throw new Error("resposta_ia_invalida");
     return parsed;
   });
+
+// -------- Geração de proposta técnica em markdown --------
+export const gerarProposta = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { candidaturaId: string }) => input)
+  .handler(async ({ data, context }) => {
+    const { data: cand, error: ce } = await context.supabase
+      .from("candidaturas")
+      .select(
+        "id, edital:editais(titulo, descricao_completa, descricao_curta, publico_alvo, tema, data_encerramento, fonte, tipo_apoio, requisitos_ia), projeto:projetos(nome, descricao)",
+      )
+      .eq("id", data.candidaturaId)
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (ce) throw new Error(ce.message);
+    if (!cand) throw new Error("candidatura não encontrada");
+
+    const edital = cand.edital as Parameters<typeof contextoDoEdital>[0] & {
+      requisitos_ia: { itens?: string[] } | null;
+    };
+    const projeto = cand.projeto as { nome: string; descricao: string | null };
+
+    const { data: perfil } = await context.supabase
+      .from("empresas_perfil")
+      .select("nome_empresa, setor, porte, uf, estagio, temas, faturamento_faixa")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+
+    const requisitos = (edital.requisitos_ia?.itens ?? [])
+      .map((r, i) => `${i + 1}. ${r}`)
+      .join("\n");
+
+    const prompt = `Redija um rascunho de proposta técnica em Markdown para submissão a este edital brasileiro de fomento. Use tom formal, objetivo e específico ao contexto informado. Se algum dado faltar, escreva um marcador entre colchetes (ex.: [preencher orçamento detalhado]).
+
+EDITAL:
+${contextoDoEdital(edital)}
+
+${requisitos ? `REQUISITOS DO EDITAL:\n${requisitos}\n` : ""}
+EMPRESA PROPONENTE:
+${perfil ? `${perfil.nome_empresa} — porte ${perfil.porte ?? "?"}, UF ${perfil.uf ?? "?"}, setor ${perfil.setor ?? "?"}, estágio ${perfil.estagio ?? "?"}, faturamento ${perfil.faturamento_faixa ?? "?"}, temas: ${(perfil.temas ?? []).join(", ") || "—"}` : "sem perfil configurado"}
+
+PROJETO:
+${projeto.nome} — ${projeto.descricao ?? "sem descrição adicional"}
+
+Estruture o documento EXATAMENTE com as seções abaixo, nesta ordem, cada uma iniciada por um cabeçalho H2:
+## Sumário Executivo
+## Aderência ao Edital
+## Metodologia
+## Cronograma
+## Equipe
+## Orçamento Indicativo
+
+Retorne apenas o markdown, sem preâmbulo ou explicação.`;
+
+    const raw = await aiComplete({
+      model: MODEL_PRO,
+      system:
+        "Você é um redator brasileiro especialista em propostas de fomento (FINEP, CNPq, BNDES, Sebrae). Escreve em português do Brasil, com precisão e sem clichês. Sempre em Markdown.",
+      prompt,
+      maxTokens: 3500,
+    });
+    const md = raw.trim();
+    if (!md) throw new Error("resposta_ia_vazia");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin
+      .from("candidaturas")
+      .update({ proposta_md: md, proposta_gerada_em: new Date().toISOString() })
+      .eq("id", data.candidaturaId)
+      .eq("user_id", context.userId);
+
+    return { markdown: md };
+  });

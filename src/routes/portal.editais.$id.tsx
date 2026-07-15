@@ -16,23 +16,42 @@ export const Route = createFileRoute("/portal/editais/$id")({
   },
   head: ({ loaderData }) => {
     const e = loaderData?.edital as
-      | { titulo: string; descricao_curta: string | null; fonte: string }
+      | {
+          id: string;
+          slug: string | null;
+          titulo: string;
+          descricao_curta: string | null;
+          descricao_completa: string | null;
+          fonte: string;
+          resumo_ia: { objetivo?: string } | null;
+          url_original?: string | null;
+        }
       | undefined;
     if (!e) {
       return { meta: [{ title: "Edital não encontrado · fomenta.ai" }] };
     }
     const title = `${e.titulo} — prazo, valores e elegibilidade | fomenta.ai`;
-    const description =
+    const rawDesc =
+      e.resumo_ia?.objetivo ??
       e.descricao_curta ??
+      (e.descricao_completa ?? "").slice(0, 160) ??
       `${e.titulo} (${e.fonte}): datas, valores, elegibilidade e link para a fonte oficial.`;
+    const description = rawDesc.length > 160 ? rawDesc.slice(0, 157) + "…" : rawDesc;
+    const ogKey = e.slug ?? e.id;
+    // og:image relativa — resolvida pelo cliente/crawler contra a origem servida.
+    const ogImage = `/api/og/edital/${ogKey}`;
     return {
       meta: [
         { title },
         { name: "description", content: description },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
+        { property: "og:type", content: "article" },
+        { property: "og:image", content: ogImage },
+        { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: description },
+        { name: "twitter:image", content: ogImage },
       ],
     };
   },

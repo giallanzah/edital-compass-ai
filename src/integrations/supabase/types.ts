@@ -64,6 +64,8 @@ export type Database = {
           observacoes: string | null
           progresso: number
           projeto_id: string
+          proposta_gerada_em: string | null
+          proposta_md: string | null
           updated_at: string
           user_id: string
         }
@@ -75,6 +77,8 @@ export type Database = {
           observacoes?: string | null
           progresso?: number
           projeto_id: string
+          proposta_gerada_em?: string | null
+          proposta_md?: string | null
           updated_at?: string
           user_id: string
         }
@@ -86,6 +90,8 @@ export type Database = {
           observacoes?: string | null
           progresso?: number
           projeto_id?: string
+          proposta_gerada_em?: string | null
+          proposta_md?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -414,6 +420,60 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notif_enviadas: {
+        Row: {
+          enviado_em: string
+          id: string
+          ref_id: string
+          tipo: string
+          user_id: string
+        }
+        Insert: {
+          enviado_em?: string
+          id?: string
+          ref_id: string
+          tipo: string
+          user_id: string
+        }
+        Update: {
+          enviado_em?: string
+          id?: string
+          ref_id?: string
+          tipo?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notif_preferencias: {
+        Row: {
+          alertas_novos_editais: boolean
+          alertas_prazo: boolean
+          created_at: string
+          email: string
+          min_score: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          alertas_novos_editais?: boolean
+          alertas_prazo?: boolean
+          created_at?: string
+          email: string
+          min_score?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          alertas_novos_editais?: boolean
+          alertas_prazo?: boolean
+          created_at?: string
+          email?: string
+          min_score?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       projetos: {
         Row: {
