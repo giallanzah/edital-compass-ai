@@ -12,4 +12,11 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  // Self-hosted on Netlify, not the Lovable sandbox — override the wrapper's
+  // "cloudflare-module" default so Nitro emits a Netlify Function instead of
+  // a Cloudflare Worker. Outputs static assets to dist/ and the SSR handler
+  // to .netlify/functions-internal/server/ (see netlify.toml).
+  nitro: {
+    preset: "netlify",
+  },
 });

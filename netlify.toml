@@ -1,0 +1,8 @@
+[build]
+  command = "bun run build"
+  publish = "dist"
+
+# Nitro's "netlify" preset writes the SSR handler to
+# .netlify/functions-internal/server/ during the build above; Netlify's
+# build system picks it up automatically from that path, no [functions]
+# block needed here.
