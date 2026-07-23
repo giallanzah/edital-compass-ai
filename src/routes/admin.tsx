@@ -1,7 +1,12 @@
 import { createFileRoute, Outlet, useRouterState, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import type { Session } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
 import { PortalShell } from "@/components/PortalShell";
-import { getAdminSession, hasAdminAccess, adminLogout, type AdminSession } from "@/lib/adminAuth";
+import { meuRole } from "@/lib/admin.functions";
+import { logAudit } from "@/lib/adminAuth";
 import { Logo } from "@/components/Logo";
 
 export const Route = createFileRoute("/admin")({
@@ -40,11 +45,13 @@ const MENU = [
 function AdminLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
-  const [session, setSession] = useState<AdminSession | null | undefined>(undefined);
+  const [session, setSession] = useState<Session | null | undefined>(undefined);
 
   useEffect(() => {
-    setSession(getAdminSession());
-  }, [pathname]);
+    supabase.auth.getSession().then(({ data }) => setSession(data.session));
+    const { data: sub } = supabase.auth.onAuthStateChange((_ev, s) => setSession(s));
+    return () => sub.subscription.unsubscribe();
+  }, []);
 
   const isPublic = PUBLIC.some((p) => pathname === p);
 
@@ -54,6 +61,14 @@ function AdminLayout() {
       navigate({ to: "/admin/login", search: { reason: "no_session" } });
     }
   }, [isPublic, session, navigate]);
+
+  const meuRoleFn = useServerFn(meuRole);
+  const roleQ = useQuery({
+    queryKey: ["admin", "meu-role"],
+    queryFn: () => meuRoleFn(),
+    enabled: !isPublic && !!session,
+    staleTime: 60_000,
+  });
 
   if (isPublic) {
     return <Outlet />;
@@ -70,23 +85,30 @@ function AdminLayout() {
     return <AdminLoading label="Redirecionando para login…" />;
   }
 
-  // Confirmação explícita do role antes de renderizar o backoffice
-  if (!hasAdminAccess(session.role)) {
-    return <AccessDenied session={session} />;
+  // Aguarda a confirmação do role real (tabela user_roles) antes de renderizar o backoffice
+  if (roleQ.isLoading || roleQ.isFetching) {
+    return <AdminLoading label="Verificando permissões…" />;
   }
+
+  if (roleQ.isError || !roleQ.data?.isAdmin) {
+    return <AccessDenied email={session.user.email ?? ""} />;
+  }
+
+  const highestRole = roleQ.data.roles.includes("SUPER_ADMIN") ? "super_admin" : "admin";
 
   return (
     <PortalShell
       title="Backoffice"
-      badge={session.role.toLowerCase()}
+      badge={highestRole}
       rightSlot={
         <div className="flex items-center gap-3">
           <span className="hidden font-mono text-[10px] uppercase tracking-wider text-muted-foreground md:inline">
             ● sistema operante
           </span>
           <button
-            onClick={() => {
-              adminLogout();
+            onClick={async () => {
+              logAudit(session.user.email ?? "", "logout", "Sessão encerrada");
+              await supabase.auth.signOut();
               navigate({ to: "/admin/login" });
             }}
             className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground hover:text-foreground"
@@ -114,7 +136,7 @@ function AdminLoading({ label }: { label: string }) {
   );
 }
 
-function AccessDenied({ session }: { session: AdminSession }) {
+function AccessDenied({ email }: { email: string }) {
   const navigate = useNavigate();
   return (
     <div className="flex min-h-screen items-center justify-center px-6">
@@ -125,13 +147,13 @@ function AccessDenied({ session }: { session: AdminSession }) {
         <div className="eyebrow mb-3">403 · acesso negado</div>
         <h1 className="text-3xl font-medium tracking-tight">Sem permissão de administrador</h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          A conta <span className="font-mono">{session.email}</span> não possui perfil ADMIN ou
-          SUPER_ADMIN. Solicite acesso ao responsável pela plataforma.
+          A conta <span className="font-mono">{email}</span> não possui perfil ADMIN ou SUPER_ADMIN.
+          Solicite acesso ao responsável pela plataforma.
         </p>
         <div className="mt-8 flex justify-center gap-2">
           <button
-            onClick={() => {
-              adminLogout();
+            onClick={async () => {
+              await supabase.auth.signOut();
               navigate({ to: "/admin/login", search: { reason: "unauthorized" } });
             }}
             className="inline-flex h-9 items-center rounded-sm bg-foreground px-4 text-sm font-medium text-background"

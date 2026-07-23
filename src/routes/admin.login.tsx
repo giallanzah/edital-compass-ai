@@ -1,6 +1,9 @@
 import { createFileRoute, useNavigate, Link, useRouterState } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { adminLogin, hasAdminAccess, adminLogout, getAdminSession } from "@/lib/adminAuth";
+import { useServerFn } from "@tanstack/react-start";
+import { supabase } from "@/integrations/supabase/client";
+import { meuRole, bootstrapAdmin } from "@/lib/admin.functions";
+import { logAudit } from "@/lib/adminAuth";
 import { Logo } from "@/components/Logo";
 
 type SessionStatus = "checking" | "no_session" | "has_session" | "unauthorized";
@@ -13,44 +16,66 @@ export const Route = createFileRoute("/admin/login")({
 function AdminLogin() {
   const navigate = useNavigate();
   const routerState = useRouterState();
-  const reason = (routerState.location.search as Record<string, unknown>)?.reason as string | undefined;
-  const [email, setEmail] = useState("admin@fomenta.ai");
-  const [password, setPassword] = useState("admin123");
+  const reason = (routerState.location.search as Record<string, unknown>)?.reason as
+    string | undefined;
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [sessionStatus, setSessionStatus] = useState<SessionStatus>("checking");
 
+  const meuRoleFn = useServerFn(meuRole);
+  const bootstrapAdminFn = useServerFn(bootstrapAdmin);
+
   // Verifica sessão existente ao montar para mostrar estado de carregamento
   // ou redirecionar se já estiver autenticado com role correto
   useEffect(() => {
-    const session = getAdminSession();
-    if (!session) {
-      setSessionStatus("no_session");
-      return;
-    }
-    if (hasAdminAccess(session.role)) {
-      setSessionStatus("has_session");
-      navigate({ to: "/admin" });
-    } else {
-      setSessionStatus("unauthorized");
-    }
-  }, [navigate]);
+    supabase.auth.getSession().then(async ({ data }) => {
+      if (!data.session) {
+        setSessionStatus("no_session");
+        return;
+      }
+      try {
+        const { isAdmin } = await meuRoleFn();
+        if (isAdmin) {
+          setSessionStatus("has_session");
+          navigate({ to: "/admin" });
+        } else {
+          setSessionStatus("unauthorized");
+        }
+      } catch {
+        setSessionStatus("unauthorized");
+      }
+    });
+  }, [navigate, meuRoleFn]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setLoading(true);
     try {
-      const session = adminLogin(email, password);
-      // Verificação explícita do role antes de redirecionar
-      if (!hasAdminAccess(session.role)) {
-        adminLogout();
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+      if (signInError) throw signInError;
+
+      // Verificação do role real (tabela user_roles) antes de liberar acesso.
+      let { isAdmin } = await meuRoleFn();
+
+      // Primeiro acesso: se ainda não existe nenhum admin na plataforma, este
+      // usuário autenticado se torna SUPER_ADMIN automaticamente (bootstrap_admin
+      // é no-op se já existir um admin).
+      if (!isAdmin) {
+        const { role } = await bootstrapAdminFn();
+        isAdmin = role !== null;
+      }
+
+      if (!isAdmin) {
+        await supabase.auth.signOut();
         throw new Error(
           "Acesso negado. Sua conta não possui perfil ADMIN ou SUPER_ADMIN. Entre em contato com o responsável pela plataforma para solicitar acesso.",
         );
       }
-      // Pequeno delay para garantir que a sessão foi persistida
-      await new Promise((r) => setTimeout(r, 50));
+
+      logAudit(email, "login", "Login efetuado no backoffice");
       navigate({ to: "/admin" });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao autenticar.");
@@ -115,9 +140,10 @@ function AdminLogin() {
           {(sessionStatus === "unauthorized" || reason === "unauthorized") && (
             <div className="mt-6 rounded-sm border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
               <strong className="block mb-1">Acesso negado</strong>
-              Sua conta não possui perfil de administrador. O acesso ao backoffice é restrito a perfis{" "}
-              <span className="font-mono">ADMIN</span> ou <span className="font-mono">SUPER_ADMIN</span>.
-              Entre em contato com o responsável pela plataforma para solicitar acesso.
+              Sua conta não possui perfil de administrador. O acesso ao backoffice é restrito a
+              perfis <span className="font-mono">ADMIN</span> ou{" "}
+              <span className="font-mono">SUPER_ADMIN</span>. Entre em contato com o responsável
+              pela plataforma para solicitar acesso.
             </div>
           )}
 
@@ -127,6 +153,7 @@ function AdminLogin() {
               <input
                 type="email"
                 required
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="h-10 w-full rounded-sm border border-[var(--hairline)] bg-background px-3 text-sm outline-none focus:border-foreground"
@@ -146,6 +173,7 @@ function AdminLogin() {
               <input
                 type="password"
                 required
+                autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="h-10 w-full rounded-sm border border-[var(--hairline)] bg-background px-3 text-sm outline-none focus:border-foreground"
@@ -166,13 +194,6 @@ function AdminLogin() {
             >
               {loading ? "Entrando…" : "Entrar"}
             </button>
-
-            <div className="rounded-sm bg-secondary p-3 font-mono text-[10px] leading-relaxed text-muted-foreground">
-              DEMO ·<br />
-              super_admin: admin@fomenta.ai / admin123<br />
-              admin: ana@fomenta.ai / ana123<br />
-              sem acesso: viewer@fomenta.ai / viewer123
-            </div>
           </form>
 
           <div className="mt-10 text-center">
