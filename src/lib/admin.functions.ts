@@ -1,8 +1,8 @@
-// Server functions administrativas (empresas, projetos, usuários, roles).
+// Server functions administrativas (empresas, projetos, usuários, roles, auditoria, dashboard).
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-async function assertAdmin(userId: string) {
+export async function assertAdmin(userId: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data } = await supabaseAdmin
     .from("user_roles")
@@ -13,11 +13,45 @@ async function assertAdmin(userId: string) {
   if (!data || data.length === 0) throw new Error("forbidden");
 }
 
+// Registro server-side, persistido em public.admin_audit_log — ações críticas
+// (promoção de usuário, moderação de fontes/editais, disparo manual de coleta).
+export async function registrarAuditoria(
+  actorUserId: string,
+  actorEmail: string,
+  action: string,
+  detail?: string,
+) {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  await supabaseAdmin.from("admin_audit_log").insert({
+    actor_user_id: actorUserId,
+    actor_email: actorEmail,
+    action,
+    detail: detail ?? null,
+  });
+}
+
+// Logger genérico para eventos client-driven que precisam ficar no audit log
+// real (login/logout do backoffice). Ações que já mutam dados (promover
+// usuário, toggles etc.) chamam registrarAuditoria() diretamente no handler.
+export const registrarEventoAdmin = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { action: string; detail?: string }) => input)
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
+    const email = (context.claims.email as string | undefined) ?? context.userId;
+    await registrarAuditoria(context.userId, email, data.action, data.detail);
+    return { ok: true };
+  });
+
 export const bootstrapAdmin = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase.rpc("bootstrap_admin");
     if (error) throw new Error(error.message);
+    if (data) {
+      const email = (context.claims.email as string | undefined) ?? context.userId;
+      await registrarAuditoria(context.userId, email, "bootstrap_admin", `Promovido a ${data}`);
+    }
     return { role: data as string | null };
   });
 
@@ -101,5 +135,108 @@ export const promoverUsuario = createServerFn({ method: "POST" })
       _role: data.role,
     });
     if (error) throw new Error(error.message);
+    const email = (context.claims.email as string | undefined) ?? context.userId;
+    await registrarAuditoria(
+      context.userId,
+      email,
+      "promover_usuario",
+      `Definiu role ${data.role} para usuário ${data.userId}`,
+    );
     return { ok: true };
+  });
+
+export const listarAuditLogAdmin = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("admin_audit_log")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(100);
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });
+
+export const dashboardAdmin = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const desde14dias = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
+
+    const [
+      empresas,
+      projetos,
+      editaisAtivos,
+      editaisRevisao,
+      resumosGerados,
+      requisitosGerados,
+      propostasGeradas,
+      candidaturas,
+      fontes,
+      editaisRecentes,
+      usersRes,
+    ] = await Promise.all([
+      supabaseAdmin.from("empresas_perfil").select("id", { count: "exact", head: true }),
+      supabaseAdmin.from("projetos").select("id", { count: "exact", head: true }),
+      supabaseAdmin
+        .from("editais")
+        .select("id", { count: "exact", head: true })
+        .eq("ativo", true)
+        .eq("oculto", false),
+      supabaseAdmin
+        .from("editais")
+        .select("id", { count: "exact", head: true })
+        .eq("precisa_revisao", true),
+      supabaseAdmin
+        .from("editais")
+        .select("id", { count: "exact", head: true })
+        .not("resumo_ia", "is", null),
+      supabaseAdmin
+        .from("editais")
+        .select("id", { count: "exact", head: true })
+        .not("requisitos_ia", "is", null),
+      supabaseAdmin
+        .from("candidaturas")
+        .select("id", { count: "exact", head: true })
+        .not("proposta_md", "is", null),
+      supabaseAdmin.from("candidaturas").select("estagio"),
+      supabaseAdmin
+        .from("fontes_monitoradas")
+        .select(
+          "slug, nome, ativo, status_coleta, ultimo_sucesso_em, ultimo_erro_em, ultima_mensagem",
+        )
+        .order("slug"),
+      supabaseAdmin.from("editais").select("coletado_em").gte("coletado_em", desde14dias),
+      supabaseAdmin.auth.admin.listUsers({ perPage: 1000 }),
+    ]);
+
+    const candidaturasPorEstagio: Record<string, number> = {};
+    for (const c of candidaturas.data ?? []) {
+      const k = (c.estagio as string) || "rascunho";
+      candidaturasPorEstagio[k] = (candidaturasPorEstagio[k] ?? 0) + 1;
+    }
+
+    const editaisPorDia: Record<string, number> = {};
+    for (const e of editaisRecentes.data ?? []) {
+      const dia = (e.coletado_em as string).slice(0, 10);
+      editaisPorDia[dia] = (editaisPorDia[dia] ?? 0) + 1;
+    }
+
+    return {
+      empresas: empresas.count ?? 0,
+      usuarios: usersRes.data?.users.length ?? 0,
+      projetos: projetos.count ?? 0,
+      editaisAtivos: editaisAtivos.count ?? 0,
+      editaisPrecisamRevisao: editaisRevisao.count ?? 0,
+      resumosGerados: resumosGerados.count ?? 0,
+      requisitosGerados: requisitosGerados.count ?? 0,
+      propostasGeradas: propostasGeradas.count ?? 0,
+      candidaturasPorEstagio,
+      fontes: fontes.data ?? [],
+      editaisPorDia,
+    };
   });

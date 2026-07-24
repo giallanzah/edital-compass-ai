@@ -5,8 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { PortalShell } from "@/components/PortalShell";
-import { meuRole } from "@/lib/admin.functions";
-import { logAudit } from "@/lib/adminAuth";
+import { meuRole, registrarEventoAdmin } from "@/lib/admin.functions";
 import { Logo } from "@/components/Logo";
 
 export const Route = createFileRoute("/admin")({
@@ -63,6 +62,7 @@ function AdminLayout() {
   }, [isPublic, session, navigate]);
 
   const meuRoleFn = useServerFn(meuRole);
+  const registrarEventoFn = useServerFn(registrarEventoAdmin);
   const roleQ = useQuery({
     queryKey: ["admin", "meu-role"],
     queryFn: () => meuRoleFn(),
@@ -107,7 +107,7 @@ function AdminLayout() {
           </span>
           <button
             onClick={async () => {
-              logAudit(session.user.email ?? "", "logout", "Sessão encerrada");
+              await registrarEventoFn({ data: { action: "logout", detail: "Sessão encerrada" } });
               await supabase.auth.signOut();
               navigate({ to: "/admin/login" });
             }}

@@ -2,8 +2,7 @@ import { createFileRoute, useNavigate, Link, useRouterState } from "@tanstack/re
 import { useState, useEffect } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
-import { meuRole, bootstrapAdmin } from "@/lib/admin.functions";
-import { logAudit } from "@/lib/adminAuth";
+import { meuRole, bootstrapAdmin, registrarEventoAdmin } from "@/lib/admin.functions";
 import { Logo } from "@/components/Logo";
 
 type SessionStatus = "checking" | "no_session" | "has_session" | "unauthorized";
@@ -26,6 +25,7 @@ function AdminLogin() {
 
   const meuRoleFn = useServerFn(meuRole);
   const bootstrapAdminFn = useServerFn(bootstrapAdmin);
+  const registrarEventoFn = useServerFn(registrarEventoAdmin);
 
   // Verifica sessão existente ao montar para mostrar estado de carregamento
   // ou redirecionar se já estiver autenticado com role correto
@@ -75,7 +75,9 @@ function AdminLogin() {
         );
       }
 
-      logAudit(email, "login", "Login efetuado no backoffice");
+      await registrarEventoFn({
+        data: { action: "login", detail: "Login efetuado no backoffice" },
+      });
       navigate({ to: "/admin" });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao autenticar.");
