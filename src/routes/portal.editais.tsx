@@ -9,7 +9,11 @@ export const Route = createFileRoute("/portal/editais")({
   head: () => ({
     meta: [
       { title: "Editais e linhas de fomento · fomenta.ai" },
-      { name: "description", content: "Catálogo de editais de CNPq, FINEP, SEBRAE e BNDES atualizado várias vezes ao dia." },
+      {
+        name: "description",
+        content:
+          "Catálogo de editais de CNPq, FINEP, SEBRAE e BNDES atualizado várias vezes ao dia.",
+      },
     ],
   }),
   component: EditaisList,
@@ -42,6 +46,10 @@ function EditaisList() {
   const items = editaisQ.data?.items ?? [];
   const contagem = contQ.data?.porFonte ?? {};
   const total = contQ.data?.total ?? 0;
+  // Só tratamos como "banco vazio" quando a contagem realmente respondeu com
+  // sucesso — se contQ falhou, isLoading também vira false e total fica 0,
+  // o que antes disparava esse aviso mesmo em caso de erro.
+  const bancoVazioConfirmado = contQ.isSuccess && total === 0;
 
   return (
     <div className="mx-auto max-w-7xl px-8 py-10">
@@ -80,13 +88,25 @@ function EditaisList() {
             <div className="eyebrow mb-3">Status</div>
             <ul className="space-y-1.5 text-sm">
               <li>
-                <button onClick={() => setStatus(null)}
-                  className={!status ? "font-medium" : "text-muted-foreground hover:text-foreground"}>Todos</button>
+                <button
+                  onClick={() => setStatus(null)}
+                  className={
+                    !status ? "font-medium" : "text-muted-foreground hover:text-foreground"
+                  }
+                >
+                  Todos
+                </button>
               </li>
               {Object.entries(STATUS_LABEL).map(([k, label]) => (
                 <li key={k}>
-                  <button onClick={() => setStatus(k)}
-                    className={status === k ? "font-medium" : "text-muted-foreground hover:text-foreground"}>{label}</button>
+                  <button
+                    onClick={() => setStatus(k)}
+                    className={
+                      status === k ? "font-medium" : "text-muted-foreground hover:text-foreground"
+                    }
+                  >
+                    {label}
+                  </button>
                 </li>
               ))}
             </ul>
@@ -96,12 +116,14 @@ function EditaisList() {
         <div>
           <div className="mb-4 flex items-center justify-between text-xs text-muted-foreground">
             <span className="font-mono">
-              {editaisQ.isLoading ? "carregando…" : `${items.length} resultados`}
+              {editaisQ.isLoading
+                ? "carregando…"
+                : editaisQ.isError
+                  ? "erro ao carregar"
+                  : `${items.length} resultados`}
             </span>
-            {total === 0 && !contQ.isLoading && (
-              <span className="font-mono text-[10px]">
-                banco vazio — rode o robô no backoffice
-              </span>
+            {bancoVazioConfirmado && (
+              <span className="font-mono text-[10px]">banco vazio — rode o robô no backoffice</span>
             )}
           </div>
 
@@ -116,13 +138,30 @@ function EditaisList() {
                 </div>
               ))}
             </div>
+          ) : editaisQ.isError ? (
+            <div className="hairline p-12 text-center text-sm">
+              <p className="text-muted-foreground">
+                Não foi possível carregar os editais.{" "}
+                <span className="font-mono text-xs">
+                  {(editaisQ.error as Error)?.message || "erro desconhecido"}
+                </span>
+              </p>
+              <button
+                onClick={() => editaisQ.refetch()}
+                className="mt-4 inline-flex h-9 items-center rounded-sm bg-foreground px-4 text-sm font-medium text-background hover:opacity-90"
+              >
+                Tentar novamente
+              </button>
+            </div>
           ) : items.length === 0 ? (
             <div className="hairline p-12 text-center text-sm text-muted-foreground">
               Nenhum edital encontrado com esses filtros.
             </div>
           ) : (
             <div className="grid gap-4 md:grid-cols-2">
-              {items.map((e) => <EditalCard key={e.id} e={e} />)}
+              {items.map((e) => (
+                <EditalCard key={e.id} e={e} />
+              ))}
             </div>
           )}
         </div>
@@ -132,8 +171,16 @@ function EditaisList() {
 }
 
 function Chip({
-  active, label, count, onClick,
-}: { active: boolean; label: string; count: number; onClick: () => void }) {
+  active,
+  label,
+  count,
+  onClick,
+}: {
+  active: boolean;
+  label: string;
+  count: number;
+  onClick: () => void;
+}) {
   return (
     <button
       onClick={onClick}
@@ -168,9 +215,13 @@ function EditalCard({ e }: { e: EditalResumo }) {
             </>
           )}
         </div>
-        <span className={`rounded-sm px-1.5 py-0.5 font-mono text-[10px] uppercase ${
-          e.status === "aberto" ? "bg-foreground text-background" : "hairline text-muted-foreground"
-        }`}>
+        <span
+          className={`rounded-sm px-1.5 py-0.5 font-mono text-[10px] uppercase ${
+            e.status === "aberto"
+              ? "bg-foreground text-background"
+              : "hairline text-muted-foreground"
+          }`}
+        >
           {STATUS_LABEL[e.status] ?? e.status}
         </span>
       </div>
@@ -186,7 +237,11 @@ function EditalCard({ e }: { e: EditalResumo }) {
         <div className="text-right">
           <div className="eyebrow mb-1">Prazo</div>
           <div className="font-mono text-xs">
-            {diasRestantes === null ? "sem prazo" : diasRestantes > 0 ? `${diasRestantes} dias` : "encerrado"}
+            {diasRestantes === null
+              ? "sem prazo"
+              : diasRestantes > 0
+                ? `${diasRestantes} dias`
+                : "encerrado"}
           </div>
         </div>
       </div>
