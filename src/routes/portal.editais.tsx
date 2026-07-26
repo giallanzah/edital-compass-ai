@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
@@ -29,6 +29,13 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 function EditaisList() {
+  // /portal/editais/$id é filho desta rota na árvore de rotas — sem esse
+  // check, a rota filha carrega os dados certos (até o <head> de SEO fica
+  // correto) mas nunca aparece na tela, porque esta rota nunca renderizava
+  // um <Outlet /> para ela.
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isIndex = pathname === "/portal/editais";
+
   const [q, setQ] = useState("");
   const [fonte, setFonte] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
@@ -40,8 +47,15 @@ function EditaisList() {
   const editaisQ = useQuery({
     queryKey: ["editais", filtros],
     queryFn: () => list({ data: filtros }),
+    enabled: isIndex,
   });
-  const contQ = useQuery({ queryKey: ["contagem-fonte"], queryFn: () => cont() });
+  const contQ = useQuery({
+    queryKey: ["contagem-fonte"],
+    queryFn: () => cont(),
+    enabled: isIndex,
+  });
+
+  if (!isIndex) return <Outlet />;
 
   const items = editaisQ.data?.items ?? [];
   const contagem = contQ.data?.porFonte ?? {};
