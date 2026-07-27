@@ -9,16 +9,22 @@ export function SiteHeader() {
           <Logo />
         </Link>
         <nav className="hidden items-center gap-8 text-sm md:flex">
-          <Link to="/portal" className="text-muted-foreground hover:text-foreground transition-colors">
+          <Link
+            to="/portal"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
             Portal
           </Link>
-          <Link to="/admin" className="text-muted-foreground hover:text-foreground transition-colors">
-            Backoffice
-          </Link>
-          <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
+          <a
+            href="#features"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
             Plataforma
           </a>
-          <a href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors">
+          <a
+            href="#pricing"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
             Planos
           </a>
         </nav>

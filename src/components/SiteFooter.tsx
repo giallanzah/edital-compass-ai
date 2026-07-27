@@ -29,6 +29,11 @@ export function SiteFooter() {
                 Backoffice
               </Link>
             </li>
+            <li>
+              <Link to="/consultor" className="text-muted-foreground hover:text-foreground">
+                Consultor
+              </Link>
+            </li>
           </ul>
         </div>
         <div>

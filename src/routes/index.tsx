@@ -81,8 +81,8 @@ function Landing() {
             <span className="text-muted-foreground">organizado em uma só camada.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-base text-muted-foreground md:text-lg">
-            Descubra, qualifique e acompanhe editais de CNPq, FINEP, SEBRAE, BNDES, FAPs estaduais
-            e Lei do Bem. Inteligência aplicada a R$ 19 bilhões em recursos públicos.
+            Descubra, qualifique e acompanhe editais de CNPq, FINEP, SEBRAE, BNDES, FAPs estaduais e
+            Lei do Bem. Inteligência aplicada a R$ 19 bilhões em recursos públicos.
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-3">
             <Link
@@ -90,12 +90,6 @@ function Landing() {
               className="inline-flex h-11 items-center rounded-sm bg-foreground px-6 text-sm font-medium text-background hover:opacity-90"
             >
               Explorar o portal →
-            </Link>
-            <Link
-              to="/admin"
-              className="inline-flex h-11 items-center rounded-sm hairline px-6 text-sm font-medium hover:bg-secondary"
-            >
-              Ver backoffice
             </Link>
           </div>
 
@@ -269,19 +263,23 @@ function Landing() {
                   p.highlight ? "bg-foreground text-background" : ""
                 }`}
               >
-                <div className={`eyebrow ${p.highlight ? "text-background/60" : ""}`}>
-                  {p.name}
-                </div>
+                <div className={`eyebrow ${p.highlight ? "text-background/60" : ""}`}>{p.name}</div>
                 <div className="mt-6 flex items-baseline gap-2">
                   <span className="font-mono text-4xl tracking-tight">{p.price}</span>
-                  <span className={`text-sm ${p.highlight ? "text-background/60" : "text-muted-foreground"}`}>
+                  <span
+                    className={`text-sm ${p.highlight ? "text-background/60" : "text-muted-foreground"}`}
+                  >
                     {p.hint}
                   </span>
                 </div>
                 <ul className="mt-8 space-y-3 text-sm">
                   {p.feats.map((f) => (
                     <li key={f} className="flex gap-2">
-                      <span className={p.highlight ? "text-background/60" : "text-muted-foreground"}>—</span>
+                      <span
+                        className={p.highlight ? "text-background/60" : "text-muted-foreground"}
+                      >
+                        —
+                      </span>
                       {f}
                     </li>
                   ))}
