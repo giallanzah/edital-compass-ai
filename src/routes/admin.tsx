@@ -13,7 +13,7 @@ export const Route = createFileRoute("/admin")({
   component: AdminLayout,
 });
 
-const PUBLIC = ["/admin/login", "/admin/recuperar-senha"];
+const PUBLIC = ["/admin/login", "/admin/recuperar-senha", "/admin/redefinir-senha"];
 
 const MENU = [
   { to: "/admin", label: "Dashboard" },

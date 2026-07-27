@@ -37,6 +37,7 @@ import { Route as AdminPagamentosRouteImport } from './routes/admin.pagamentos'
 import { Route as AdminPermissoesRouteImport } from './routes/admin.permissoes'
 import { Route as AdminProjetosRouteImport } from './routes/admin.projetos'
 import { Route as AdminRecuperarSenhaRouteImport } from './routes/admin.recuperar-senha'
+import { Route as AdminRedefinirSenhaRouteImport } from './routes/admin.redefinir-senha'
 import { Route as AdminRelatoriosRouteImport } from './routes/admin.relatorios'
 import { Route as AdminScrapersRouteImport } from './routes/admin.scrapers'
 import { Route as AdminUsuariosRouteImport } from './routes/admin.usuarios'
@@ -198,6 +199,11 @@ const AdminRecuperarSenhaRoute = AdminRecuperarSenhaRouteImport.update({
   path: '/recuperar-senha',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminRedefinirSenhaRoute = AdminRedefinirSenhaRouteImport.update({
+  id: '/redefinir-senha',
+  path: '/redefinir-senha',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminRelatoriosRoute = AdminRelatoriosRouteImport.update({
   id: '/relatorios',
   path: '/relatorios',
@@ -327,6 +333,7 @@ export interface FileRoutesByFullPath {
   '/admin/permissoes': typeof AdminPermissoesRoute
   '/admin/projetos': typeof AdminProjetosRoute
   '/admin/recuperar-senha': typeof AdminRecuperarSenhaRoute
+  '/admin/redefinir-senha': typeof AdminRedefinirSenhaRoute
   '/admin/relatorios': typeof AdminRelatoriosRoute
   '/admin/scrapers': typeof AdminScrapersRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
@@ -374,6 +381,7 @@ export interface FileRoutesByTo {
   '/admin/permissoes': typeof AdminPermissoesRoute
   '/admin/projetos': typeof AdminProjetosRoute
   '/admin/recuperar-senha': typeof AdminRecuperarSenhaRoute
+  '/admin/redefinir-senha': typeof AdminRedefinirSenhaRoute
   '/admin/relatorios': typeof AdminRelatoriosRoute
   '/admin/scrapers': typeof AdminScrapersRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
@@ -425,6 +433,7 @@ export interface FileRoutesById {
   '/admin/permissoes': typeof AdminPermissoesRoute
   '/admin/projetos': typeof AdminProjetosRoute
   '/admin/recuperar-senha': typeof AdminRecuperarSenhaRoute
+  '/admin/redefinir-senha': typeof AdminRedefinirSenhaRoute
   '/admin/relatorios': typeof AdminRelatoriosRoute
   '/admin/scrapers': typeof AdminScrapersRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
@@ -477,6 +486,7 @@ export interface FileRouteTypes {
     | '/admin/permissoes'
     | '/admin/projetos'
     | '/admin/recuperar-senha'
+    | '/admin/redefinir-senha'
     | '/admin/relatorios'
     | '/admin/scrapers'
     | '/admin/usuarios'
@@ -524,6 +534,7 @@ export interface FileRouteTypes {
     | '/admin/permissoes'
     | '/admin/projetos'
     | '/admin/recuperar-senha'
+    | '/admin/redefinir-senha'
     | '/admin/relatorios'
     | '/admin/scrapers'
     | '/admin/usuarios'
@@ -574,6 +585,7 @@ export interface FileRouteTypes {
     | '/admin/permissoes'
     | '/admin/projetos'
     | '/admin/recuperar-senha'
+    | '/admin/redefinir-senha'
     | '/admin/relatorios'
     | '/admin/scrapers'
     | '/admin/usuarios'
@@ -806,6 +818,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRecuperarSenhaRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/redefinir-senha': {
+      id: '/admin/redefinir-senha'
+      path: '/redefinir-senha'
+      fullPath: '/admin/redefinir-senha'
+      preLoaderRoute: typeof AdminRedefinirSenhaRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/relatorios': {
       id: '/admin/relatorios'
       path: '/relatorios'
@@ -972,6 +991,7 @@ interface AdminRouteChildren {
   AdminPermissoesRoute: typeof AdminPermissoesRoute
   AdminProjetosRoute: typeof AdminProjetosRoute
   AdminRecuperarSenhaRoute: typeof AdminRecuperarSenhaRoute
+  AdminRedefinirSenhaRoute: typeof AdminRedefinirSenhaRoute
   AdminRelatoriosRoute: typeof AdminRelatoriosRoute
   AdminScrapersRoute: typeof AdminScrapersRoute
   AdminUsuariosRoute: typeof AdminUsuariosRoute
@@ -1001,6 +1021,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminPermissoesRoute: AdminPermissoesRoute,
   AdminProjetosRoute: AdminProjetosRoute,
   AdminRecuperarSenhaRoute: AdminRecuperarSenhaRoute,
+  AdminRedefinirSenhaRoute: AdminRedefinirSenhaRoute,
   AdminRelatoriosRoute: AdminRelatoriosRoute,
   AdminScrapersRoute: AdminScrapersRoute,
   AdminUsuariosRoute: AdminUsuariosRoute,
