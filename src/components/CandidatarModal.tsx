@@ -6,13 +6,7 @@ import { listMyProjetos, createProjeto } from "@/lib/portal.functions";
 import { criarCandidatura, criarTarefa } from "@/lib/candidatura.functions";
 import { extrairRequisitos } from "@/lib/ai.functions";
 
-export function CandidatarModal({
-  editalId,
-  onClose,
-}: {
-  editalId: string;
-  onClose: () => void;
-}) {
+export function CandidatarModal({ editalId, onClose }: { editalId: string; onClose: () => void }) {
   const qc = useQueryClient();
   const navigate = useNavigate();
   const listFn = useServerFn(listMyProjetos);
@@ -36,7 +30,9 @@ export function CandidatarModal({
       qc.invalidateQueries({ queryKey: ["me", "projetos"] });
       setSelecionado((novo as { id: string }).id);
       setModo("lista");
+      setErro(null);
     },
+    onError: (e) => setErro((e as Error).message),
   });
 
   const candMut = useMutation({
@@ -174,7 +170,8 @@ export function CandidatarModal({
             className="mt-0.5"
           />
           <span>
-            Importar requisitos do edital como checklist inicial <span className="font-mono">(IA)</span>.
+            Importar requisitos do edital como checklist inicial{" "}
+            <span className="font-mono">(IA)</span>.
           </span>
         </label>
 

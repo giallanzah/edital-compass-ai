@@ -57,6 +57,7 @@ function Projetos() {
     mutationFn: (id: string) => deleteFn({ data: { id } }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["me", "projetos"] }),
   });
+  const erro = createMut.error ?? updateMut.error ?? deleteMut.error;
 
   function startEdit(p: { id: string; nome: string; descricao: string | null }) {
     setEditing(p.id);
@@ -91,6 +92,12 @@ function Projetos() {
           </button>
         )}
       </div>
+
+      {erro && (
+        <div className="mt-4 hairline border-destructive/40 bg-destructive/5 p-3 text-xs text-destructive">
+          {(erro as Error).message}
+        </div>
+      )}
 
       {showForm && (
         <form onSubmit={onSubmit} className="mt-8 hairline p-5">
