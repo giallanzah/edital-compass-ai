@@ -171,7 +171,7 @@ export const listMyCandidaturas = createServerFn({ method: "GET" })
     const { data, error } = await context.supabase
       .from("candidaturas")
       .select(
-        "id, estagio, progresso, created_at, updated_at, projeto:projetos(id, nome), edital:editais(id, titulo, fonte, data_encerramento)",
+        "id, estagio, progresso, created_at, updated_at, projeto:projetos(id, nome), edital:editais(id, titulo, fonte, data_encerramento), consultor:consultores(id, nome, email)",
       )
       .eq("user_id", context.userId)
       .order("updated_at", { ascending: false });

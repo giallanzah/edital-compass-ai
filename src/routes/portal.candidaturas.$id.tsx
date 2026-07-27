@@ -12,6 +12,7 @@ import {
   salvarProposta,
 } from "@/lib/candidatura.functions";
 import { extrairRequisitos, analisarAderencia, gerarProposta } from "@/lib/ai.functions";
+import { chamarConsultor } from "@/lib/consultor.functions";
 
 export const Route = createFileRoute("/portal/candidaturas/$id")({
   head: () => ({ meta: [{ title: "Candidatura · fomenta.ai" }] }),
@@ -42,6 +43,7 @@ function CandidaturaDetalhe() {
   const aderenciaFn = useServerFn(analisarAderencia);
   const propostaFn = useServerFn(gerarProposta);
   const salvarPropostaFn = useServerFn(salvarProposta);
+  const chamarConsultorFn = useServerFn(chamarConsultor);
 
   const q = useQuery({ queryKey: ["candidatura", id], queryFn: () => getFn({ data: { id } }) });
 
@@ -65,8 +67,7 @@ function CandidaturaDetalhe() {
   });
 
   const tarefaCreateMut = useMutation({
-    mutationFn: async () =>
-      criarTarefaFn({ data: { candidaturaId: id, titulo: novaTarefa } }),
+    mutationFn: async () => criarTarefaFn({ data: { candidaturaId: id, titulo: novaTarefa } }),
     onSuccess: () => {
       setNovaTarefa("");
       qc.invalidateQueries({ queryKey: ["candidatura", id] });
@@ -121,6 +122,11 @@ function CandidaturaDetalhe() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["candidatura", id] }),
   });
 
+  const chamarConsultorMut = useMutation({
+    mutationFn: async () => chamarConsultorFn({ data: { candidaturaId: id } }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["candidatura", id] }),
+  });
+
   if (q.isLoading) {
     return <div className="p-10 text-sm text-muted-foreground">Carregando…</div>;
   }
@@ -129,7 +135,9 @@ function CandidaturaDetalhe() {
     return (
       <div className="p-10 text-sm text-muted-foreground">
         Candidatura não encontrada.{" "}
-        <Link to="/portal/candidaturas" className="underline">Voltar</Link>
+        <Link to="/portal/candidaturas" className="underline">
+          Voltar
+        </Link>
       </div>
     );
   }
@@ -144,6 +152,7 @@ function CandidaturaDetalhe() {
     tipo_apoio: string | null;
   } | null;
   const projeto = c.projeto as { id: string; nome: string; descricao: string | null } | null;
+  const consultor = c.consultor as { id: string; nome: string; email: string } | null;
   const tarefas = c.tarefas as Array<{ id: string; titulo: string; feito: boolean; ordem: number }>;
   const feitas = tarefas.filter((t) => t.feito).length;
   const totalTarefas = tarefas.length;
@@ -154,8 +163,7 @@ function CandidaturaDetalhe() {
     : null;
 
   const aderenciaResult = aderenciaMut.data as
-    | { score: number; parecer: string; pontos_fortes: string[]; riscos: string[] }
-    | undefined;
+    { score: number; parecer: string; pontos_fortes: string[]; riscos: string[] } | undefined;
 
   const urgente =
     dias !== null &&
@@ -186,7 +194,9 @@ function CandidaturaDetalhe() {
 
       <div className="mt-6 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <div className="eyebrow mb-1">{edital?.fonte} · {edital?.tipo_apoio ?? "—"}</div>
+          <div className="eyebrow mb-1">
+            {edital?.fonte} · {edital?.tipo_apoio ?? "—"}
+          </div>
           <h1 className="text-2xl font-medium tracking-tight">{edital?.titulo}</h1>
           <div className="mt-2 text-sm text-muted-foreground">
             Projeto: <span className="text-foreground">{projeto?.nome}</span>
@@ -199,7 +209,6 @@ function CandidaturaDetalhe() {
           </div>
         </div>
       </div>
-
 
       <div className="mt-8 grid gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-8">
@@ -225,7 +234,9 @@ function CandidaturaDetalhe() {
 
           <section>
             <div className="mb-3 flex items-center justify-between">
-              <div className="eyebrow">Checklist ({feitas}/{totalTarefas} · {progressoTarefas}%)</div>
+              <div className="eyebrow">
+                Checklist ({feitas}/{totalTarefas} · {progressoTarefas}%)
+              </div>
               <button
                 onClick={() => importarMut.mutate()}
                 disabled={importarMut.isPending}
@@ -250,7 +261,9 @@ function CandidaturaDetalhe() {
                         checked={t.feito}
                         onChange={(e) => toggleMut.mutate({ id: t.id, feito: e.target.checked })}
                       />
-                      <span className={`flex-1 text-sm ${t.feito ? "line-through text-muted-foreground" : ""}`}>
+                      <span
+                        className={`flex-1 text-sm ${t.feito ? "line-through text-muted-foreground" : ""}`}
+                      >
                         {t.titulo}
                       </span>
                       <button
@@ -365,7 +378,9 @@ function CandidaturaDetalhe() {
                   placeholder="Markdown da proposta…"
                 />
                 <div className="hairline overflow-auto p-4 text-sm leading-relaxed">
-                  {propostaMd ? renderMarkdown(propostaMd) : (
+                  {propostaMd ? (
+                    renderMarkdown(propostaMd)
+                  ) : (
                     <span className="text-muted-foreground">preview aparecerá aqui</span>
                   )}
                 </div>
@@ -469,6 +484,38 @@ function CandidaturaDetalhe() {
               </a>
             )}
           </div>
+
+          <div className="hairline p-4 text-xs">
+            <div className="eyebrow mb-2">Consultor Fomenta.ai</div>
+            {consultor ? (
+              <p className="text-sm">
+                {consultor.nome}
+                <span className="mt-1 block font-mono text-[10px] text-muted-foreground">
+                  {consultor.email}
+                </span>
+              </p>
+            ) : (
+              <p className="text-muted-foreground">
+                Nenhum consultor acompanhando esta candidatura ainda.
+              </p>
+            )}
+            <button
+              onClick={() => chamarConsultorMut.mutate()}
+              disabled={chamarConsultorMut.isPending || chamarConsultorMut.isSuccess}
+              className="mt-3 inline-flex h-8 w-full items-center justify-center rounded-sm bg-foreground text-xs font-medium text-background disabled:opacity-40"
+            >
+              {chamarConsultorMut.isPending
+                ? "Enviando…"
+                : chamarConsultorMut.isSuccess
+                  ? "Chamado enviado ✓"
+                  : "Chamar consultor Fomenta.ai"}
+            </button>
+            {chamarConsultorMut.error && (
+              <div className="mt-2 text-[11px] text-destructive">
+                {(chamarConsultorMut.error as Error).message}
+              </div>
+            )}
+          </div>
         </aside>
       </div>
     </div>
@@ -505,25 +552,57 @@ function renderMarkdown(md: string) {
     const l = raw.trimEnd();
     if (/^###\s+/.test(l)) {
       flushPara();
-      if (inList) { flushList(listBuf); listBuf = []; inList = false; }
-      nodes.push(<h4 key={nodes.length} className="mb-2 mt-4 text-sm font-medium">{l.replace(/^###\s+/, "")}</h4>);
+      if (inList) {
+        flushList(listBuf);
+        listBuf = [];
+        inList = false;
+      }
+      nodes.push(
+        <h4 key={nodes.length} className="mb-2 mt-4 text-sm font-medium">
+          {l.replace(/^###\s+/, "")}
+        </h4>,
+      );
     } else if (/^##\s+/.test(l)) {
       flushPara();
-      if (inList) { flushList(listBuf); listBuf = []; inList = false; }
-      nodes.push(<h3 key={nodes.length} className="mb-2 mt-5 text-base font-medium tracking-tight">{l.replace(/^##\s+/, "")}</h3>);
+      if (inList) {
+        flushList(listBuf);
+        listBuf = [];
+        inList = false;
+      }
+      nodes.push(
+        <h3 key={nodes.length} className="mb-2 mt-5 text-base font-medium tracking-tight">
+          {l.replace(/^##\s+/, "")}
+        </h3>,
+      );
     } else if (/^#\s+/.test(l)) {
       flushPara();
-      if (inList) { flushList(listBuf); listBuf = []; inList = false; }
-      nodes.push(<h2 key={nodes.length} className="mb-2 mt-5 text-lg font-medium tracking-tight">{l.replace(/^#\s+/, "")}</h2>);
+      if (inList) {
+        flushList(listBuf);
+        listBuf = [];
+        inList = false;
+      }
+      nodes.push(
+        <h2 key={nodes.length} className="mb-2 mt-5 text-lg font-medium tracking-tight">
+          {l.replace(/^#\s+/, "")}
+        </h2>,
+      );
     } else if (/^[-*]\s+/.test(l)) {
       flushPara();
       inList = true;
       listBuf.push(l.replace(/^[-*]\s+/, ""));
     } else if (!l.trim()) {
       flushPara();
-      if (inList) { flushList(listBuf); listBuf = []; inList = false; }
+      if (inList) {
+        flushList(listBuf);
+        listBuf = [];
+        inList = false;
+      }
     } else {
-      if (inList) { flushList(listBuf); listBuf = []; inList = false; }
+      if (inList) {
+        flushList(listBuf);
+        listBuf = [];
+        inList = false;
+      }
       buffer.push(l);
     }
   }
@@ -542,7 +621,12 @@ function inline(s: string): React.ReactNode {
     if (m.index > last) parts.push(s.slice(last, m.index));
     const tok = m[0];
     if (tok.startsWith("**")) parts.push(<strong key={k++}>{tok.slice(2, -2)}</strong>);
-    else if (tok.startsWith("`")) parts.push(<code key={k++} className="rounded bg-secondary px-1 font-mono text-[11px]">{tok.slice(1, -1)}</code>);
+    else if (tok.startsWith("`"))
+      parts.push(
+        <code key={k++} className="rounded bg-secondary px-1 font-mono text-[11px]">
+          {tok.slice(1, -1)}
+        </code>,
+      );
     else parts.push(<em key={k++}>{tok.slice(1, -1)}</em>);
     last = m.index + tok.length;
   }

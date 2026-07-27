@@ -2,7 +2,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const PROGRESSO: Record<string, number> = {
+export const PROGRESSO: Record<string, number> = {
   rascunho: 0,
   aplicando: 25,
   em_revisao: 50,
@@ -84,7 +84,7 @@ export const getCandidatura = createServerFn({ method: "GET" })
     const { data: row, error } = await context.supabase
       .from("candidaturas")
       .select(
-        "id, estagio, progresso, observacoes, proposta_md, proposta_gerada_em, created_at, updated_at, projeto:projetos(id, nome, descricao), edital:editais(id, titulo, slug, fonte, data_encerramento, url_original, tipo_apoio, status)",
+        "id, estagio, progresso, observacoes, proposta_md, proposta_gerada_em, created_at, updated_at, projeto:projetos(id, nome, descricao), edital:editais(id, titulo, slug, fonte, data_encerramento, url_original, tipo_apoio, status), consultor:consultores(id, nome, email)",
       )
       .eq("id", data.id)
       .eq("user_id", context.userId)

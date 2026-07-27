@@ -27,7 +27,7 @@ const MENU = [
   { to: "/admin/municipios", label: "Municípios" },
   { to: "/admin/estados", label: "Estados" },
   { to: "/admin/instituicoes", label: "Instituições" },
-  { to: "/admin/analistas", label: "Analistas" },
+  { to: "/admin/consultores", label: "Consultores" },
   { to: "/admin/investidores", label: "Investidores" },
   { to: "/admin/indicadores", label: "Indicadores" },
   { to: "/admin/relatorios", label: "Relatórios" },

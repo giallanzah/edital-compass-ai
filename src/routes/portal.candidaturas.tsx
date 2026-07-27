@@ -146,15 +146,7 @@ function Candidaturas() {
           <div className="mt-8 grid grid-cols-2 hairline md:grid-cols-6">
             {STAGES.map(([k, label], i) => {
               const items = data.filter((r) => r.estagio === k);
-              return (
-                <Column
-                  key={k}
-                  estagio={k}
-                  label={label}
-                  items={items}
-                  divider={i !== 0}
-                />
-              );
+              return <Column key={k} estagio={k} label={label} items={items} divider={i !== 0} />;
             })}
           </div>
           <p className="mt-3 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
@@ -277,6 +269,11 @@ function Card({ row }: { row: Row }) {
         {(row.projeto as { nome: string } | null)?.nome ?? "—"}
       </div>
       <div className="mt-1 text-[11px] text-muted-foreground line-clamp-2">{ed?.titulo ?? "—"}</div>
+      {row.consultor && (
+        <div className="mt-1.5 font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
+          consultor: {(row.consultor as { nome: string }).nome}
+        </div>
+      )}
       <div className="mt-2 flex items-center justify-between gap-2">
         <Link
           to="/portal/candidaturas/$id"

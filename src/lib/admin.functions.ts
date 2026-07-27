@@ -240,3 +240,164 @@ export const dashboardAdmin = createServerFn({ method: "GET" })
       editaisPorDia,
     };
   });
+
+// -------- Consultores (CRM interno) --------
+
+export const listarConsultoresAdmin = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin.from("consultores").select("*").order("nome");
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });
+
+// Vincula um usuário JÁ EXISTENTE como consultor — nunca cria conta nova.
+export const credenciarConsultorAdmin = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    (input: {
+      userId: string;
+      nome: string;
+      email: string;
+      telefone?: string | null;
+      especialidade?: string | null;
+    }) => input,
+  )
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.rpc("credenciar_consultor", {
+      _alvo: data.userId,
+      _nome: data.nome,
+      _email: data.email,
+      _telefone: data.telefone ?? undefined,
+      _especialidade: data.especialidade ?? undefined,
+    });
+    if (error) throw new Error(error.message);
+    const email = (context.claims.email as string | undefined) ?? context.userId;
+    await registrarAuditoria(
+      context.userId,
+      email,
+      "credenciar_consultor",
+      `Credenciou ${data.email} (${data.userId}) como consultor`,
+    );
+    return { ok: true };
+  });
+
+export const atualizarConsultorAdmin = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    (input: {
+      id: string;
+      nome?: string;
+      telefone?: string | null;
+      especialidade?: string | null;
+      ativo?: boolean;
+    }) => input,
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const patch: {
+      nome?: string;
+      telefone?: string | null;
+      especialidade?: string | null;
+      ativo?: boolean;
+    } = {};
+    if (data.nome !== undefined) patch.nome = data.nome;
+    if (data.telefone !== undefined) patch.telefone = data.telefone;
+    if (data.especialidade !== undefined) patch.especialidade = data.especialidade;
+    if (data.ativo !== undefined) patch.ativo = data.ativo;
+    const { error } = await supabaseAdmin.from("consultores").update(patch).eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const listarContratosAdmin = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("consultor_clientes")
+      .select(
+        "*, consultor:consultores(id, nome, email), empresa:empresas_perfil(id, nome_empresa)",
+      )
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });
+
+export const criarContratoAdmin = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    (input: {
+      consultorId: string;
+      empresaId: string;
+      contratoInicio: string;
+      contratoFim?: string | null;
+      creditosContratados: number;
+      observacoes?: string | null;
+    }) => input,
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row, error } = await supabaseAdmin
+      .from("consultor_clientes")
+      .insert({
+        consultor_id: data.consultorId,
+        empresa_id: data.empresaId,
+        contrato_inicio: data.contratoInicio,
+        contrato_fim: data.contratoFim ?? null,
+        creditos_contratados: data.creditosContratados,
+        observacoes: data.observacoes ?? null,
+      })
+      .select()
+      .single();
+    if (error) throw new Error(error.message);
+    const email = (context.claims.email as string | undefined) ?? context.userId;
+    await registrarAuditoria(
+      context.userId,
+      email,
+      "criar_contrato_consultor",
+      `Contrato consultor ${data.consultorId} ↔ empresa ${data.empresaId}`,
+    );
+    return row;
+  });
+
+export const atualizarContratoAdmin = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    (input: {
+      id: string;
+      status?: string;
+      contratoFim?: string | null;
+      creditosContratados?: number;
+      creditosUtilizados?: number;
+      observacoes?: string | null;
+    }) => input,
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const patch: {
+      status?: string;
+      contrato_fim?: string | null;
+      creditos_contratados?: number;
+      creditos_utilizados?: number;
+      observacoes?: string | null;
+    } = {};
+    if (data.status !== undefined) patch.status = data.status;
+    if (data.contratoFim !== undefined) patch.contrato_fim = data.contratoFim;
+    if (data.creditosContratados !== undefined)
+      patch.creditos_contratados = data.creditosContratados;
+    if (data.creditosUtilizados !== undefined) patch.creditos_utilizados = data.creditosUtilizados;
+    if (data.observacoes !== undefined) patch.observacoes = data.observacoes;
+    const { error } = await supabaseAdmin
+      .from("consultor_clientes")
+      .update(patch)
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });

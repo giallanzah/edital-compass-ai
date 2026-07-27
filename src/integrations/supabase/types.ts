@@ -41,6 +41,67 @@ export type Database = {
         }
         Relationships: []
       }
+      atividades_consultor: {
+        Row: {
+          candidatura_id: string | null
+          consultor_id: string | null
+          created_at: string
+          data_vencimento: string | null
+          descricao: string | null
+          empresa_id: string
+          id: string
+          status: string
+          tipo: string
+          updated_at: string
+        }
+        Insert: {
+          candidatura_id?: string | null
+          consultor_id?: string | null
+          created_at?: string
+          data_vencimento?: string | null
+          descricao?: string | null
+          empresa_id: string
+          id?: string
+          status?: string
+          tipo: string
+          updated_at?: string
+        }
+        Update: {
+          candidatura_id?: string | null
+          consultor_id?: string | null
+          created_at?: string
+          data_vencimento?: string | null
+          descricao?: string | null
+          empresa_id?: string
+          id?: string
+          status?: string
+          tipo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "atividades_consultor_candidatura_id_fkey"
+            columns: ["candidatura_id"]
+            isOneToOne: false
+            referencedRelation: "candidaturas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "atividades_consultor_consultor_id_fkey"
+            columns: ["consultor_id"]
+            isOneToOne: false
+            referencedRelation: "consultores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "atividades_consultor_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas_perfil"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       candidatura_tarefas: {
         Row: {
           candidatura_id: string
@@ -84,6 +145,7 @@ export type Database = {
       }
       candidaturas: {
         Row: {
+          consultor_id: string | null
           created_at: string
           edital_id: string
           estagio: string
@@ -97,6 +159,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          consultor_id?: string | null
           created_at?: string
           edital_id: string
           estagio?: string
@@ -110,6 +173,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          consultor_id?: string | null
           created_at?: string
           edital_id?: string
           estagio?: string
@@ -123,6 +187,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "candidaturas_consultor_id_fkey"
+            columns: ["consultor_id"]
+            isOneToOne: false
+            referencedRelation: "consultores"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "candidaturas_edital_id_fkey"
             columns: ["edital_id"]
@@ -138,6 +209,99 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      consultor_clientes: {
+        Row: {
+          consultor_id: string
+          contrato_fim: string | null
+          contrato_inicio: string
+          created_at: string
+          creditos_contratados: number
+          creditos_utilizados: number
+          empresa_id: string
+          id: string
+          observacoes: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          consultor_id: string
+          contrato_fim?: string | null
+          contrato_inicio?: string
+          created_at?: string
+          creditos_contratados?: number
+          creditos_utilizados?: number
+          empresa_id: string
+          id?: string
+          observacoes?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          consultor_id?: string
+          contrato_fim?: string | null
+          contrato_inicio?: string
+          created_at?: string
+          creditos_contratados?: number
+          creditos_utilizados?: number
+          empresa_id?: string
+          id?: string
+          observacoes?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultor_clientes_consultor_id_fkey"
+            columns: ["consultor_id"]
+            isOneToOne: false
+            referencedRelation: "consultores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consultor_clientes_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas_perfil"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      consultores: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          email: string
+          especialidade: string | null
+          id: string
+          nome: string
+          telefone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          email: string
+          especialidade?: string | null
+          id?: string
+          nome: string
+          telefone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          email?: string
+          especialidade?: string | null
+          id?: string
+          nome?: string
+          telefone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       editais: {
         Row: {
@@ -559,6 +723,16 @@ export type Database = {
         Args: never
         Returns: Database["public"]["Enums"]["app_role"]
       }
+      credenciar_consultor: {
+        Args: {
+          _alvo: string
+          _email: string
+          _especialidade?: string
+          _nome: string
+          _telefone?: string
+        }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -574,7 +748,7 @@ export type Database = {
       show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
-      app_role: "SUPER_ADMIN" | "ADMIN" | "user"
+      app_role: "SUPER_ADMIN" | "ADMIN" | "user" | "CONSULTOR"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -702,7 +876,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["SUPER_ADMIN", "ADMIN", "user"],
+      app_role: ["SUPER_ADMIN", "ADMIN", "user", "CONSULTOR"],
     },
   },
 } as const
