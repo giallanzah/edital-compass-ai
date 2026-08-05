@@ -38,11 +38,6 @@ export function Logo({ className = "", showWordmark = true, size = 28 }: Props) 
         <line x1="6" y1="46" x2="32" y2="4" />
         <line x1="58" y1="46" x2="32" y2="4" />
       </svg>
-      {showWordmark && (
-        <span className="text-[17px] font-medium tracking-tight leading-none">
-          fomenta<span className="text-muted-foreground">.ai</span>
-        </span>
-      )}
     </div>
   );
 }
