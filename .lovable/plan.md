@@ -1,56 +1,59 @@
-# Sincronizar mudanças externas para dentro da Lovable
+# Sincronizar as mudanças externas e destravar o projeto
 
-Objetivo: fazer com que alterações de código feitas fora daqui (GitHub / IDE local, repositório `edital-compass-ai`) apareçam neste projeto, com uma forma clara de visualizar o que mudou.
+Objetivo: trazer para cá tudo o que foi alterado fora deste ambiente e deixar o projeto compilando de novo.
 
-## O que eu verifiquei agora
+## Diagnóstico — o que eu verifiquei agora
 
-- O repositório deste projeto está no Git interno da Lovable. O único remote configurado no ambiente é o storage da Lovable — **não há remote do GitHub visível daqui**.
-- Branch de trabalho e `main` estão idênticos: `0` commits à frente, `0` atrás, nenhuma alteração pendente.
-- Os últimos commits são todos meus/da plataforma (o mais antigo de fora é de 27/07). **Nenhuma alteração externa chegou até agora.**
+O projeto **está travado**, e a causa é exatamente uma sincronização incompleta:
 
-Conclusão: hoje não existe caminho ativo para mudanças externas entrarem. Precisamos ligar o canal antes de sincronizar qualquer coisa.
+- No Git, o branch de trabalho e a `main` estão idênticos (`0` à frente, `0` atrás, nada pendente). O código externo **já chegou**.
+- Mas o banco de dados **não acompanhou**. Existem dois arquivos de migração no repositório que nunca foram executados:
+  - `20260723140000_admin_audit_log.sql`
+  - `20260726120000_consultores.sql`
+- Confirmei consultando o banco: as tabelas `admin_audit_log`, `consultores`, `consultor_clientes` e `atividades_consultor` **não existem**, nem a função `credenciar_consultor`. O banco tem apenas 11 tabelas, todas anteriores a esses arquivos.
+- Resultado: o módulo de Consultor e o log de auditoria referenciam tabelas inexistentes, os tipos gerados do banco não têm essas tabelas, e o build quebra com ~40 erros em `src/lib/admin.functions.ts` e `src/lib/consultor.functions.ts`.
 
-## Passo 1 — Ligar o GitHub (ação sua, no menu da Lovable)
+É o padrão clássico de mudança vinda de fora: **o código veio junto, o schema do banco não**. Migrações em arquivo não são aplicadas sozinhas.
 
-Isso não é código: eu não consigo criar nem conectar o repositório por você.
+## Passo 1 — Aplicar as migrações pendentes (destrava o build)
 
-1. No editor, abra o menu **+** (canto inferior esquerdo do chat) → **GitHub** → **Connect project**.
-2. Autorize o app da Lovable no GitHub e escolha a conta/organização.
-3. Se o repositório `edital-compass-ai` **ainda não existe**: clique em **Create Repository** — a Lovable cria o repo já com todo o código atual do projeto.
-4. Se o repositório **já existe com o seu código**: a Lovable hoje não importa repositórios existentes. Nesse caso, veja a alternativa no Passo 1B.
+Duas migrações, nesta ordem:
 
-Depois disso a sincronização é **bidirecional e automática**: push no GitHub → chega aqui; mudança minha aqui → vai pro GitHub. Sem pull manual.
+**1A. Auditoria administrativa**
+- Tabela `admin_audit_log`: quem executou, e-mail, ação, detalhe, data.
+- Sem acesso direto de usuários; só o servidor do backoffice grava e lê, após conferir se quem chamou é administrador.
 
-### Passo 1B — Se você já tem código só no GitHub
+**1B. Módulo Consultor (CRM interno)**
+- Novo papel `CONSULTOR` na lista de papéis.
+- `consultores`: nome, e-mail, telefone, especialidade, ativo — vinculado a um usuário existente.
+- `consultor_clientes`: contrato consultor ↔ empresa, com início, fim, status, créditos contratados e utilizados, observações. Só um contrato ativo por par.
+- `atividades_consultor`: tipo, descrição, status, data de vencimento — chamados do cliente e tarefas do consultor.
+- Coluna `consultor_id` em `candidaturas`, indicando quem acompanha cada candidatura.
+- Função `credenciar_consultor`: só administrador pode credenciar, e sempre sobre um usuário que já existe — nunca cria conta nova.
 
-Duas opções, você escolhe depois de conectar:
+**Regras de acesso que entram junto:**
+- Consultor vê apenas o próprio cadastro, os próprios contratos e as próprias atividades.
+- Consultor vê e move as candidaturas, vê as empresas e os projetos apenas dos clientes com contrato ativo na sua carteira.
+- Empresa vê o nome e contato do consultor responsável por ela.
+- Empresa pode abrir um chamado para o próprio caso, sem enxergar a fila interna.
+- Toda escrita administrativa continua passando pelo servidor, que confere o papel antes.
 
-- **Repo novo da Lovable como fonte da verdade** (recomendado): criar o repo pela Lovable, clonar localmente e reaplicar por cima as suas mudanças externas via commit/push. É o caminho mais limpo.
-- **Trazer arquivos pontuais**: você me diz quais arquivos mudaram e cola o conteúdo aqui; eu aplico no projeto. Serve para poucas mudanças, não para um merge grande.
+Detalhe técnico: a criação do papel `CONSULTOR` precisa ir numa transação separada do restante, porque Postgres não permite usar um valor de enum recém-criado no mesmo bloco. Serão então três execuções: auditoria, papel, resto do módulo.
 
-## Passo 2 — Conferir o que chegou
+## Passo 2 — Regenerar os tipos e validar
 
-Assim que houver push externo, eu faço a verificação aqui e te devolvo:
+- Os tipos do banco (`src/integrations/supabase/types.ts`) são regerados a partir do schema real, passando a incluir as quatro tabelas novas e a função.
+- Rodo o typecheck completo e confirmo zero erros antes de encerrar.
+- Confiro que `/admin/consultores`, `/admin/contratos` e as telas do consultor carregam sem erro de tabela inexistente.
 
-- Lista de commits novos (autor, data, mensagem).
-- Arquivos tocados, agrupados por área (portal, admin, robô de coleta, banco).
-- Alerta explícito se algum arquivo sensível foi alterado: `src/integrations/supabase/*` (gerado automaticamente), migrações do banco, `src/routeTree.gen.ts`, `.env`.
-- Typecheck do estado final, para garantir que a mudança externa não quebrou o build.
+## Passo 3 — Evitar que se repita
 
-## Passo 3 — Regras para não haver conflito
+Para que a próxima mudança externa não quebre o projeto de novo:
 
-Para que os dois lados convivam sem sobrescrever trabalho:
+- Sempre que chegar código de fora que inclua arquivos em `supabase/migrations/`, eu verifico o banco e aplico o que estiver faltando antes de qualquer outra coisa.
+- Arquivos gerados (`src/integrations/supabase/types.ts`, `src/routeTree.gen.ts`) não devem ser editados fora daqui — eu sempre os regenero a partir da fonte real.
+- Se você quiser um canal formal de duas vias com o GitHub (repositório `edital-compass-ai`), isso é feito por você no menu **+ → GitHub → Connect project**; depois disso o código passa a sincronizar automaticamente nos dois sentidos, e eu continuo responsável por aplicar as migrações que vierem junto.
 
-- Não editar em paralelo o mesmo arquivo — quando você for mexer em algo fora, me avisa e eu paro naquela área.
-- Arquivos gerados (`src/routeTree.gen.ts`, `src/integrations/supabase/types.ts`) devem ser alterados só de um lado; eu sempre regenero pelo banco.
-- Migrações de banco só por aqui: o schema vive no Cloud e um `.sql` empurrado pelo GitHub não é aplicado sozinho.
+## Entregável
 
-## Detalhes técnicos
-
-- A sincronização com o GitHub é feita pela plataforma, não pelo repositório do ambiente de execução — por isso não adianta eu adicionar um remote manualmente.
-- O histórico atual tem 2 commits recentes de snapshot da plataforma (`Work in progress`, `Changes`) além do plano; o último commit de conteúdo real é `ba8ce77` (recuperação de senha do admin), de 27/07.
-- Opcional, se você quiser acompanhar sem sair do app: posso depois criar `/admin/changelog` lendo a API do GitHub via connector, listando commits e arquivos alterados. Fica para uma etapa seguinte, se fizer sentido.
-
-## Entregável desta etapa
-
-Canal de sincronização ativo com o GitHub e um relatório de diferenças verificado por mim a cada push externo. Sem alteração de funcionalidade do produto.
+Banco alinhado ao código que veio de fora, build limpo, e o módulo de Consultor e o log de auditoria funcionando de fato — não apenas presentes no código.
