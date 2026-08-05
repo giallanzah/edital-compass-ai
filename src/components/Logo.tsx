@@ -1,8 +1,21 @@
+import logoAsset from "@/assets/fomenta-logo.png.asset.json";
+
 type Props = { className?: string; showWordmark?: boolean; size?: number };
 
 export function Logo({ className = "", showWordmark = true, size = 28 }: Props) {
+  if (showWordmark) {
+    return (
+      <img
+        src={logoAsset.url}
+        alt="fomenta.ai"
+        style={{ height: size * 1.15 }}
+        className={`w-auto object-contain ${className}`}
+      />
+    );
+  }
   return (
     <div className={`flex items-center gap-2.5 ${className}`}>
+
       <svg
         viewBox="0 0 64 64"
         fill="none"
@@ -25,11 +38,6 @@ export function Logo({ className = "", showWordmark = true, size = 28 }: Props) 
         <line x1="6" y1="46" x2="32" y2="4" />
         <line x1="58" y1="46" x2="32" y2="4" />
       </svg>
-      {showWordmark && (
-        <span className="text-[17px] font-medium tracking-tight leading-none">
-          fomenta<span className="text-muted-foreground">.ai</span>
-        </span>
-      )}
     </div>
   );
 }

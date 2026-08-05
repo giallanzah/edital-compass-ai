@@ -723,6 +723,11 @@ export type Database = {
         Args: never
         Returns: Database["public"]["Enums"]["app_role"]
       }
+      consultor_atende_empresa: {
+        Args: { _empresa_id: string }
+        Returns: boolean
+      }
+      consultor_atende_user: { Args: { _user_id: string }; Returns: boolean }
       credenciar_consultor: {
         Args: {
           _alvo: string
@@ -732,6 +737,10 @@ export type Database = {
           _telefone?: string
         }
         Returns: string
+      }
+      empresa_e_cliente_do_consultor: {
+        Args: { _consultor_id: string }
+        Returns: boolean
       }
       has_role: {
         Args: {
