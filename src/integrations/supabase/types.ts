@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_audit_log: {
+        Row: {
+          action: string
+          actor_email: string
+          actor_user_id: string | null
+          created_at: string
+          detail: string | null
+          id: string
+        }
+        Insert: {
+          action: string
+          actor_email: string
+          actor_user_id?: string | null
+          created_at?: string
+          detail?: string | null
+          id?: string
+        }
+        Update: {
+          action?: string
+          actor_email?: string
+          actor_user_id?: string | null
+          created_at?: string
+          detail?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
       candidatura_tarefas: {
         Row: {
           candidatura_id: string
@@ -547,7 +574,7 @@ export type Database = {
       show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
-      app_role: "SUPER_ADMIN" | "ADMIN" | "user"
+      app_role: "SUPER_ADMIN" | "ADMIN" | "user" | "CONSULTOR"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -675,7 +702,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["SUPER_ADMIN", "ADMIN", "user"],
+      app_role: ["SUPER_ADMIN", "ADMIN", "user", "CONSULTOR"],
     },
   },
 } as const
