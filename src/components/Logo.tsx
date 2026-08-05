@@ -1,8 +1,21 @@
+import logoAsset from "@/assets/fomenta-logo.png.asset.json";
+
 type Props = { className?: string; showWordmark?: boolean; size?: number };
 
 export function Logo({ className = "", showWordmark = true, size = 28 }: Props) {
+  if (showWordmark) {
+    return (
+      <img
+        src={logoAsset.url}
+        alt="fomenta.ai"
+        style={{ height: size * 1.15 }}
+        className={`w-auto object-contain ${className}`}
+      />
+    );
+  }
   return (
     <div className={`flex items-center gap-2.5 ${className}`}>
+
       <svg
         viewBox="0 0 64 64"
         fill="none"
