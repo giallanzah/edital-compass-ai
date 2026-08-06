@@ -339,13 +339,10 @@ async function upsertEdital(
     data_publicacao: dataPublicacao,
   });
 
-  const hash = await hashContent(
-    titulo,
-    descricao,
-    dataAbertura,
-    dataEncerramento,
-    item.abrangencia,
-  );
+  // Hash só com campos estáveis: descrição/abrangência variam a cada extração
+  // por IA e geravam histórico falso a cada execução.
+  const hash = await hashContent(titulo, urlCanonica, dataAbertura, dataEncerramento);
+
 
   const fonteNome = FONTE_NOME[slug];
 
