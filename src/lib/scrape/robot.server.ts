@@ -121,10 +121,64 @@ async function extractFromUrl(url: string): Promise<ExtractedEdital[]> {
   throw lastError;
 }
 
+// Página de detalhe: usada para completar prazos que a listagem não traz.
+const DETAIL_SCHEMA = {
+  type: "object",
+  properties: {
+    data_publicacao: { type: "string", description: "Data de publicação ISO YYYY-MM-DD ou vazio" },
+    data_abertura: { type: "string", description: "Início das inscrições ISO YYYY-MM-DD ou vazio" },
+    data_encerramento: {
+      type: "string",
+      description: "Prazo final de submissão ISO YYYY-MM-DD ou vazio",
+    },
+    descricao: { type: "string", description: "Resumo do objeto do edital em 1-3 frases" },
+    abrangencia: { type: "string", description: "Abrangência geográfica ou vazio" },
+  },
+};
+
+const MAX_DETALHES_POR_FONTE = 8;
+
+async function enrichFromDetail(url: string): Promise<Partial<ExtractedEdital> | null> {
+  try {
+    const fc = getFirecrawl();
+    const result: unknown = await fc.scrape(url, {
+      formats: [
+        {
+          type: "json",
+          schema: DETAIL_SCHEMA,
+          prompt:
+            "Extraia as datas oficiais (publicação, abertura e encerramento das inscrições) e um resumo curto do objeto deste edital.",
+        },
+      ],
+      onlyMainContent: true,
+      waitFor: 3000,
+      timeout: 90000,
+    });
+    const json =
+      (result as { json?: Partial<ExtractedEdital> })?.json ??
+      (result as { data?: { json?: Partial<ExtractedEdital> } })?.data?.json;
+    return json ?? null;
+  } catch (e) {
+    console.warn(`[scraper] detalhe falhou para ${url}:`, e instanceof Error ? e.message : e);
+    return null;
+  }
+}
+
 export async function runScrape(fonteSlug: FonteSlug | "todas"): Promise<{
   fontes: { slug: string; novos: number; atualizados: number; ignorados: number; status: string; mensagem?: string }[];
 }> {
-  const alvos: FonteSlug[] = fonteSlug === "todas" ? ["cnpq", "finep", "sebrae", "bndes"] : [fonteSlug];
+  let alvos: FonteSlug[];
+  if (fonteSlug === "todas") {
+    // Alvos vêm do banco: novas fontes (FAPs, Lei do Bem) entram sem deploy.
+    const { data } = await supabaseAdmin
+      .from("fontes_monitoradas")
+      .select("slug")
+      .eq("ativo", true)
+      .order("slug");
+    alvos = (data ?? []).map((f) => f.slug as FonteSlug);
+  } else {
+    alvos = [fonteSlug];
+  }
   const results: {
     slug: string;
     novos: number;
@@ -143,9 +197,10 @@ export async function runScrape(fonteSlug: FonteSlug | "todas"): Promise<{
 async function runScrapeFonte(slug: FonteSlug) {
   const { data: fonte } = await supabaseAdmin
     .from("fontes_monitoradas")
-    .select("id, slug, nome, url_base, ativo")
+    .select("id, slug, nome, url_base, urls_extra, ativo")
     .eq("slug", slug)
     .maybeSingle();
+
 
   if (!fonte) {
     return { slug, novos: 0, atualizados: 0, ignorados: 0, status: "fail", mensagem: "Fonte não encontrada" };
@@ -168,10 +223,43 @@ async function runScrapeFonte(slug: FonteSlug) {
   let itens: ExtractedEdital[] = [];
 
   try {
-    itens = await extractFromUrl(fonte.url_base);
+    // Listagem principal + páginas extras (paginação/seções configuradas na fonte).
+    const urls = [fonte.url_base, ...((fonte.urls_extra as string[] | null) ?? [])];
+    const vistos = new Set<string>();
+    for (const url of urls) {
+      let lote: ExtractedEdital[] = [];
+      try {
+        lote = await extractFromUrl(url);
+      } catch (e) {
+        if (url === fonte.url_base) throw e;
+        console.warn(`[scraper:${slug}] página extra falhou (${url})`, e);
+        continue;
+      }
+      for (const item of lote) {
+        const chave = normalizeUrl(item.url ?? "");
+        if (!chave || vistos.has(chave)) continue;
+        vistos.add(chave);
+        itens.push(item);
+      }
+    }
     if (itens.length === 0) {
       status = "warn";
       mensagem = "Nenhum edital extraído da página.";
+    }
+
+    // Completa prazos ausentes abrindo a página de detalhe (limitado por fonte).
+    let detalhes = 0;
+    for (const item of itens) {
+      if (detalhes >= MAX_DETALHES_POR_FONTE) break;
+      if (item.data_encerramento || !item.url) continue;
+      detalhes++;
+      const extra = await enrichFromDetail(item.url);
+      if (!extra) continue;
+      item.data_encerramento = item.data_encerramento || extra.data_encerramento || null;
+      item.data_abertura = item.data_abertura || extra.data_abertura || null;
+      item.data_publicacao = item.data_publicacao || extra.data_publicacao || null;
+      item.descricao = item.descricao || extra.descricao || null;
+      item.abrangencia = item.abrangencia || extra.abrangencia || null;
     }
 
     for (const item of itens) {
@@ -185,6 +273,7 @@ async function runScrapeFonte(slug: FonteSlug) {
         console.error(`[scraper:${slug}] erro em item`, e);
       }
     }
+
   } catch (e) {
     status = "fail";
     mensagem = e instanceof Error ? e.message : String(e);
@@ -250,13 +339,10 @@ async function upsertEdital(
     data_publicacao: dataPublicacao,
   });
 
-  const hash = await hashContent(
-    titulo,
-    descricao,
-    dataAbertura,
-    dataEncerramento,
-    item.abrangencia,
-  );
+  // Hash só com campos estáveis: descrição/abrangência variam a cada extração
+  // por IA e geravam histórico falso a cada execução.
+  const hash = await hashContent(titulo, urlCanonica, dataAbertura, dataEncerramento);
+
 
   const fonteNome = FONTE_NOME[slug];
 

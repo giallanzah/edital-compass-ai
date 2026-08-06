@@ -1,13 +1,28 @@
 // Pure helpers usados pelo robô e pelo backend. Sem dependências server-only.
 
-export type FonteSlug = "cnpq" | "finep" | "sebrae" | "bndes";
+export type FonteSlug =
+  | "cnpq"
+  | "finep"
+  | "sebrae"
+  | "bndes"
+  | "fapesp"
+  | "faperj"
+  | "fapemig"
+  | "fapergs"
+  | "leidobem";
 
 export const FONTE_NOME: Record<FonteSlug, string> = {
   cnpq: "CNPq",
   finep: "FINEP",
   sebrae: "SEBRAE",
   bndes: "BNDES",
+  fapesp: "FAPESP",
+  faperj: "FAPERJ",
+  fapemig: "FAPEMIG",
+  fapergs: "FAPERGS",
+  leidobem: "Lei do Bem",
 };
+
 
 export function slugify(input: string): string {
   return input
