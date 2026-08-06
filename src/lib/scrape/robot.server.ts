@@ -223,10 +223,43 @@ async function runScrapeFonte(slug: FonteSlug) {
   let itens: ExtractedEdital[] = [];
 
   try {
-    itens = await extractFromUrl(fonte.url_base);
+    // Listagem principal + páginas extras (paginação/seções configuradas na fonte).
+    const urls = [fonte.url_base, ...((fonte.urls_extra as string[] | null) ?? [])];
+    const vistos = new Set<string>();
+    for (const url of urls) {
+      let lote: ExtractedEdital[] = [];
+      try {
+        lote = await extractFromUrl(url);
+      } catch (e) {
+        if (url === fonte.url_base) throw e;
+        console.warn(`[scraper:${slug}] página extra falhou (${url})`, e);
+        continue;
+      }
+      for (const item of lote) {
+        const chave = normalizeUrl(item.url ?? "");
+        if (!chave || vistos.has(chave)) continue;
+        vistos.add(chave);
+        itens.push(item);
+      }
+    }
     if (itens.length === 0) {
       status = "warn";
       mensagem = "Nenhum edital extraído da página.";
+    }
+
+    // Completa prazos ausentes abrindo a página de detalhe (limitado por fonte).
+    let detalhes = 0;
+    for (const item of itens) {
+      if (detalhes >= MAX_DETALHES_POR_FONTE) break;
+      if (item.data_encerramento || !item.url) continue;
+      detalhes++;
+      const extra = await enrichFromDetail(item.url);
+      if (!extra) continue;
+      item.data_encerramento = item.data_encerramento || extra.data_encerramento || null;
+      item.data_abertura = item.data_abertura || extra.data_abertura || null;
+      item.data_publicacao = item.data_publicacao || extra.data_publicacao || null;
+      item.descricao = item.descricao || extra.descricao || null;
+      item.abrangencia = item.abrangencia || extra.abrangencia || null;
     }
 
     for (const item of itens) {
@@ -240,6 +273,7 @@ async function runScrapeFonte(slug: FonteSlug) {
         console.error(`[scraper:${slug}] erro em item`, e);
       }
     }
+
   } catch (e) {
     status = "fail";
     mensagem = e instanceof Error ? e.message : String(e);
