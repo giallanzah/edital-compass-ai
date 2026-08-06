@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as PortalRouteImport } from './routes/portal'
+import { Route as EntrarRouteImport } from './routes/entrar'
 import { Route as ConsultorRouteImport } from './routes/consultor'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
@@ -67,6 +68,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const PortalRoute = PortalRouteImport.update({
   id: '/portal',
   path: '/portal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EntrarRoute = EntrarRouteImport.update({
+  id: '/entrar',
+  path: '/entrar',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConsultorRoute = ConsultorRouteImport.update({
@@ -309,6 +315,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/consultor': typeof ConsultorRouteWithChildren
+  '/entrar': typeof EntrarRoute
   '/portal': typeof PortalRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/apis': typeof AdminApisRoute
@@ -358,6 +365,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/entrar': typeof EntrarRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/apis': typeof AdminApisRoute
   '/admin/coletas': typeof AdminColetasRoute
@@ -409,6 +417,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/consultor': typeof ConsultorRouteWithChildren
+  '/entrar': typeof EntrarRoute
   '/portal': typeof PortalRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/apis': typeof AdminApisRoute
@@ -462,6 +471,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/consultor'
+    | '/entrar'
     | '/portal'
     | '/sitemap.xml'
     | '/admin/apis'
@@ -511,6 +521,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/entrar'
     | '/sitemap.xml'
     | '/admin/apis'
     | '/admin/coletas'
@@ -561,6 +572,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/consultor'
+    | '/entrar'
     | '/portal'
     | '/sitemap.xml'
     | '/admin/apis'
@@ -613,6 +625,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
   ConsultorRoute: typeof ConsultorRouteWithChildren
+  EntrarRoute: typeof EntrarRoute
   PortalRoute: typeof PortalRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiOgEditalIdRoute: typeof ApiOgEditalIdRoute
@@ -634,6 +647,13 @@ declare module '@tanstack/react-router' {
       path: '/portal'
       fullPath: '/portal'
       preLoaderRoute: typeof PortalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/entrar': {
+      id: '/entrar'
+      path: '/entrar'
+      fullPath: '/entrar'
+      preLoaderRoute: typeof EntrarRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/consultor': {
@@ -1109,6 +1129,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   ConsultorRoute: ConsultorRouteWithChildren,
+  EntrarRoute: EntrarRoute,
   PortalRoute: PortalRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiOgEditalIdRoute: ApiOgEditalIdRoute,

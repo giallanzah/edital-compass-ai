@@ -30,18 +30,19 @@ export function SiteHeader() {
         </nav>
         <div className="flex items-center gap-2">
           <Link
-            to="/portal"
+            to="/entrar"
             className="hidden text-sm text-muted-foreground hover:text-foreground sm:inline-block"
           >
             Entrar
           </Link>
           <Link
-            to="/portal"
+            to="/entrar"
             className="inline-flex h-9 items-center rounded-sm bg-foreground px-4 text-sm font-medium text-background hover:opacity-90"
           >
             Acessar plataforma
           </Link>
         </div>
+
       </div>
     </header>
   );
