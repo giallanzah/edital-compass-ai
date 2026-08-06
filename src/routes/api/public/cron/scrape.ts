@@ -1,6 +1,7 @@
 // Endpoint público para o cron externo (pg_cron ou similar).
 // Autenticação por header `apikey` = SUPABASE_ANON_KEY.
 import { createFileRoute } from "@tanstack/react-router";
+import type { FonteSlug } from "@/lib/scrape/normalize";
 
 export const Route = createFileRoute("/api/public/cron/scrape")({
   server: {
@@ -18,7 +19,7 @@ export const Route = createFileRoute("/api/public/cron/scrape")({
         const { runScrape } = await import("@/lib/scrape/robot.server");
         try {
           const body = (await request.json().catch(() => ({}))) as {
-            fonte?: "cnpq" | "finep" | "sebrae" | "bndes" | "todas";
+            fonte?: FonteSlug | "todas";
           };
           const fonte = body.fonte ?? "todas";
           const result = await runScrape(fonte);

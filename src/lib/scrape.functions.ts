@@ -2,6 +2,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { assertAdmin, registrarAuditoria } from "./admin.functions";
+import type { FonteSlug } from "@/lib/scrape/normalize";
 
 export type EditalResumo = {
   id: string;
@@ -153,7 +154,7 @@ export const listLogsColeta = createServerFn({ method: "GET" })
 
 export const dispararColeta = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { fonte: "cnpq" | "finep" | "sebrae" | "bndes" | "todas" }) => input)
+  .inputValidator((input: { fonte: FonteSlug | "todas" }) => input)
   .handler(async ({ data, context }) => {
     await assertAdmin(context.userId);
     const { runScrape } = await import("./scrape/robot.server");

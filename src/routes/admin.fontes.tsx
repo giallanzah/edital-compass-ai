@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { listFontes, dispararColeta, toggleFonteAtiva } from "@/lib/scrape.functions";
+import type { FonteSlug } from "@/lib/scrape/normalize";
 
 export const Route = createFileRoute("/admin/fontes")({ component: Page });
 
@@ -47,7 +48,7 @@ function Page() {
   const runOne = useMutation({
     mutationFn: async (slug: string) => {
       setRunningSlug(slug);
-      return await disparar({ data: { fonte: slug as "cnpq" | "finep" | "sebrae" | "bndes" } });
+      return await disparar({ data: { fonte: slug as FonteSlug } });
     },
     onSettled: (res) => {
       setRunningSlug(null);
