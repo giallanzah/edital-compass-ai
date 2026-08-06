@@ -511,6 +511,7 @@ export type Database = {
       fontes_monitoradas: {
         Row: {
           ativo: boolean
+          categoria: string
           created_at: string
           frequencia_horas: number
           id: string
@@ -518,14 +519,17 @@ export type Database = {
           slug: string
           status_coleta: string
           tipo_coleta: string
+          uf: string | null
           ultima_mensagem: string | null
           ultimo_erro_em: string | null
           ultimo_sucesso_em: string | null
           updated_at: string
           url_base: string
+          urls_extra: string[]
         }
         Insert: {
           ativo?: boolean
+          categoria?: string
           created_at?: string
           frequencia_horas?: number
           id?: string
@@ -533,14 +537,17 @@ export type Database = {
           slug: string
           status_coleta?: string
           tipo_coleta?: string
+          uf?: string | null
           ultima_mensagem?: string | null
           ultimo_erro_em?: string | null
           ultimo_sucesso_em?: string | null
           updated_at?: string
           url_base: string
+          urls_extra?: string[]
         }
         Update: {
           ativo?: boolean
+          categoria?: string
           created_at?: string
           frequencia_horas?: number
           id?: string
@@ -548,11 +555,13 @@ export type Database = {
           slug?: string
           status_coleta?: string
           tipo_coleta?: string
+          uf?: string | null
           ultima_mensagem?: string | null
           ultimo_erro_em?: string | null
           ultimo_sucesso_em?: string | null
           updated_at?: string
           url_base?: string
+          urls_extra?: string[]
         }
         Relationships: []
       }
