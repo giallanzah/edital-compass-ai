@@ -51,7 +51,7 @@ function EditaisList() {
   const status = search.status ?? null;
 
   function setFiltro(patch: EditaisSearch) {
-    navigate({ search: (prev) => ({ ...prev, ...patch }), replace: true });
+    navigate({ search: (prev: EditaisSearch) => ({ ...prev, ...patch }), replace: true });
   }
   const setQ = (v: string) => setFiltro({ q: v || undefined });
   const setFonte = (v: string | null) => setFiltro({ fonte: v ?? undefined });
