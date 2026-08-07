@@ -11,6 +11,7 @@ import {
   useSensors,
   type DragEndEvent,
 } from "@dnd-kit/core";
+import { toast } from "sonner";
 import { listMyCandidaturas } from "@/lib/portal.functions";
 import { mudarEstagio } from "@/lib/candidatura.functions";
 
@@ -26,6 +27,8 @@ const STAGES = [
   ["aprovado", "Aprovado"],
   ["reprovado", "Reprovado"],
 ] as const;
+
+const ESTAGIO_LABEL: Record<string, string> = Object.fromEntries(STAGES);
 
 type Estagio = (typeof STAGES)[number][0];
 
