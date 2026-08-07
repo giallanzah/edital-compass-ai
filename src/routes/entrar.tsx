@@ -117,18 +117,17 @@ function EntrarPage() {
 
       const destino = await destinoPorRole();
       const esperado = PERFIS.find((p) => p.id === perfil)!.destino;
-      if (destino !== esperado) {
+      if (destino !== esperado && perfil !== "empreendedor") {
         setMsg({
           tone: "err",
           text:
             perfil === "admin"
               ? "Esta conta não possui perfil de administrador."
-              : perfil === "consultor"
-                ? "Esta conta não está credenciada como consultor."
-                : "Sua conta tem um perfil diferente — redirecionando para a área correta.",
+              : "Esta conta não está credenciada como consultor.",
         });
+        return;
       }
-      navigate({ to: destino });
+      navigate({ to: redirect ?? destino });
     } catch (err) {
       setMsg({ tone: "err", text: err instanceof Error ? err.message : "Erro ao entrar." });
     } finally {
