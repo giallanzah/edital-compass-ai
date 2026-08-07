@@ -18,6 +18,7 @@ function Dashboard() {
   const perfilFn = useServerFn(getMyProfile);
   const recFn = useServerFn(getRecomendados);
   const projFn = useServerFn(listMyProjetos);
+  const prazosFn = useServerFn(alertasPrazo);
 
   const perfilQ = useQuery({ queryKey: ["me", "profile"], queryFn: () => perfilFn() });
   const recQ = useQuery({
@@ -26,6 +27,10 @@ function Dashboard() {
     enabled: !!perfilQ.data,
   });
   const projQ = useQuery({ queryKey: ["me", "projetos"], queryFn: () => projFn() });
+  const prazosQ = useQuery({
+    queryKey: ["me", "prazos", 30],
+    queryFn: () => prazosFn({ data: { dias: 30 } }),
+  });
 
   const perfil = perfilQ.data;
   const now = new Date();
