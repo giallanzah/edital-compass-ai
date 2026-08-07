@@ -158,16 +158,18 @@ export const removerTarefa = createServerFn({ method: "POST" })
 // Alertas de prazo (para badge no dashboard)
 export const alertasPrazo = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  // dias = janela de vencimento (7 por padrão; o painel usa 30)
+  .inputValidator((input?: { dias?: number }) => ({ dias: input?.dias ?? 7 }))
+  .handler(async ({ data, context }) => {
     const limite = new Date();
-    limite.setDate(limite.getDate() + 7);
-    const { data, error } = await context.supabase
+    limite.setDate(limite.getDate() + data.dias);
+    const { data: rows, error } = await context.supabase
       .from("candidaturas")
       .select("id, estagio, edital:editais(id, titulo, data_encerramento)")
       .eq("user_id", context.userId)
       .in("estagio", ["rascunho", "aplicando", "em_revisao"]);
     if (error) throw new Error(error.message);
-    const proximos = (data ?? []).filter((c) => {
+    const proximos = (rows ?? []).filter((c) => {
       const dt = (c.edital as { data_encerramento: string | null } | null)?.data_encerramento;
       if (!dt) return false;
       const d = new Date(dt).getTime();

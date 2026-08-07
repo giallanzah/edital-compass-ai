@@ -11,6 +11,7 @@ import {
   useSensors,
   type DragEndEvent,
 } from "@dnd-kit/core";
+import { toast } from "sonner";
 import { listMyCandidaturas } from "@/lib/portal.functions";
 import { mudarEstagio } from "@/lib/candidatura.functions";
 
@@ -26,6 +27,8 @@ const STAGES = [
   ["aprovado", "Aprovado"],
   ["reprovado", "Reprovado"],
 ] as const;
+
+const ESTAGIO_LABEL: Record<string, string> = Object.fromEntries(STAGES);
 
 type Estagio = (typeof STAGES)[number][0];
 
@@ -66,8 +69,22 @@ function Candidaturas() {
       );
       return { prev };
     },
-    onError: (_e, _v, ctx) => {
+    onError: (e, _v, ctx) => {
       if (ctx?.prev) qc.setQueryData(["me", "candidaturas"], ctx.prev);
+      toast.error("Não foi possível mover a candidatura", {
+        description: e instanceof Error ? e.message : "Tente novamente em instantes.",
+      });
+    },
+    onSuccess: (_d, v, ctx) => {
+      const anterior = ctx?.prev?.find((r) => r.id === v.id)?.estagio;
+      toast.success(`Movido para “${ESTAGIO_LABEL[v.estagio] ?? v.estagio}”`, {
+        action: anterior
+          ? {
+              label: "Desfazer",
+              onClick: () => estMut.mutate({ id: v.id, estagio: anterior }),
+            }
+          : undefined,
+      });
     },
     onSettled: () => qc.invalidateQueries({ queryKey: ["me", "candidaturas"] }),
   });
@@ -82,6 +99,7 @@ function Candidaturas() {
     if (!atual || atual.estagio === dest) return;
     estMut.mutate({ id, estagio: dest });
   }
+
 
   if (isLoading) {
     return <div className="p-10 text-sm text-muted-foreground">Carregando…</div>;

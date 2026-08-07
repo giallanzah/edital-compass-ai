@@ -1,11 +1,18 @@
-import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
 import { listEditais, contagemPorFonte, type EditalResumo } from "@/lib/scrape.functions";
 import { Skeleton } from "@/components/ui/skeleton";
 
+type EditaisSearch = { q?: string; fonte?: string; status?: string };
+
 export const Route = createFileRoute("/portal/editais")({
+  // Filtros vivem na URL: voltar do detalhe preserva a busca e o link é compartilhável.
+  validateSearch: (search: Record<string, unknown>): EditaisSearch => ({
+    q: typeof search.q === "string" && search.q ? search.q : undefined,
+    fonte: typeof search.fonte === "string" && search.fonte ? search.fonte : undefined,
+    status: typeof search.status === "string" && search.status ? search.status : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Editais e linhas de fomento · fomenta.ai" },
@@ -18,6 +25,7 @@ export const Route = createFileRoute("/portal/editais")({
   }),
   component: EditaisList,
 });
+
 
 const FONTES = ["CNPq", "FINEP", "SEBRAE", "BNDES"] as const;
 const STATUS_LABEL: Record<string, string> = {
@@ -36,9 +44,18 @@ function EditaisList() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isIndex = pathname === "/portal/editais";
 
-  const [q, setQ] = useState("");
-  const [fonte, setFonte] = useState<string | null>(null);
-  const [status, setStatus] = useState<string | null>(null);
+  const search = Route.useSearch();
+  const navigate = useNavigate({ from: "/portal/editais" });
+  const q = search.q ?? "";
+  const fonte = search.fonte ?? null;
+  const status = search.status ?? null;
+
+  function setFiltro(patch: EditaisSearch) {
+    navigate({ search: (prev: EditaisSearch) => ({ ...prev, ...patch }), replace: true });
+  }
+  const setQ = (v: string) => setFiltro({ q: v || undefined });
+  const setFonte = (v: string | null) => setFiltro({ fonte: v ?? undefined });
+  const setStatus = (v: string | null) => setFiltro({ status: v ?? undefined });
 
   const list = useServerFn(listEditais);
   const cont = useServerFn(contagemPorFonte);
@@ -169,7 +186,15 @@ function EditaisList() {
             </div>
           ) : items.length === 0 ? (
             <div className="hairline p-12 text-center text-sm text-muted-foreground">
-              Nenhum edital encontrado com esses filtros.
+              <p>Nenhum edital encontrado com esses filtros.</p>
+              {(q || fonte || status) && (
+                <button
+                  onClick={() => navigate({ search: {}, replace: true })}
+                  className="mt-4 inline-flex h-9 items-center rounded-sm bg-foreground px-4 text-sm font-medium text-background hover:opacity-90"
+                >
+                  Limpar filtros
+                </button>
+              )}
             </div>
           ) : (
             <div className="grid gap-4 md:grid-cols-2">
@@ -229,15 +254,23 @@ function EditalCard({ e }: { e: EditalResumo }) {
             </>
           )}
         </div>
-        <span
-          className={`rounded-sm px-1.5 py-0.5 font-mono text-[10px] uppercase ${
-            e.status === "aberto"
-              ? "bg-foreground text-background"
-              : "hairline text-muted-foreground"
-          }`}
-        >
-          {STATUS_LABEL[e.status] ?? e.status}
-        </span>
+        <div className="flex shrink-0 items-center gap-1.5">
+          {diasRestantes !== null && diasRestantes >= 0 && diasRestantes <= 7 && (
+            <span className="inline-flex items-center gap-1 rounded-sm border border-destructive/40 bg-destructive/10 px-1.5 py-0.5 font-mono text-[10px] uppercase text-destructive">
+              <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-destructive" />
+              {diasRestantes === 0 ? "hoje" : `${diasRestantes}d`}
+            </span>
+          )}
+          <span
+            className={`rounded-sm px-1.5 py-0.5 font-mono text-[10px] uppercase ${
+              e.status === "aberto"
+                ? "bg-foreground text-background"
+                : "hairline text-muted-foreground"
+            }`}
+          >
+            {STATUS_LABEL[e.status] ?? e.status}
+          </span>
+        </div>
       </div>
       <h3 className="mt-3 text-[15px] font-medium leading-snug tracking-tight">{e.titulo}</h3>
       {e.descricao_curta && (

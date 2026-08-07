@@ -4,6 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/Logo";
 
 export const Route = createFileRoute("/entrar")({
+  validateSearch: (search: Record<string, unknown>) => {
+    const raw = typeof search.redirect === "string" ? search.redirect : "";
+    // Só aceitamos caminhos internos — nunca URLs externas.
+    const redirect = raw.startsWith("/") && !raw.startsWith("//") ? raw : undefined;
+    return { redirect };
+  },
   head: () => ({
     meta: [
       { title: "Entrar na plataforma · fomenta.ai" },
@@ -60,6 +66,7 @@ async function destinoPorRole(): Promise<string> {
 
 function EntrarPage() {
   const navigate = useNavigate();
+  const { redirect } = Route.useSearch();
   const [perfil, setPerfil] = useState<Perfil>("empreendedor");
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
@@ -70,9 +77,10 @@ function EntrarPage() {
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data }) => {
-      if (data.session) navigate({ to: await destinoPorRole() });
+      if (data.session) navigate({ to: redirect ?? (await destinoPorRole()) });
     });
-  }, [navigate]);
+  }, [navigate, redirect]);
+
 
   const podeCadastrar = perfil === "empreendedor";
 
@@ -109,18 +117,17 @@ function EntrarPage() {
 
       const destino = await destinoPorRole();
       const esperado = PERFIS.find((p) => p.id === perfil)!.destino;
-      if (destino !== esperado) {
+      if (destino !== esperado && perfil !== "empreendedor") {
         setMsg({
           tone: "err",
           text:
             perfil === "admin"
               ? "Esta conta não possui perfil de administrador."
-              : perfil === "consultor"
-                ? "Esta conta não está credenciada como consultor."
-                : "Sua conta tem um perfil diferente — redirecionando para a área correta.",
+              : "Esta conta não está credenciada como consultor.",
         });
+        return;
       }
-      navigate({ to: destino });
+      navigate({ to: redirect ?? destino });
     } catch (err) {
       setMsg({ tone: "err", text: err instanceof Error ? err.message : "Erro ao entrar." });
     } finally {
