@@ -4,6 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/Logo";
 
 export const Route = createFileRoute("/entrar")({
+  validateSearch: (search: Record<string, unknown>) => {
+    const raw = typeof search.redirect === "string" ? search.redirect : "";
+    // Só aceitamos caminhos internos — nunca URLs externas.
+    const redirect = raw.startsWith("/") && !raw.startsWith("//") ? raw : undefined;
+    return { redirect };
+  },
   head: () => ({
     meta: [
       { title: "Entrar na plataforma · fomenta.ai" },
