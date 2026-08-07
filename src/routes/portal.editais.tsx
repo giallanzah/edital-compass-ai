@@ -1,11 +1,18 @@
-import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
 import { listEditais, contagemPorFonte, type EditalResumo } from "@/lib/scrape.functions";
 import { Skeleton } from "@/components/ui/skeleton";
 
+type EditaisSearch = { q?: string; fonte?: string; status?: string };
+
 export const Route = createFileRoute("/portal/editais")({
+  // Filtros vivem na URL: voltar do detalhe preserva a busca e o link é compartilhável.
+  validateSearch: (search: Record<string, unknown>): EditaisSearch => ({
+    q: typeof search.q === "string" && search.q ? search.q : undefined,
+    fonte: typeof search.fonte === "string" && search.fonte ? search.fonte : undefined,
+    status: typeof search.status === "string" && search.status ? search.status : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Editais e linhas de fomento · fomenta.ai" },
@@ -18,6 +25,7 @@ export const Route = createFileRoute("/portal/editais")({
   }),
   component: EditaisList,
 });
+
 
 const FONTES = ["CNPq", "FINEP", "SEBRAE", "BNDES"] as const;
 const STATUS_LABEL: Record<string, string> = {
