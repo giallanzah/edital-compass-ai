@@ -44,9 +44,18 @@ function EditaisList() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isIndex = pathname === "/portal/editais";
 
-  const [q, setQ] = useState("");
-  const [fonte, setFonte] = useState<string | null>(null);
-  const [status, setStatus] = useState<string | null>(null);
+  const search = Route.useSearch();
+  const navigate = useNavigate({ from: "/portal/editais" });
+  const q = search.q ?? "";
+  const fonte = search.fonte ?? null;
+  const status = search.status ?? null;
+
+  function setFiltro(patch: EditaisSearch) {
+    navigate({ search: (prev) => ({ ...prev, ...patch }), replace: true });
+  }
+  const setQ = (v: string) => setFiltro({ q: v || undefined });
+  const setFonte = (v: string | null) => setFiltro({ fonte: v ?? undefined });
+  const setStatus = (v: string | null) => setFiltro({ status: v ?? undefined });
 
   const list = useServerFn(listEditais);
   const cont = useServerFn(contagemPorFonte);
