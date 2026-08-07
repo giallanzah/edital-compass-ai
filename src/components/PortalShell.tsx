@@ -53,7 +53,7 @@ export function PortalShell({
         <div className="flex h-14 items-center justify-between px-6">
           <div className="flex items-center gap-6">
             <Link to="/" className="flex items-center">
-              <Logo />
+              <Logo variant="compact" />
             </Link>
             <span className="hidden h-4 w-px bg-border md:block" />
             <div className="hidden items-center gap-2 md:flex">
