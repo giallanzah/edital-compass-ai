@@ -66,6 +66,7 @@ async function destinoPorRole(): Promise<string> {
 
 function EntrarPage() {
   const navigate = useNavigate();
+  const { redirect } = Route.useSearch();
   const [perfil, setPerfil] = useState<Perfil>("empreendedor");
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
@@ -76,9 +77,10 @@ function EntrarPage() {
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data }) => {
-      if (data.session) navigate({ to: await destinoPorRole() });
+      if (data.session) navigate({ to: redirect ?? (await destinoPorRole()) });
     });
-  }, [navigate]);
+  }, [navigate, redirect]);
+
 
   const podeCadastrar = perfil === "empreendedor";
 
