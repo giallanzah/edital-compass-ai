@@ -254,15 +254,23 @@ function EditalCard({ e }: { e: EditalResumo }) {
             </>
           )}
         </div>
-        <span
-          className={`rounded-sm px-1.5 py-0.5 font-mono text-[10px] uppercase ${
-            e.status === "aberto"
-              ? "bg-foreground text-background"
-              : "hairline text-muted-foreground"
-          }`}
-        >
-          {STATUS_LABEL[e.status] ?? e.status}
-        </span>
+        <div className="flex shrink-0 items-center gap-1.5">
+          {diasRestantes !== null && diasRestantes >= 0 && diasRestantes <= 7 && (
+            <span className="inline-flex items-center gap-1 rounded-sm border border-destructive/40 bg-destructive/10 px-1.5 py-0.5 font-mono text-[10px] uppercase text-destructive">
+              <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-destructive" />
+              {diasRestantes === 0 ? "hoje" : `${diasRestantes}d`}
+            </span>
+          )}
+          <span
+            className={`rounded-sm px-1.5 py-0.5 font-mono text-[10px] uppercase ${
+              e.status === "aberto"
+                ? "bg-foreground text-background"
+                : "hairline text-muted-foreground"
+            }`}
+          >
+            {STATUS_LABEL[e.status] ?? e.status}
+          </span>
+        </div>
       </div>
       <h3 className="mt-3 text-[15px] font-medium leading-snug tracking-tight">{e.titulo}</h3>
       {e.descricao_curta && (
