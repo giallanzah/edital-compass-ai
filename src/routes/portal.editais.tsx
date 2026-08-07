@@ -186,7 +186,15 @@ function EditaisList() {
             </div>
           ) : items.length === 0 ? (
             <div className="hairline p-12 text-center text-sm text-muted-foreground">
-              Nenhum edital encontrado com esses filtros.
+              <p>Nenhum edital encontrado com esses filtros.</p>
+              {(q || fonte || status) && (
+                <button
+                  onClick={() => navigate({ search: {}, replace: true })}
+                  className="mt-4 inline-flex h-9 items-center rounded-sm bg-foreground px-4 text-sm font-medium text-background hover:opacity-90"
+                >
+                  Limpar filtros
+                </button>
+              )}
             </div>
           ) : (
             <div className="grid gap-4 md:grid-cols-2">
