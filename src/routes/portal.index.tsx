@@ -91,6 +91,55 @@ function Dashboard() {
         </Link>
       </div>
 
+      {(prazosQ.data?.length ?? 0) > 0 && (
+        <section className="mt-8">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-sm font-medium">Prazos nos próximos 30 dias</h2>
+            <Link
+              to="/portal/candidaturas"
+              className="text-xs text-muted-foreground hover:text-foreground"
+            >
+              ver candidaturas →
+            </Link>
+          </div>
+          <div className="hairline divide-y divide-[var(--hairline)]">
+            {(prazosQ.data ?? [])
+              .map((c) => ({
+                c,
+                d: daysUntil(
+                  (c.edital as { data_encerramento: string | null } | null)?.data_encerramento ??
+                    null,
+                ),
+              }))
+              .sort((a, b) => (a.d ?? 999) - (b.d ?? 999))
+              .map(({ c, d }) => {
+                const edital = c.edital as { id: string; titulo: string } | null;
+                return (
+                  <Link
+                    key={c.id}
+                    to="/portal/candidaturas/$id"
+                    params={{ id: c.id }}
+                    className="flex items-center justify-between gap-4 px-5 py-3 transition-colors hover:bg-secondary"
+                  >
+                    <span className="truncate text-sm">{edital?.titulo ?? "Edital"}</span>
+                    <span
+                      className={`shrink-0 rounded-sm px-1.5 py-0.5 font-mono text-[10px] uppercase ${
+                        (d ?? 99) <= 7
+                          ? "border border-destructive/40 bg-destructive/10 text-destructive"
+                          : "hairline text-muted-foreground"
+                      }`}
+                    >
+                      {d === 0 ? "hoje" : `${d}d`}
+                    </span>
+                  </Link>
+                );
+              })}
+          </div>
+        </section>
+      )}
+
+
+
       <div className="mt-10 grid gap-8 lg:grid-cols-3">
         <section className="lg:col-span-2">
           <div className="mb-4 flex items-center justify-between">
