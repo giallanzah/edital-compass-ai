@@ -169,7 +169,7 @@ export const alertasPrazo = createServerFn({ method: "GET" })
       .eq("user_id", context.userId)
       .in("estagio", ["rascunho", "aplicando", "em_revisao"]);
     if (error) throw new Error(error.message);
-    const proximos = (data ?? []).filter((c) => {
+    const proximos = (rows ?? []).filter((c) => {
       const dt = (c.edital as { data_encerramento: string | null } | null)?.data_encerramento;
       if (!dt) return false;
       const d = new Date(dt).getTime();
