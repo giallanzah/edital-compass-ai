@@ -84,9 +84,6 @@ function EntrarPage() {
 
   const podeCadastrar = perfil === "empreendedor";
 
-  useEffect(() => {
-    if (!podeCadastrar) setMode("login");
-  }, [podeCadastrar]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
