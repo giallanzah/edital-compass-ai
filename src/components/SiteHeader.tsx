@@ -91,6 +91,7 @@ export function SiteHeader() {
             ))}
             <Link
               to="/entrar"
+              search={{ redirect: undefined }}
               onClick={() => setOpen(false)}
               className="my-3 inline-flex h-10 items-center justify-center rounded-sm bg-foreground text-sm font-medium text-background"
             >
