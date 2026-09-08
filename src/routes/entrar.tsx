@@ -84,9 +84,6 @@ function EntrarPage() {
 
   const podeCadastrar = perfil === "empreendedor";
 
-  useEffect(() => {
-    if (!podeCadastrar) setMode("login");
-  }, [podeCadastrar]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -158,33 +155,37 @@ function EntrarPage() {
         <div className="flex items-center justify-center p-8">
           <form onSubmit={onSubmit} className="w-full max-w-sm space-y-5">
             <div>
-              <div className="eyebrow mb-2">Tipo de acesso</div>
-              <div className="grid grid-cols-3 gap-2">
-                {PERFIS.map((p) => (
-                  <button
-                    key={p.id}
-                    type="button"
-                    onClick={() => setPerfil(p.id)}
-                    className={`hairline px-2 py-2 text-xs transition-colors ${
-                      perfil === p.id
-                        ? "bg-foreground text-background"
-                        : "text-muted-foreground hover:bg-secondary"
-                    }`}
-                  >
-                    {p.label}
-                  </button>
-                ))}
+              <div className="eyebrow mb-2">
+                {mode === "login" ? "Acesso à plataforma" : "Tipo de cadastro"}
               </div>
-              <p className="mt-2 text-xs text-muted-foreground">
-                {PERFIS.find((p) => p.id === perfil)!.desc}
-              </p>
-            </div>
-
-            <div>
               <h2 className="text-2xl font-medium tracking-tight">
                 {mode === "login" ? "Entrar" : "Criar conta"}
               </h2>
             </div>
+
+            {mode === "signup" && (
+              <div>
+                <div className="grid grid-cols-3 gap-2">
+                  {PERFIS.map((p) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => setPerfil(p.id)}
+                      className={`hairline px-2 py-2 text-xs transition-colors ${
+                        perfil === p.id
+                          ? "bg-foreground text-background"
+                          : "text-muted-foreground hover:bg-secondary"
+                      }`}
+                    >
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  {PERFIS.find((p) => p.id === perfil)!.desc}
+                </p>
+              </div>
+            )}
 
             {msg && (
               <div
@@ -198,67 +199,72 @@ function EntrarPage() {
               </div>
             )}
 
-            {mode === "signup" && (
-              <label className="block">
-                <span className="eyebrow mb-1.5 block">Nome completo</span>
-                <input
-                  type="text"
-                  required
-                  value={nome}
-                  onChange={(e) => setNome(e.target.value)}
-                  className="h-11 w-full hairline bg-transparent px-3 text-sm outline-none focus:border-foreground"
-                />
-              </label>
+            {mode === "signup" && !podeCadastrar ? (
+              <p className="hairline p-3 text-xs text-muted-foreground">
+                {perfil === "consultor"
+                  ? "Consultores são credenciados pela equipe fomenta.ai. Fale com a gente para liberar seu acesso."
+                  : "Contas de administrador são criadas internamente pela equipe fomenta.ai."}
+              </p>
+            ) : (
+              <>
+                {mode === "signup" && (
+                  <label className="block">
+                    <span className="eyebrow mb-1.5 block">Nome completo</span>
+                    <input
+                      type="text"
+                      required
+                      value={nome}
+                      onChange={(e) => setNome(e.target.value)}
+                      className="h-11 w-full hairline bg-transparent px-3 text-sm outline-none focus:border-foreground"
+                    />
+                  </label>
+                )}
+
+                <label className="block">
+                  <span className="eyebrow mb-1.5 block">Email</span>
+                  <input
+                    type="email"
+                    required
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="h-11 w-full hairline bg-transparent px-3 text-sm outline-none focus:border-foreground"
+                  />
+                </label>
+
+                <label className="block">
+                  <span className="eyebrow mb-1.5 block">Senha</span>
+                  <input
+                    type="password"
+                    required
+                    minLength={6}
+                    autoComplete={mode === "login" ? "current-password" : "new-password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="h-11 w-full hairline bg-transparent px-3 text-sm outline-none focus:border-foreground"
+                  />
+                </label>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="h-11 w-full rounded-sm bg-foreground text-sm font-medium text-background disabled:opacity-50"
+                >
+                  {loading ? "Processando…" : mode === "login" ? "Entrar" : "Criar conta"}
+                </button>
+              </>
             )}
-
-            <label className="block">
-              <span className="eyebrow mb-1.5 block">Email</span>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="h-11 w-full hairline bg-transparent px-3 text-sm outline-none focus:border-foreground"
-              />
-            </label>
-
-            <label className="block">
-              <span className="eyebrow mb-1.5 block">Senha</span>
-              <input
-                type="password"
-                required
-                minLength={6}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="h-11 w-full hairline bg-transparent px-3 text-sm outline-none focus:border-foreground"
-              />
-            </label>
 
             <button
-              type="submit"
-              disabled={loading}
-              className="h-11 w-full rounded-sm bg-foreground text-sm font-medium text-background disabled:opacity-50"
+              type="button"
+              onClick={() => {
+                setMsg(null);
+                setMode(mode === "login" ? "signup" : "login");
+              }}
+              className="w-full text-xs text-muted-foreground hover:text-foreground"
             >
-              {loading ? "Processando…" : mode === "login" ? "Entrar" : "Criar conta"}
+              {mode === "login" ? "Não tem conta? Criar conta" : "Já tem conta? Entrar"}
             </button>
-
-            {podeCadastrar ? (
-              <button
-                type="button"
-                onClick={() => setMode(mode === "login" ? "signup" : "login")}
-                className="w-full text-xs text-muted-foreground hover:text-foreground"
-              >
-                {mode === "login"
-                  ? "Não tem conta? Cadastre sua empresa"
-                  : "Já tem conta? Entrar"}
-              </button>
-            ) : (
-              <p className="text-center text-xs text-muted-foreground">
-                {perfil === "consultor"
-                  ? "Consultores são credenciados pela equipe fomenta.ai."
-                  : "Contas de administrador são criadas internamente."}
-              </p>
-            )}
 
             <div className="text-center">
               <Link
