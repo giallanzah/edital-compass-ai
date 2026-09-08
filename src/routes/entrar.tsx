@@ -35,20 +35,20 @@ type Perfil = "empreendedor" | "consultor" | "admin";
 const PERFIS: { id: Perfil; label: string; desc: string; destino: string }[] = [
   {
     id: "empreendedor",
-    label: "Empreendedor",
-    desc: "Empresa buscando editais, match score e acompanhamento de candidaturas.",
+    label: "Empresa / Empreendedor",
+    desc: "Quero captar recursos de fomento para meus projetos.",
     destino: "/portal",
   },
   {
     id: "consultor",
-    label: "Consultor",
-    desc: "Gestão de carteira de clientes, atividades e candidaturas assessoradas.",
+    label: "Consultor Especialista",
+    desc: "Quero ajudar empresas a aprovar projetos e monetizar minha expertise.",
     destino: "/consultor",
   },
   {
     id: "admin",
-    label: "Administrador",
-    desc: "Backoffice da plataforma: fontes do robô, usuários e indicadores.",
+    label: "Equipe Fomenta",
+    desc: "Acesso administrativo (requer aprovação).",
     destino: "/admin",
   },
 ];
