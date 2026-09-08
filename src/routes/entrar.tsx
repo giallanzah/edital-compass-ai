@@ -158,33 +158,37 @@ function EntrarPage() {
         <div className="flex items-center justify-center p-8">
           <form onSubmit={onSubmit} className="w-full max-w-sm space-y-5">
             <div>
-              <div className="eyebrow mb-2">Tipo de acesso</div>
-              <div className="grid grid-cols-3 gap-2">
-                {PERFIS.map((p) => (
-                  <button
-                    key={p.id}
-                    type="button"
-                    onClick={() => setPerfil(p.id)}
-                    className={`hairline px-2 py-2 text-xs transition-colors ${
-                      perfil === p.id
-                        ? "bg-foreground text-background"
-                        : "text-muted-foreground hover:bg-secondary"
-                    }`}
-                  >
-                    {p.label}
-                  </button>
-                ))}
+              <div className="eyebrow mb-2">
+                {mode === "login" ? "Acesso à plataforma" : "Tipo de cadastro"}
               </div>
-              <p className="mt-2 text-xs text-muted-foreground">
-                {PERFIS.find((p) => p.id === perfil)!.desc}
-              </p>
-            </div>
-
-            <div>
               <h2 className="text-2xl font-medium tracking-tight">
                 {mode === "login" ? "Entrar" : "Criar conta"}
               </h2>
             </div>
+
+            {mode === "signup" && (
+              <div>
+                <div className="grid grid-cols-3 gap-2">
+                  {PERFIS.map((p) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => setPerfil(p.id)}
+                      className={`hairline px-2 py-2 text-xs transition-colors ${
+                        perfil === p.id
+                          ? "bg-foreground text-background"
+                          : "text-muted-foreground hover:bg-secondary"
+                      }`}
+                    >
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  {PERFIS.find((p) => p.id === perfil)!.desc}
+                </p>
+              </div>
+            )}
 
             {msg && (
               <div
