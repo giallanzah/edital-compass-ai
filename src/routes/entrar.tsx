@@ -164,26 +164,30 @@ function EntrarPage() {
             </div>
 
             {mode === "signup" && (
-              <div>
-                <div className="grid grid-cols-3 gap-2">
+              <div className="space-y-4">
+                <h3 className="text-center text-lg font-medium tracking-tight">
+                  Como você deseja atuar na Fomenta.ai?
+                </h3>
+
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
                   {PERFIS.map((p) => (
                     <button
                       key={p.id}
                       type="button"
                       onClick={() => setPerfil(p.id)}
-                      className={`hairline px-2 py-2 text-xs transition-colors ${
+                      className={`hairline flex flex-col items-start gap-2 p-4 text-left transition-colors ${
                         perfil === p.id
-                          ? "bg-foreground text-background"
-                          : "text-muted-foreground hover:bg-secondary"
+                          ? "border-foreground bg-secondary"
+                          : "hover:bg-secondary/50"
                       }`}
                     >
-                      {p.label}
+                      <span className="text-sm font-medium">{p.label}</span>
+                      <span className="text-xs leading-relaxed text-muted-foreground">
+                        {p.desc}
+                      </span>
                     </button>
                   ))}
                 </div>
-                <p className="mt-2 text-xs text-muted-foreground">
-                  {PERFIS.find((p) => p.id === perfil)!.desc}
-                </p>
               </div>
             )}
 
