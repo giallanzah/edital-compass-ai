@@ -48,6 +48,7 @@ export function SiteHeader() {
         <div className="flex items-center gap-2">
           <Link
             to="/entrar"
+            search={{ redirect: undefined }}
             className="hidden h-9 items-center rounded-sm bg-foreground px-4 text-sm font-medium text-background transition-opacity hover:opacity-90 sm:inline-flex"
           >
             Acessar plataforma
