@@ -153,7 +153,12 @@ function EntrarPage() {
         </div>
 
         <div className="flex items-center justify-center p-8">
-          <form onSubmit={onSubmit} className="w-full max-w-sm space-y-5">
+          <form
+            onSubmit={onSubmit}
+            className={`w-full space-y-5 transition-all ${
+              mode === "signup" ? "max-w-2xl" : "max-w-sm"
+            }`}
+          >
             <div>
               <div className="eyebrow mb-2">
                 {mode === "login" ? "Acesso à plataforma" : "Tipo de cadastro"}
