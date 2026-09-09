@@ -169,29 +169,75 @@ function EntrarPage() {
             </div>
 
             {mode === "signup" && (
-              <div className="space-y-4">
-                <h3 className="text-center text-lg font-medium tracking-tight">
-                  Como você deseja atuar na Fomenta.ai?
-                </h3>
+              <div className="space-y-5">
+                <div className="text-center">
+                  <h3 className="text-lg font-medium tracking-tight">
+                    Como você deseja atuar na Fomenta.ai?
+                  </h3>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Selecione o perfil que faz sentido para você.
+                  </p>
+                </div>
 
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-                  {PERFIS.map((p) => (
-                    <button
-                      key={p.id}
-                      type="button"
-                      onClick={() => setPerfil(p.id)}
-                      className={`hairline flex flex-col items-start gap-2 p-4 text-left transition-colors ${
-                        perfil === p.id
-                          ? "border-foreground bg-secondary"
-                          : "hover:bg-secondary/50"
-                      }`}
-                    >
-                      <span className="text-sm font-medium">{p.label}</span>
-                      <span className="text-xs leading-relaxed text-muted-foreground">
-                        {p.desc}
-                      </span>
-                    </button>
-                  ))}
+                  {PERFIS.map((p) => {
+                    const selected = perfil === p.id;
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => setPerfil(p.id)}
+                        aria-pressed={selected}
+                        className={`hairline group relative flex flex-col items-start gap-3 p-4 text-left transition-all ${
+                          selected
+                            ? "border-foreground bg-secondary"
+                            : "hover:bg-secondary/50"
+                        }`}
+                      >
+                        <div
+                          className={`flex h-9 w-9 items-center justify-center rounded-full border transition-colors ${
+                            selected
+                              ? "border-foreground bg-foreground text-background"
+                              : "border-muted-foreground/30 text-muted-foreground group-hover:border-foreground/50 group-hover:text-foreground"
+                          }`}
+                        >
+                          {p.id === "empreendedor" && (
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M3 21h18" />
+                              <path d="M5 21V7l8-4 8 4v14" />
+                              <path d="M9 21v-6h6v6" />
+                            </svg>
+                          )}
+                          {p.id === "consultor" && (
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M12 2l2.4 4.8L20 8l-4 4.2L16.8 18 12 15.6 7.2 18 8 12.2 4 8l5.6-1.2L12 2z" />
+                            </svg>
+                          )}
+                          {p.id === "admin" && (
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                              <path d="M9 12l2 2 4-4" />
+                            </svg>
+                          )}
+                        </div>
+                        <div>
+                          <span className="text-sm font-medium">{p.label}</span>
+                          <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">
+                            {p.desc}
+                          </span>
+                        </div>
+                        <span
+                          className={`absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full border text-[10px] font-medium transition-colors ${
+                            selected
+                              ? "border-foreground bg-foreground text-background"
+                              : "border-muted-foreground/30 text-transparent group-hover:border-foreground/50"
+                          }`}
+                        >
+                          ✓
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
