@@ -215,7 +215,7 @@ function EntrarPage() {
                   : "Contas de administrador são criadas internamente pela equipe fomenta.ai."}
               </p>
             ) : (
-              <>
+              <div className="mx-auto w-full max-w-sm space-y-5">
                 {mode === "signup" && (
                   <label className="block">
                     <span className="eyebrow mb-1.5 block">Nome completo</span>
