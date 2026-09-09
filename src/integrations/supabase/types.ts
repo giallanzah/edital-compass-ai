@@ -702,6 +702,45 @@ export type Database = {
         }
         Relationships: []
       }
+      solicitacoes_acesso: {
+        Row: {
+          created_at: string
+          decidido_em: string | null
+          email: string
+          id: string
+          nome: string | null
+          observacao: string | null
+          perfil: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          decidido_em?: string | null
+          email: string
+          id?: string
+          nome?: string | null
+          observacao?: string | null
+          perfil: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          decidido_em?: string | null
+          email?: string
+          id?: string
+          nome?: string | null
+          observacao?: string | null
+          perfil?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
