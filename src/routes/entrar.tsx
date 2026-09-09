@@ -261,7 +261,7 @@ function EntrarPage() {
                 >
                   {loading ? "Processando…" : mode === "login" ? "Entrar" : "Criar conta"}
                 </button>
-              </>
+              </div>
             )}
 
             <button
