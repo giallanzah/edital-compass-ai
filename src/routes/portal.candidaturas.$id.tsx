@@ -464,6 +464,21 @@ function CandidaturaDetalhe() {
                 )}
               </div>
             )}
+            {propostaMd && (
+              <BarraIA
+                disabled={!propostaMd.trim()}
+                pending={refinarPropostaMut.isPending}
+                error={refinarPropostaMut.error as Error | null}
+                podeDesfazer={anteriorProposta !== null}
+                onModo={(m) => refinarPropostaMut.mutate(m)}
+                onDesfazer={() => {
+                  if (anteriorProposta !== null) {
+                    setPropostaMd(anteriorProposta);
+                    setAnteriorProposta(null);
+                  }
+                }}
+              />
+            )}
             {propostaMut.error && (
               <div className="mt-3 text-[11px] text-destructive">
                 {(propostaMut.error as Error).message}
