@@ -245,3 +245,57 @@ Retorne apenas o markdown, sem preâmbulo ou explicação.`;
 
     return { markdown: md };
   });
+
+// -------- Revisão/evolução de texto escrito por cliente ou consultor --------
+const MODOS = {
+  organizar:
+    "Reorganize o texto em uma estrutura clara e lógica (títulos, parágrafos e listas quando fizer sentido). Não invente informação: apenas estruture, corrija gramática e melhore a coesão.",
+  evoluir:
+    "Aprofunde e desenvolva o texto: detalhe o que está superficial, torne os argumentos mais concretos e alinhados às exigências de editais de fomento. Onde faltar dado real, insira um marcador entre colchetes (ex.: [preencher valor]). Nunca invente números, nomes ou resultados.",
+  revisar:
+    "Revise o texto em nível editorial: gramática, ortografia, concordância, clareza e tom formal-técnico. Preserve o conteúdo, a estrutura e o tamanho aproximado.",
+} as const;
+
+export type ModoTexto = keyof typeof MODOS;
+
+export const refinarTexto = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    (input: { texto: string; modo: ModoTexto; formato?: "markdown" | "texto"; contexto?: string }) => {
+      const texto = (input.texto ?? "").trim();
+      if (!texto) throw new Error("texto_vazio");
+      if (texto.length > 20000) throw new Error("texto_muito_longo");
+      if (!(input.modo in MODOS)) throw new Error("modo_invalido");
+      return {
+        texto,
+        modo: input.modo,
+        formato: input.formato ?? "markdown",
+        contexto: (input.contexto ?? "").slice(0, 4000),
+      };
+    },
+  )
+  .handler(async ({ data }) => {
+    const prompt = `${MODOS[data.modo]}
+
+${data.contexto ? `CONTEXTO (apenas para orientar o texto, não repita literalmente):\n${data.contexto}\n\n` : ""}TEXTO ORIGINAL:
+"""
+${data.texto}
+"""
+
+Responda apenas com o texto final em ${data.formato === "markdown" ? "Markdown" : "texto corrido"}, em português do Brasil, sem preâmbulo, sem comentários e sem cercas de código.`;
+
+    const raw = await aiComplete({
+      model: "google/gemini-3.8-flash",
+      system:
+        "Você é um editor brasileiro especialista em propostas de fomento (FINEP, CNPq, BNDES, Sebrae). Escreve português do Brasil formal, preciso e sem clichês. Nunca inventa dados.",
+      prompt,
+      maxTokens: 3500,
+    });
+    const texto = raw
+      .trim()
+      .replace(/^```(?:markdown|md)?\s*/i, "")
+      .replace(/```$/, "")
+      .trim();
+    if (!texto) throw new Error("resposta_ia_vazia");
+    return { texto };
+  });
