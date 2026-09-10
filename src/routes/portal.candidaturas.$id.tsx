@@ -353,6 +353,20 @@ function CandidaturaDetalhe() {
             {obsMut.isPending && (
               <div className="mt-1 text-[10px] font-mono text-muted-foreground">salvando…</div>
             )}
+            <BarraIA
+              disabled={!obs.trim()}
+              pending={refinarObsMut.isPending}
+              error={refinarObsMut.error as Error | null}
+              podeDesfazer={anteriorObs !== null}
+              onModo={(m) => refinarObsMut.mutate(m)}
+              onDesfazer={() => {
+                if (anteriorObs !== null) {
+                  setObs(anteriorObs);
+                  obsFn({ data: { id, observacoes: anteriorObs } });
+                  setAnteriorObs(null);
+                }
+              }}
+            />
           </section>
 
           <section>
