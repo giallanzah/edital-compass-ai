@@ -285,13 +285,15 @@ function EntrarPage() {
               </div>
             )}
 
-            {mode === "signup" && !podeCadastrar ? (
-              <p className="hairline p-3 text-xs text-muted-foreground">
+            {mode === "signup" && perfil !== "empreendedor" && (
+              <p className="mx-auto w-full max-w-sm hairline p-3 text-xs text-muted-foreground">
                 {perfil === "consultor"
-                  ? "Consultores são credenciados pela equipe fomenta.ai. Fale com a gente para liberar seu acesso."
-                  : "Contas de administrador são criadas internamente pela equipe fomenta.ai."}
+                  ? "Contas de consultor passam por análise da equipe fomenta.ai antes da liberação."
+                  : "Contas da Equipe Fomenta passam por aprovação interna antes da liberação."}
               </p>
-            ) : (
+            )}
+
+            {(
               <div className="mx-auto w-full max-w-sm space-y-5">
                 {mode === "signup" && (
                   <label className="block">
