@@ -1,6 +1,8 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
+import { registrarSolicitacaoAcesso, minhaSolicitacao } from "@/lib/acesso.functions";
 import { Logo } from "@/components/Logo";
 
 export const Route = createFileRoute("/entrar")({
@@ -82,8 +84,13 @@ function EntrarPage() {
   }, [navigate, redirect]);
 
 
-  const podeCadastrar = perfil === "empreendedor";
+  const registrarSolicitacao = useServerFn(registrarSolicitacaoAcesso);
+  const consultarSolicitacao = useServerFn(minhaSolicitacao);
 
+  const avisoAnalise = (p: Perfil) =>
+    `Cadastro recebido! Seu perfil de ${
+      p === "consultor" ? "Consultor" : "Equipe"
+    } está em análise. Nossa equipe entrará em contato em breve para liberar seu acesso.`;
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -101,6 +108,17 @@ function EntrarPage() {
           },
         });
         if (error) throw error;
+
+        if (perfil !== "empreendedor") {
+          if (data.session) {
+            await registrarSolicitacao({ data: { perfil, nome } });
+            await supabase.auth.signOut();
+          }
+          setMsg({ tone: "ok", text: avisoAnalise(perfil) });
+          setMode("login");
+          return;
+        }
+
         if (!data.session) {
           setMsg({ tone: "ok", text: "Conta criada. Confirme o email para acessar a plataforma." });
           return;
@@ -112,18 +130,31 @@ function EntrarPage() {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
 
-      const destino = await destinoPorRole();
-      const esperado = PERFIS.find((p) => p.id === perfil)!.destino;
-      if (destino !== esperado && perfil !== "empreendedor") {
-        setMsg({
-          tone: "err",
-          text:
-            perfil === "admin"
-              ? "Esta conta não possui perfil de administrador."
-              : "Esta conta não está credenciada como consultor.",
-        });
+      // Perfil pendente de aprovação: registra/consulta a solicitação e avisa.
+      if (perfil !== "empreendedor") {
+        const destinoAtual = await destinoPorRole();
+        const esperado = PERFIS.find((p) => p.id === perfil)!.destino;
+        if (destinoAtual !== esperado) {
+          let solicitacao = await consultarSolicitacao({ data: { perfil } });
+          if (!solicitacao) {
+            await registrarSolicitacao({ data: { perfil, nome: nome || undefined } });
+            solicitacao = { status: "pendente", created_at: new Date().toISOString() };
+          }
+          await supabase.auth.signOut();
+          setMsg({
+            tone: solicitacao.status === "recusada" ? "err" : "ok",
+            text:
+              solicitacao.status === "recusada"
+                ? "Sua solicitação de acesso foi recusada. Fale com a equipe fomenta.ai."
+                : avisoAnalise(perfil),
+          });
+          return;
+        }
+        navigate({ to: redirect ?? esperado });
         return;
       }
+
+      const destino = await destinoPorRole();
       navigate({ to: redirect ?? destino });
     } catch (err) {
       setMsg({ tone: "err", text: err instanceof Error ? err.message : "Erro ao entrar." });
