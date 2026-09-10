@@ -11,7 +11,13 @@ import {
   removerTarefa,
   salvarProposta,
 } from "@/lib/candidatura.functions";
-import { extrairRequisitos, analisarAderencia, gerarProposta } from "@/lib/ai.functions";
+import {
+  extrairRequisitos,
+  analisarAderencia,
+  gerarProposta,
+  refinarTexto,
+  type ModoTexto,
+} from "@/lib/ai.functions";
 import { chamarConsultor } from "@/lib/consultor.functions";
 
 export const Route = createFileRoute("/portal/candidaturas/$id")({
@@ -114,6 +120,43 @@ function CandidaturaDetalhe() {
       setPropostaMd((r as { markdown: string }).markdown);
       setConfirmandoRegen(false);
       qc.invalidateQueries({ queryKey: ["candidatura", id] });
+    },
+  });
+
+  const refinarFn = useServerFn(refinarTexto);
+  const [anteriorProposta, setAnteriorProposta] = useState<string | null>(null);
+  const [anteriorObs, setAnteriorObs] = useState<string | null>(null);
+
+  const contextoIA = () => {
+    const ed = q.data?.edital as { titulo?: string } | undefined;
+    const pr = q.data?.projeto as { nome?: string; descricao?: string | null } | undefined;
+    return [
+      ed?.titulo ? `Edital: ${ed.titulo}` : "",
+      pr?.nome ? `Projeto: ${pr.nome}` : "",
+      pr?.descricao ? `Descrição do projeto: ${pr.descricao}` : "",
+    ]
+      .filter(Boolean)
+      .join("\n");
+  };
+
+  const refinarPropostaMut = useMutation({
+    mutationFn: async (modo: ModoTexto) =>
+      refinarFn({
+        data: { texto: propostaMd, modo, formato: "markdown", contexto: contextoIA() },
+      }),
+    onSuccess: (r) => {
+      setAnteriorProposta(propostaMd);
+      setPropostaMd((r as { texto: string }).texto);
+    },
+  });
+
+  const refinarObsMut = useMutation({
+    mutationFn: async (modo: ModoTexto) =>
+      refinarFn({ data: { texto: obs, modo, formato: "texto", contexto: contextoIA() } }),
+    onSuccess: (r) => {
+      setAnteriorObs(obs);
+      setObs((r as { texto: string }).texto);
+      obsFn({ data: { id, observacoes: (r as { texto: string }).texto } });
     },
   });
 
@@ -310,6 +353,20 @@ function CandidaturaDetalhe() {
             {obsMut.isPending && (
               <div className="mt-1 text-[10px] font-mono text-muted-foreground">salvando…</div>
             )}
+            <BarraIA
+              disabled={!obs.trim()}
+              pending={refinarObsMut.isPending}
+              error={refinarObsMut.error as Error | null}
+              podeDesfazer={anteriorObs !== null}
+              onModo={(m) => refinarObsMut.mutate(m)}
+              onDesfazer={() => {
+                if (anteriorObs !== null) {
+                  setObs(anteriorObs);
+                  obsFn({ data: { id, observacoes: anteriorObs } });
+                  setAnteriorObs(null);
+                }
+              }}
+            />
           </section>
 
           <section>
@@ -406,6 +463,21 @@ function CandidaturaDetalhe() {
                   <span className="text-[10px] font-mono text-muted-foreground">salvo ✓</span>
                 )}
               </div>
+            )}
+            {propostaMd && (
+              <BarraIA
+                disabled={!propostaMd.trim()}
+                pending={refinarPropostaMut.isPending}
+                error={refinarPropostaMut.error as Error | null}
+                podeDesfazer={anteriorProposta !== null}
+                onModo={(m) => refinarPropostaMut.mutate(m)}
+                onDesfazer={() => {
+                  if (anteriorProposta !== null) {
+                    setPropostaMd(anteriorProposta);
+                    setAnteriorProposta(null);
+                  }
+                }}
+              />
             )}
             {propostaMut.error && (
               <div className="mt-3 text-[11px] text-destructive">
