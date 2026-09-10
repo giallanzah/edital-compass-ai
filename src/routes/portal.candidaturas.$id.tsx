@@ -11,7 +11,13 @@ import {
   removerTarefa,
   salvarProposta,
 } from "@/lib/candidatura.functions";
-import { extrairRequisitos, analisarAderencia, gerarProposta } from "@/lib/ai.functions";
+import {
+  extrairRequisitos,
+  analisarAderencia,
+  gerarProposta,
+  refinarTexto,
+  type ModoTexto,
+} from "@/lib/ai.functions";
 import { chamarConsultor } from "@/lib/consultor.functions";
 
 export const Route = createFileRoute("/portal/candidaturas/$id")({
