@@ -123,6 +123,43 @@ function CandidaturaDetalhe() {
     },
   });
 
+  const refinarFn = useServerFn(refinarTexto);
+  const [anteriorProposta, setAnteriorProposta] = useState<string | null>(null);
+  const [anteriorObs, setAnteriorObs] = useState<string | null>(null);
+
+  const contextoIA = () => {
+    const ed = q.data?.edital as { titulo?: string } | undefined;
+    const pr = q.data?.projeto as { nome?: string; descricao?: string | null } | undefined;
+    return [
+      ed?.titulo ? `Edital: ${ed.titulo}` : "",
+      pr?.nome ? `Projeto: ${pr.nome}` : "",
+      pr?.descricao ? `Descrição do projeto: ${pr.descricao}` : "",
+    ]
+      .filter(Boolean)
+      .join("\n");
+  };
+
+  const refinarPropostaMut = useMutation({
+    mutationFn: async (modo: ModoTexto) =>
+      refinarFn({
+        data: { texto: propostaMd, modo, formato: "markdown", contexto: contextoIA() },
+      }),
+    onSuccess: (r) => {
+      setAnteriorProposta(propostaMd);
+      setPropostaMd((r as { texto: string }).texto);
+    },
+  });
+
+  const refinarObsMut = useMutation({
+    mutationFn: async (modo: ModoTexto) =>
+      refinarFn({ data: { texto: obs, modo, formato: "texto", contexto: contextoIA() } }),
+    onSuccess: (r) => {
+      setAnteriorObs(obs);
+      setObs((r as { texto: string }).texto);
+      obsFn({ data: { id, observacoes: (r as { texto: string }).texto } });
+    },
+  });
+
   const salvarPropostaMut = useMutation({
     mutationFn: async () => salvarPropostaFn({ data: { id, proposta_md: propostaMd } }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["candidatura", id] }),
