@@ -177,6 +177,25 @@ export const moverEstagioConsultor = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+// Leitura da proposta escrita pelo empreendedor, para o consultor revisar.
+export const propostaDaCandidatura = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { candidaturaId: string }) => input)
+  .handler(async ({ data, context }) => {
+    await assertConsultor(context.supabase, context.userId);
+    const { data: row, error } = await context.supabase
+      .from("candidaturas")
+      .select(
+        "id, proposta_md, proposta_gerada_em, observacoes, projeto:projetos(nome, descricao), edital:editais(titulo)",
+      )
+      .eq("id", data.candidaturaId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!row) throw new Error("candidatura não encontrada ou fora da sua carteira");
+    return row;
+  });
+
+
 export const listarAtividades = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
