@@ -19,6 +19,7 @@ import {
   type ModoTexto,
 } from "@/lib/ai.functions";
 import { chamarConsultor } from "@/lib/consultor.functions";
+import { BarraIA } from "@/components/BarraIA";
 
 export const Route = createFileRoute("/portal/candidaturas/$id")({
   head: () => ({ meta: [{ title: "Candidatura · fomenta.ai" }] }),
