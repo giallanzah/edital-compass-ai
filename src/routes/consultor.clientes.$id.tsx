@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useState } from "react";
 import {
   DndContext,
   useDraggable,
@@ -14,7 +15,10 @@ import {
   listarKanbanCliente,
   moverEstagioConsultor,
   listarAtividades,
+  criarAtividade,
 } from "@/lib/consultor.functions";
+import { refinarTexto, type ModoTexto } from "@/lib/ai.functions";
+import { BarraIA } from "@/components/BarraIA";
 import { AdminErrorState } from "@/components/AdminErrorState";
 
 export const Route = createFileRoute("/consultor/clientes/$id")({
