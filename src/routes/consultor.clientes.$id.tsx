@@ -66,7 +66,44 @@ function ClienteDetalhe() {
     onSettled: () => qc.invalidateQueries({ queryKey: ["consultor", "kanban-cliente", id] }),
   });
 
+  // --- Parecer do consultor (rascunho com apoio de IA) ---
+  const refinarFn = useServerFn(refinarTexto);
+  const criarAtividadeFn = useServerFn(criarAtividade);
+  const [parecer, setParecer] = useState("");
+  const [vinculo, setVinculo] = useState<string>("");
+  const [anterior, setAnterior] = useState<string | null>(null);
+  const [salvo, setSalvo] = useState(false);
+
+  const refinarMut = useMutation({
+    mutationFn: async (modo: ModoTexto) =>
+      refinarFn({ data: { texto: parecer, modo, formato: "texto" } }),
+    onSuccess: (r) => {
+      setAnterior(parecer);
+      setParecer((r as { texto: string }).texto);
+    },
+  });
+
+  const registrarMut = useMutation({
+    mutationFn: async () =>
+      criarAtividadeFn({
+        data: {
+          empresaId: id,
+          candidaturaId: vinculo || null,
+          tipo: "parecer",
+          descricao: parecer.trim(),
+        },
+      }),
+    onSuccess: () => {
+      setParecer("");
+      setAnterior(null);
+      setVinculo("");
+      setSalvo(true);
+      qc.invalidateQueries({ queryKey: ["consultor", "atividades"] });
+    },
+  });
+
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
+
 
   if (q.isError) return <AdminErrorState error={q.error as Error} />;
   if (q.isLoading) {
