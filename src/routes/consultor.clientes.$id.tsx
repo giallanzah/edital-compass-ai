@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useState } from "react";
 import {
   DndContext,
   useDraggable,
@@ -14,7 +15,10 @@ import {
   listarKanbanCliente,
   moverEstagioConsultor,
   listarAtividades,
+  criarAtividade,
 } from "@/lib/consultor.functions";
+import { refinarTexto, type ModoTexto } from "@/lib/ai.functions";
+import { BarraIA } from "@/components/BarraIA";
 import { AdminErrorState } from "@/components/AdminErrorState";
 
 export const Route = createFileRoute("/consultor/clientes/$id")({
@@ -62,7 +66,44 @@ function ClienteDetalhe() {
     onSettled: () => qc.invalidateQueries({ queryKey: ["consultor", "kanban-cliente", id] }),
   });
 
+  // --- Parecer do consultor (rascunho com apoio de IA) ---
+  const refinarFn = useServerFn(refinarTexto);
+  const criarAtividadeFn = useServerFn(criarAtividade);
+  const [parecer, setParecer] = useState("");
+  const [vinculo, setVinculo] = useState<string>("");
+  const [anterior, setAnterior] = useState<string | null>(null);
+  const [salvo, setSalvo] = useState(false);
+
+  const refinarMut = useMutation({
+    mutationFn: async (modo: ModoTexto) =>
+      refinarFn({ data: { texto: parecer, modo, formato: "texto" } }),
+    onSuccess: (r) => {
+      setAnterior(parecer);
+      setParecer((r as { texto: string }).texto);
+    },
+  });
+
+  const registrarMut = useMutation({
+    mutationFn: async () =>
+      criarAtividadeFn({
+        data: {
+          empresaId: id,
+          candidaturaId: vinculo || null,
+          tipo: "parecer",
+          descricao: parecer.trim(),
+        },
+      }),
+    onSuccess: () => {
+      setParecer("");
+      setAnterior(null);
+      setVinculo("");
+      setSalvo(true);
+      qc.invalidateQueries({ queryKey: ["consultor", "atividades"] });
+    },
+  });
+
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
+
 
   if (q.isError) return <AdminErrorState error={q.error as Error} />;
   if (q.isLoading) {
@@ -120,6 +161,81 @@ function ClienteDetalhe() {
           </p>
         </DndContext>
       )}
+
+      <div className="mt-10 hairline bg-card p-5">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <div>
+            <h2 className="text-sm font-medium">Parecer do consultor</h2>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Escreva a análise para este cliente. A IA organiza, aprofunda ou revisa o texto — você
+              revisa antes de registrar.
+            </p>
+          </div>
+          {items.length > 0 && (
+            <label className="flex items-center gap-2 text-xs text-muted-foreground">
+              Vincular a
+              <select
+                value={vinculo}
+                onChange={(e) => setVinculo(e.target.value)}
+                className="h-8 rounded-sm hairline bg-background px-2 text-xs"
+              >
+                <option value="">nenhuma candidatura</option>
+                {items.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {(r.projeto as { nome: string } | null)?.nome ?? "—"}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+        </div>
+
+        <textarea
+          value={parecer}
+          onChange={(e) => {
+            setParecer(e.target.value);
+            setSalvo(false);
+          }}
+          rows={7}
+          placeholder="Diagnóstico, recomendações e próximos passos para o cliente…"
+          className="mt-4 w-full rounded-sm hairline bg-background p-3 text-sm"
+        />
+
+        <BarraIA
+          disabled={!parecer.trim()}
+          pending={refinarMut.isPending}
+          error={refinarMut.error as Error | null}
+          podeDesfazer={anterior !== null}
+          onModo={(m) => refinarMut.mutate(m)}
+          onDesfazer={() => {
+            if (anterior !== null) {
+              setParecer(anterior);
+              setAnterior(null);
+            }
+          }}
+        />
+
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[var(--hairline)] pt-4">
+          <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            {salvo ? "parecer registrado ✓" : `${parecer.trim().length} caracteres`}
+          </span>
+          <div className="flex items-center gap-2">
+            {registrarMut.error && (
+              <span className="text-xs text-destructive">
+                {(registrarMut.error as Error).message}
+              </span>
+            )}
+            <button
+              type="button"
+              disabled={!parecer.trim() || registrarMut.isPending}
+              onClick={() => registrarMut.mutate()}
+              className="inline-flex h-9 items-center rounded-sm bg-foreground px-4 text-sm font-medium text-background disabled:opacity-40"
+            >
+              {registrarMut.isPending ? "Registrando…" : "Registrar no histórico"}
+            </button>
+          </div>
+        </div>
+      </div>
 
       <h2 className="mb-3 mt-10 text-sm font-medium">Histórico de atividades</h2>
       <div className="hairline divide-y divide-[var(--hairline)] text-sm">
