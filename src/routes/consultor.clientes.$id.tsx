@@ -16,6 +16,7 @@ import {
   moverEstagioConsultor,
   listarAtividades,
   criarAtividade,
+  propostaDaCandidatura,
 } from "@/lib/consultor.functions";
 import { refinarTexto, type ModoTexto } from "@/lib/ai.functions";
 import { BarraIA } from "@/components/BarraIA";
@@ -98,6 +99,58 @@ function ClienteDetalhe() {
       setAnterior(null);
       setVinculo("");
       setSalvo(true);
+      qc.invalidateQueries({ queryKey: ["consultor", "atividades"] });
+    },
+  });
+
+  // --- Revisão da proposta do cliente ---
+  const propostaFn = useServerFn(propostaDaCandidatura);
+  const [revisandoId, setRevisandoId] = useState("");
+  const [sugestao, setSugestao] = useState("");
+  const [anteriorSugestao, setAnteriorSugestao] = useState<string | null>(null);
+  const [sugestaoEnviada, setSugestaoEnviada] = useState(false);
+
+  const propostaQ = useQuery({
+    queryKey: ["consultor", "proposta", revisandoId],
+    queryFn: () => propostaFn({ data: { candidaturaId: revisandoId } }),
+    enabled: Boolean(revisandoId),
+  });
+  const propostaOriginal = (propostaQ.data?.proposta_md ?? "").trim();
+
+  const refinarSugestaoMut = useMutation({
+    mutationFn: async (modo: ModoTexto) =>
+      refinarFn({
+        data: {
+          texto: sugestao,
+          modo,
+          formato: "markdown",
+          contexto: [
+            (propostaQ.data?.edital as { titulo: string } | null)?.titulo,
+            (propostaQ.data?.projeto as { nome: string } | null)?.nome,
+          ]
+            .filter(Boolean)
+            .join(" — "),
+        },
+      }),
+    onSuccess: (r) => {
+      setAnteriorSugestao(sugestao);
+      setSugestao((r as { texto: string }).texto);
+      setSugestaoEnviada(false);
+    },
+  });
+
+  const enviarSugestaoMut = useMutation({
+    mutationFn: async () =>
+      criarAtividadeFn({
+        data: {
+          empresaId: id,
+          candidaturaId: revisandoId || null,
+          tipo: "revisao_proposta",
+          descricao: sugestao.trim(),
+        },
+      }),
+    onSuccess: () => {
+      setSugestaoEnviada(true);
       qc.invalidateQueries({ queryKey: ["consultor", "atividades"] });
     },
   });
