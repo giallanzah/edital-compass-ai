@@ -16,6 +16,7 @@ export const Route = createFileRoute("/consultor")({
 const MENU = [
   { to: "/consultor", label: "Dashboard" },
   { to: "/consultor/clientes", label: "Clientes" },
+  { to: "/consultor/revisoes", label: "Revisões" },
   { to: "/consultor/atividades", label: "Atividades" },
 ];
 

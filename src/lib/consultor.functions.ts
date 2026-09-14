@@ -196,6 +196,24 @@ export const propostaDaCandidatura = createServerFn({ method: "GET" })
   });
 
 
+// Painel de revisões: tudo que o consultor já registrou como parecer ou
+// sugestão de proposta, agrupado por candidatura.
+export const listarRevisoes = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const consultor = await assertConsultor(context.supabase, context.userId);
+    const { data, error } = await context.supabase
+      .from("atividades_consultor")
+      .select(
+        "id, tipo, descricao, status, created_at, empresa:empresas_perfil(id, nome_empresa), candidatura:candidaturas(id, estagio, progresso, updated_at, edital:editais(titulo, data_encerramento), projeto:projetos(nome))",
+      )
+      .eq("consultor_id", consultor.id)
+      .in("tipo", ["parecer", "revisao_proposta"])
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });
+
 export const listarAtividades = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {

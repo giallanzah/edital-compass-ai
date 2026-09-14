@@ -25,6 +25,7 @@ import { Route as PortalLoginRouteImport } from './routes/portal.login'
 import { Route as PortalEditaisRouteImport } from './routes/portal.editais'
 import { Route as PortalConhecimentoRouteImport } from './routes/portal.conhecimento'
 import { Route as PortalCandidaturasRouteImport } from './routes/portal.candidaturas'
+import { Route as ConsultorRevisoesRouteImport } from './routes/consultor.revisoes'
 import { Route as ConsultorClientesRouteImport } from './routes/consultor.clientes'
 import { Route as ConsultorAtividadesRouteImport } from './routes/consultor.atividades'
 import { Route as AdminUsuariosRouteImport } from './routes/admin.usuarios'
@@ -139,6 +140,11 @@ const PortalCandidaturasRoute = PortalCandidaturasRouteImport.update({
   id: '/candidaturas',
   path: '/candidaturas',
   getParentRoute: () => PortalRoute,
+} as any)
+const ConsultorRevisoesRoute = ConsultorRevisoesRouteImport.update({
+  id: '/revisoes',
+  path: '/revisoes',
+  getParentRoute: () => ConsultorRoute,
 } as any)
 const ConsultorClientesRoute = ConsultorClientesRouteImport.update({
   id: '/clientes',
@@ -346,6 +352,7 @@ export interface FileRoutesByFullPath {
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/consultor/atividades': typeof ConsultorAtividadesRoute
   '/consultor/clientes': typeof ConsultorClientesRouteWithChildren
+  '/consultor/revisoes': typeof ConsultorRevisoesRoute
   '/portal/candidaturas': typeof PortalCandidaturasRouteWithChildren
   '/portal/conhecimento': typeof PortalConhecimentoRoute
   '/portal/editais': typeof PortalEditaisRouteWithChildren
@@ -395,6 +402,7 @@ export interface FileRoutesByTo {
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/consultor/atividades': typeof ConsultorAtividadesRoute
   '/consultor/clientes': typeof ConsultorClientesRouteWithChildren
+  '/consultor/revisoes': typeof ConsultorRevisoesRoute
   '/portal/candidaturas': typeof PortalCandidaturasRouteWithChildren
   '/portal/conhecimento': typeof PortalConhecimentoRoute
   '/portal/editais': typeof PortalEditaisRouteWithChildren
@@ -448,6 +456,7 @@ export interface FileRoutesById {
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/consultor/atividades': typeof ConsultorAtividadesRoute
   '/consultor/clientes': typeof ConsultorClientesRouteWithChildren
+  '/consultor/revisoes': typeof ConsultorRevisoesRoute
   '/portal/candidaturas': typeof PortalCandidaturasRouteWithChildren
   '/portal/conhecimento': typeof PortalConhecimentoRoute
   '/portal/editais': typeof PortalEditaisRouteWithChildren
@@ -502,6 +511,7 @@ export interface FileRouteTypes {
     | '/admin/usuarios'
     | '/consultor/atividades'
     | '/consultor/clientes'
+    | '/consultor/revisoes'
     | '/portal/candidaturas'
     | '/portal/conhecimento'
     | '/portal/editais'
@@ -551,6 +561,7 @@ export interface FileRouteTypes {
     | '/admin/usuarios'
     | '/consultor/atividades'
     | '/consultor/clientes'
+    | '/consultor/revisoes'
     | '/portal/candidaturas'
     | '/portal/conhecimento'
     | '/portal/editais'
@@ -603,6 +614,7 @@ export interface FileRouteTypes {
     | '/admin/usuarios'
     | '/consultor/atividades'
     | '/consultor/clientes'
+    | '/consultor/revisoes'
     | '/portal/candidaturas'
     | '/portal/conhecimento'
     | '/portal/editais'
@@ -746,6 +758,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/portal/candidaturas'
       preLoaderRoute: typeof PortalCandidaturasRouteImport
       parentRoute: typeof PortalRoute
+    }
+    '/consultor/revisoes': {
+      id: '/consultor/revisoes'
+      path: '/revisoes'
+      fullPath: '/consultor/revisoes'
+      preLoaderRoute: typeof ConsultorRevisoesRouteImport
+      parentRoute: typeof ConsultorRoute
     }
     '/consultor/clientes': {
       id: '/consultor/clientes'
@@ -1064,12 +1083,14 @@ const ConsultorClientesRouteWithChildren =
 interface ConsultorRouteChildren {
   ConsultorAtividadesRoute: typeof ConsultorAtividadesRoute
   ConsultorClientesRoute: typeof ConsultorClientesRouteWithChildren
+  ConsultorRevisoesRoute: typeof ConsultorRevisoesRoute
   ConsultorIndexRoute: typeof ConsultorIndexRoute
 }
 
 const ConsultorRouteChildren: ConsultorRouteChildren = {
   ConsultorAtividadesRoute: ConsultorAtividadesRoute,
   ConsultorClientesRoute: ConsultorClientesRouteWithChildren,
+  ConsultorRevisoesRoute: ConsultorRevisoesRoute,
   ConsultorIndexRoute: ConsultorIndexRoute,
 }
 
