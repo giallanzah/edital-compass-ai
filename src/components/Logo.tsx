@@ -1,60 +1,55 @@
+import wordmarkAsset from "@/assets/fomenta-logo-wordmark.png.asset.json";
+import markAsset from "@/assets/fomenta-mark.png.asset.json";
+
 type Variant = "full" | "compact" | "mark";
 
 type Props = {
   className?: string;
   /** full = símbolo + wordmark (header do site) · compact = versão menor · mark = só o símbolo */
   variant?: Variant;
+  /** altura em px */
   size?: number;
 };
 
-const SIZES: Record<Variant, number> = { full: 26, compact: 22, mark: 26 };
+// Proporções reais dos arquivos (largura ÷ altura)
+const WORDMARK_RATIO = 1101 / 443;
+const MARK_RATIO = 324 / 443;
+
+const HEIGHTS: Record<Variant, number> = { full: 28, compact: 22, mark: 26 };
 
 export function LogoMark({ size = 26, className = "" }: { size?: number; className?: string }) {
   return (
-    <svg
-      viewBox="0 0 64 64"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinejoin="round"
-      strokeLinecap="round"
-      width={size}
+    <img
+      src={markAsset.url}
+      alt=""
+      width={Math.round(size * MARK_RATIO)}
       height={size}
-      className={`shrink-0 ${className}`}
+      style={{ height: size, width: "auto" }}
+      className={`shrink-0 select-none ${className}`}
       aria-hidden
-    >
-      <polygon points="32,4 58,18 58,46 32,60 6,46 6,18" />
-      <polyline points="6,18 32,32 58,18" />
-      <polyline points="6,46 32,32 58,46" />
-      <line x1="32" y1="4" x2="32" y2="32" />
-      <line x1="32" y1="32" x2="32" y2="60" />
-    </svg>
+    />
   );
 }
 
 export function Logo({ className = "", variant = "full", size }: Props) {
-  const px = size ?? SIZES[variant];
+  const h = size ?? HEIGHTS[variant];
 
   if (variant === "mark") {
     return (
-      <span className={`inline-flex text-foreground ${className}`} aria-label="fomenta.ai">
-        <LogoMark size={px} />
+      <span className={`inline-flex ${className}`} aria-label="fomenta.ai">
+        <LogoMark size={h} />
       </span>
     );
   }
 
   return (
-    <span
-      className={`inline-flex items-center gap-2 text-foreground ${className}`}
-      aria-label="fomenta.ai"
-    >
-      <LogoMark size={px} />
-      <span
-        className="font-medium tracking-tight leading-none"
-        style={{ fontSize: variant === "compact" ? 15 : 17 }}
-      >
-        fomenta<span className="text-muted-foreground">.ai</span>
-      </span>
-    </span>
+    <img
+      src={wordmarkAsset.url}
+      alt="fomenta.ai"
+      width={Math.round(h * WORDMARK_RATIO)}
+      height={h}
+      style={{ height: h, width: "auto" }}
+      className={`shrink-0 select-none ${className}`}
+    />
   );
 }

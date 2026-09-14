@@ -29,6 +29,7 @@ import { Route as ConsultorRevisoesRouteImport } from './routes/consultor.reviso
 import { Route as ConsultorClientesRouteImport } from './routes/consultor.clientes'
 import { Route as ConsultorAtividadesRouteImport } from './routes/consultor.atividades'
 import { Route as AdminUsuariosRouteImport } from './routes/admin.usuarios'
+import { Route as AdminSolicitacoesRouteImport } from './routes/admin.solicitacoes'
 import { Route as AdminScrapersRouteImport } from './routes/admin.scrapers'
 import { Route as AdminRelatoriosRouteImport } from './routes/admin.relatorios'
 import { Route as AdminRedefinirSenhaRouteImport } from './routes/admin.redefinir-senha'
@@ -159,6 +160,11 @@ const ConsultorAtividadesRoute = ConsultorAtividadesRouteImport.update({
 const AdminUsuariosRoute = AdminUsuariosRouteImport.update({
   id: '/usuarios',
   path: '/usuarios',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSolicitacoesRoute = AdminSolicitacoesRouteImport.update({
+  id: '/solicitacoes',
+  path: '/solicitacoes',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminScrapersRoute = AdminScrapersRouteImport.update({
@@ -349,6 +355,7 @@ export interface FileRoutesByFullPath {
   '/admin/redefinir-senha': typeof AdminRedefinirSenhaRoute
   '/admin/relatorios': typeof AdminRelatoriosRoute
   '/admin/scrapers': typeof AdminScrapersRoute
+  '/admin/solicitacoes': typeof AdminSolicitacoesRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/consultor/atividades': typeof ConsultorAtividadesRoute
   '/consultor/clientes': typeof ConsultorClientesRouteWithChildren
@@ -399,6 +406,7 @@ export interface FileRoutesByTo {
   '/admin/redefinir-senha': typeof AdminRedefinirSenhaRoute
   '/admin/relatorios': typeof AdminRelatoriosRoute
   '/admin/scrapers': typeof AdminScrapersRoute
+  '/admin/solicitacoes': typeof AdminSolicitacoesRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/consultor/atividades': typeof ConsultorAtividadesRoute
   '/consultor/clientes': typeof ConsultorClientesRouteWithChildren
@@ -453,6 +461,7 @@ export interface FileRoutesById {
   '/admin/redefinir-senha': typeof AdminRedefinirSenhaRoute
   '/admin/relatorios': typeof AdminRelatoriosRoute
   '/admin/scrapers': typeof AdminScrapersRoute
+  '/admin/solicitacoes': typeof AdminSolicitacoesRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/consultor/atividades': typeof ConsultorAtividadesRoute
   '/consultor/clientes': typeof ConsultorClientesRouteWithChildren
@@ -508,6 +517,7 @@ export interface FileRouteTypes {
     | '/admin/redefinir-senha'
     | '/admin/relatorios'
     | '/admin/scrapers'
+    | '/admin/solicitacoes'
     | '/admin/usuarios'
     | '/consultor/atividades'
     | '/consultor/clientes'
@@ -558,6 +568,7 @@ export interface FileRouteTypes {
     | '/admin/redefinir-senha'
     | '/admin/relatorios'
     | '/admin/scrapers'
+    | '/admin/solicitacoes'
     | '/admin/usuarios'
     | '/consultor/atividades'
     | '/consultor/clientes'
@@ -611,6 +622,7 @@ export interface FileRouteTypes {
     | '/admin/redefinir-senha'
     | '/admin/relatorios'
     | '/admin/scrapers'
+    | '/admin/solicitacoes'
     | '/admin/usuarios'
     | '/consultor/atividades'
     | '/consultor/clientes'
@@ -785,6 +797,13 @@ declare module '@tanstack/react-router' {
       path: '/usuarios'
       fullPath: '/admin/usuarios'
       preLoaderRoute: typeof AdminUsuariosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/solicitacoes': {
+      id: '/admin/solicitacoes'
+      path: '/solicitacoes'
+      fullPath: '/admin/solicitacoes'
+      preLoaderRoute: typeof AdminSolicitacoesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/scrapers': {
@@ -1033,6 +1052,7 @@ interface AdminRouteChildren {
   AdminRedefinirSenhaRoute: typeof AdminRedefinirSenhaRoute
   AdminRelatoriosRoute: typeof AdminRelatoriosRoute
   AdminScrapersRoute: typeof AdminScrapersRoute
+  AdminSolicitacoesRoute: typeof AdminSolicitacoesRoute
   AdminUsuariosRoute: typeof AdminUsuariosRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
@@ -1063,6 +1083,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminRedefinirSenhaRoute: AdminRedefinirSenhaRoute,
   AdminRelatoriosRoute: AdminRelatoriosRoute,
   AdminScrapersRoute: AdminScrapersRoute,
+  AdminSolicitacoesRoute: AdminSolicitacoesRoute,
   AdminUsuariosRoute: AdminUsuariosRoute,
   AdminIndexRoute: AdminIndexRoute,
 }

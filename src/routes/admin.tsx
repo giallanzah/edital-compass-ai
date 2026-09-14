@@ -19,6 +19,7 @@ const MENU = [
   { to: "/admin", label: "Dashboard" },
   { to: "/admin/empresas", label: "Empresas" },
   { to: "/admin/usuarios", label: "Usuários" },
+  { to: "/admin/solicitacoes", label: "Solicitações de acesso" },
   { to: "/admin/projetos", label: "Projetos" },
   { to: "/admin/editais", label: "Editais" },
   { to: "/admin/fontes", label: "Fontes do robô" },

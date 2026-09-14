@@ -401,3 +401,80 @@ export const atualizarContratoAdmin = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+// -------- Solicitações de acesso (Consultor / Equipe Fomenta) --------
+
+export const listarSolicitacoesAdmin = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("solicitacoes_acesso")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });
+
+// Aprovar: concede o papel real (CONSULTOR via credenciamento, ADMIN via promoção).
+// Recusar: apenas marca o status, sem conceder nada.
+export const decidirSolicitacaoAdmin = createServerFn({ method: "POST" })
+  .inputValidator(
+    (input: { id: string; decisao: "aprovada" | "recusada"; observacao?: string | null }) => {
+      if (input.decisao !== "aprovada" && input.decisao !== "recusada") {
+        throw new Error("Decisão inválida.");
+      }
+      return input;
+    },
+  )
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: sol, error: errSol } = await supabaseAdmin
+      .from("solicitacoes_acesso")
+      .select("*")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (errSol) throw new Error(errSol.message);
+    if (!sol) throw new Error("Solicitação não encontrada.");
+    if (sol.status !== "pendente") throw new Error("Esta solicitação já foi decidida.");
+
+    if (data.decisao === "aprovada") {
+      if (sol.perfil === "consultor") {
+        const { error } = await context.supabase.rpc("credenciar_consultor", {
+          _alvo: sol.user_id,
+          _nome: sol.nome ?? sol.email,
+          _email: sol.email,
+        });
+        if (error) throw new Error(error.message);
+      } else {
+        const { error } = await context.supabase.rpc("promover_usuario", {
+          _alvo: sol.user_id,
+          _role: "ADMIN",
+        });
+        if (error) throw new Error(error.message);
+      }
+    }
+
+    const { error: errUp } = await supabaseAdmin
+      .from("solicitacoes_acesso")
+      .update({
+        status: data.decisao,
+        observacao: data.observacao ?? null,
+        decidido_em: new Date().toISOString(),
+      })
+      .eq("id", data.id);
+    if (errUp) throw new Error(errUp.message);
+
+    const email = (context.claims.email as string | undefined) ?? context.userId;
+    await registrarAuditoria(
+      context.userId,
+      email,
+      `solicitacao_${data.decisao}`,
+      `${sol.email} (${sol.perfil}) — ${data.decisao}${data.observacao ? `: ${data.observacao}` : ""}`,
+    );
+    return { ok: true };
+  });
