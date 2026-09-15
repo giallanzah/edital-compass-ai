@@ -15,7 +15,7 @@ type Props = {
 const WORDMARK_RATIO = 1101 / 443;
 const MARK_RATIO = 324 / 443;
 
-const HEIGHTS: Record<Variant, number> = { full: 28, compact: 22, mark: 26 };
+const HEIGHTS: Record<Variant, number> = { full: 36, compact: 28, mark: 28 };
 
 export function LogoMark({ size = 26, className = "" }: { size?: number; className?: string }) {
   return (
