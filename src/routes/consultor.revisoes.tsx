@@ -150,11 +150,16 @@ function Page() {
         {q.isLoading ? (
           <div className="p-5 text-sm text-muted-foreground">Carregando…</div>
         ) : lista.length === 0 ? (
-          <div className="p-10 text-center text-sm text-muted-foreground">
-            {todas.length === 0
-              ? "Você ainda não registrou revisões. Abra um cliente e escreva um parecer ou uma sugestão de proposta."
-              : "Nenhuma revisão corresponde ao filtro."}
-          </div>
+          todas.length === 0 ? (
+            <EmptyState icon="doc" title="Nenhuma revisão registrada">
+              Abra um cliente, escolha uma candidatura e escreva um parecer ou uma sugestão de
+              proposta — ela aparecerá aqui.
+            </EmptyState>
+          ) : (
+            <EmptyState icon="doc" title="Nada encontrado">
+              Nenhuma revisão corresponde ao filtro ou à busca.
+            </EmptyState>
+          )
         ) : (
           lista.map((r) => {
             const expandida = aberta === r.id;
