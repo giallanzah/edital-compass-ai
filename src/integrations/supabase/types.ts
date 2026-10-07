@@ -270,10 +270,12 @@ export type Database = {
       consultores: {
         Row: {
           ativo: boolean
+          bio: string | null
           created_at: string
           email: string
           especialidade: string | null
           id: string
+          links: string[]
           nome: string
           telefone: string | null
           updated_at: string
@@ -281,10 +283,12 @@ export type Database = {
         }
         Insert: {
           ativo?: boolean
+          bio?: string | null
           created_at?: string
           email: string
           especialidade?: string | null
           id?: string
+          links?: string[]
           nome: string
           telefone?: string | null
           updated_at?: string
@@ -292,10 +296,12 @@ export type Database = {
         }
         Update: {
           ativo?: boolean
+          bio?: string | null
           created_at?: string
           email?: string
           especialidade?: string | null
           id?: string
+          links?: string[]
           nome?: string
           telefone?: string | null
           updated_at?: string
@@ -767,6 +773,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      atualizar_meu_perfil_consultor: {
+        Args: {
+          _bio: string
+          _especialidade: string
+          _links: string[]
+          _nome: string
+          _telefone: string
+        }
+        Returns: undefined
+      }
       bootstrap_admin: {
         Args: never
         Returns: Database["public"]["Enums"]["app_role"]
