@@ -1,4 +1,5 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { EmptyState } from "@/components/EmptyState";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listarClientesDoConsultor } from "@/lib/consultor.functions";
@@ -44,9 +45,10 @@ function Page() {
         {q.isLoading ? (
           <div className="p-5 text-sm text-muted-foreground">Carregando…</div>
         ) : clientes.length === 0 ? (
-          <div className="p-5 text-sm text-muted-foreground">
-            Nenhum cliente vinculado a você ainda.
-          </div>
+          <EmptyState icon="users" title="Nenhum cliente vinculado ainda">
+            A equipe Fomenta.ai vincula empresas à sua carteira. Mantenha seu perfil completo para
+            receber indicações compatíveis com sua especialidade.
+          </EmptyState>
         ) : (
           clientes.map((c) => (
             <Link

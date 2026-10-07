@@ -6,6 +6,7 @@ import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { PortalShell } from "@/components/PortalShell";
 import { meuConsultorId } from "@/lib/consultor.functions";
+import { minhaSolicitacao } from "@/lib/acesso.functions";
 import { Logo } from "@/components/Logo";
 
 export const Route = createFileRoute("/consultor")({
@@ -18,6 +19,7 @@ const MENU = [
   { to: "/consultor/clientes", label: "Clientes" },
   { to: "/consultor/revisoes", label: "Revisões" },
   { to: "/consultor/atividades", label: "Atividades" },
+  { to: "/consultor/perfil", label: "Meu perfil" },
 ];
 
 function ConsultorLayout() {
@@ -33,7 +35,7 @@ function ConsultorLayout() {
 
   useEffect(() => {
     if (session === null) {
-      navigate({ to: "/portal/login", search: { redirect: pathname } });
+      navigate({ to: "/entrar", search: { redirect: pathname } });
     }
   }, [session, pathname, navigate]);
 
@@ -44,6 +46,13 @@ function ConsultorLayout() {
     enabled: !!session,
     staleTime: 60_000,
   });
+  const solFn = useServerFn(minhaSolicitacao);
+  const semCredencial = !!session && consultorQ.isSuccess && !consultorQ.data?.ativo;
+  const solQ = useQuery({
+    queryKey: ["consultor", "minha-solicitacao"],
+    queryFn: () => solFn({ data: { perfil: "consultor" } }),
+    enabled: semCredencial,
+  });
 
   if (session === undefined) {
     return <ConsultorLoading label="Verificando sessão…" />;
@@ -53,6 +62,12 @@ function ConsultorLayout() {
   }
   if (consultorQ.isLoading || consultorQ.isFetching) {
     return <ConsultorLoading label="Verificando credencial de consultor…" />;
+  }
+  if (semCredencial && solQ.isLoading) {
+    return <ConsultorLoading label="Verificando solicitação…" />;
+  }
+  if (semCredencial && solQ.data?.status === "pendente") {
+    return <EmAnalise email={session.user.email ?? ""} />;
   }
   if (consultorQ.isError || !consultorQ.data?.ativo) {
     return <AccessDenied email={session.user.email ?? ""} />;
@@ -105,7 +120,7 @@ function AccessDenied({ email }: { email: string }) {
           <button
             onClick={async () => {
               await supabase.auth.signOut();
-              navigate({ to: "/portal/login" });
+              navigate({ to: "/" });
             }}
             className="inline-flex h-9 items-center rounded-sm bg-foreground px-4 text-sm font-medium text-background"
           >
@@ -115,6 +130,40 @@ function AccessDenied({ email }: { email: string }) {
             to="/"
             className="inline-flex h-9 items-center rounded-sm hairline px-4 text-sm hover:bg-secondary"
           >
+            Voltar ao site
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EmAnalise({ email }: { email: string }) {
+  const navigate = useNavigate();
+  return (
+    <div className="flex min-h-screen items-center justify-center px-6">
+      <div className="max-w-md text-center">
+        <div className="mb-8 flex justify-center">
+          <Logo />
+        </div>
+        <div className="eyebrow mb-3">cadastro em análise</div>
+        <h1 className="text-3xl font-medium tracking-tight">Sua solicitação está em análise</h1>
+        <p className="mt-3 text-sm text-muted-foreground">
+          Recebemos o pedido de credenciamento da conta <span className="font-mono">{email}</span>.
+          A equipe da Fomenta.ai está avaliando seu perfil e entrará em contato em breve para liberar
+          seu acesso.
+        </p>
+        <div className="mt-8 flex justify-center gap-2">
+          <button
+            onClick={async () => {
+              await supabase.auth.signOut();
+              navigate({ to: "/" });
+            }}
+            className="inline-flex h-9 items-center rounded-sm bg-foreground px-4 text-sm font-medium text-background"
+          >
+            Sair da conta
+          </button>
+          <Link to="/" className="inline-flex h-9 items-center rounded-sm hairline px-4 text-sm hover:bg-secondary">
             Voltar ao site
           </Link>
         </div>

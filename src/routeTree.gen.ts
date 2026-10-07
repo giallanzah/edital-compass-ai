@@ -9,77 +9,63 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as PortalRouteImport } from './routes/portal'
-import { Route as EntrarRouteImport } from './routes/entrar'
-import { Route as ConsultorRouteImport } from './routes/consultor'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as PortalIndexRouteImport } from './routes/portal.index'
-import { Route as ConsultorIndexRouteImport } from './routes/consultor.index'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as ConsultorRouteImport } from './routes/consultor'
+import { Route as EntrarRouteImport } from './routes/entrar'
+import { Route as PortalRouteImport } from './routes/portal'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as PortalProjetosRouteImport } from './routes/portal.projetos'
-import { Route as PortalPerfilRouteImport } from './routes/portal.perfil'
-import { Route as PortalOnboardingRouteImport } from './routes/portal.onboarding'
-import { Route as PortalLoginRouteImport } from './routes/portal.login'
-import { Route as PortalEditaisRouteImport } from './routes/portal.editais'
-import { Route as PortalConhecimentoRouteImport } from './routes/portal.conhecimento'
-import { Route as PortalCandidaturasRouteImport } from './routes/portal.candidaturas'
-import { Route as ConsultorRevisoesRouteImport } from './routes/consultor.revisoes'
-import { Route as ConsultorClientesRouteImport } from './routes/consultor.clientes'
-import { Route as ConsultorAtividadesRouteImport } from './routes/consultor.atividades'
-import { Route as AdminUsuariosRouteImport } from './routes/admin.usuarios'
-import { Route as AdminSolicitacoesRouteImport } from './routes/admin.solicitacoes'
-import { Route as AdminScrapersRouteImport } from './routes/admin.scrapers'
-import { Route as AdminRelatoriosRouteImport } from './routes/admin.relatorios'
-import { Route as AdminRedefinirSenhaRouteImport } from './routes/admin.redefinir-senha'
-import { Route as AdminRecuperarSenhaRouteImport } from './routes/admin.recuperar-senha'
-import { Route as AdminProjetosRouteImport } from './routes/admin.projetos'
-import { Route as AdminPermissoesRouteImport } from './routes/admin.permissoes'
-import { Route as AdminPagamentosRouteImport } from './routes/admin.pagamentos'
-import { Route as AdminMunicipiosRouteImport } from './routes/admin.municipios'
-import { Route as AdminLogsRouteImport } from './routes/admin.logs'
-import { Route as AdminLoginRouteImport } from './routes/admin.login'
-import { Route as AdminInvestidoresRouteImport } from './routes/admin.investidores'
-import { Route as AdminIntegracoesRouteImport } from './routes/admin.integracoes'
-import { Route as AdminInstituicoesRouteImport } from './routes/admin.instituicoes'
-import { Route as AdminIndicadoresRouteImport } from './routes/admin.indicadores'
-import { Route as AdminIaRouteImport } from './routes/admin.ia'
-import { Route as AdminFontesRouteImport } from './routes/admin.fontes'
-import { Route as AdminFinanceiroRouteImport } from './routes/admin.financeiro'
-import { Route as AdminEstadosRouteImport } from './routes/admin.estados'
-import { Route as AdminEmpresasRouteImport } from './routes/admin.empresas'
-import { Route as AdminEditaisRouteImport } from './routes/admin.editais'
-import { Route as AdminConveniosRouteImport } from './routes/admin.convenios'
-import { Route as AdminConsultoresRouteImport } from './routes/admin.consultores'
-import { Route as AdminConfiguracoesRouteImport } from './routes/admin.configuracoes'
-import { Route as AdminColetasRouteImport } from './routes/admin.coletas'
 import { Route as AdminApisRouteImport } from './routes/admin.apis'
-import { Route as PortalEditaisIdRouteImport } from './routes/portal.editais.$id'
-import { Route as PortalCandidaturasIdRouteImport } from './routes/portal.candidaturas.$id'
+import { Route as AdminColetasRouteImport } from './routes/admin.coletas'
+import { Route as AdminConfiguracoesRouteImport } from './routes/admin.configuracoes'
+import { Route as AdminConsultoresRouteImport } from './routes/admin.consultores'
+import { Route as AdminConveniosRouteImport } from './routes/admin.convenios'
+import { Route as AdminEditaisRouteImport } from './routes/admin.editais'
+import { Route as AdminEmpresasRouteImport } from './routes/admin.empresas'
+import { Route as AdminEstadosRouteImport } from './routes/admin.estados'
+import { Route as AdminFinanceiroRouteImport } from './routes/admin.financeiro'
+import { Route as AdminFontesRouteImport } from './routes/admin.fontes'
+import { Route as AdminIaRouteImport } from './routes/admin.ia'
+import { Route as AdminIndicadoresRouteImport } from './routes/admin.indicadores'
+import { Route as AdminInstituicoesRouteImport } from './routes/admin.instituicoes'
+import { Route as AdminIntegracoesRouteImport } from './routes/admin.integracoes'
+import { Route as AdminInvestidoresRouteImport } from './routes/admin.investidores'
+import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AdminLogsRouteImport } from './routes/admin.logs'
+import { Route as AdminMunicipiosRouteImport } from './routes/admin.municipios'
+import { Route as AdminPagamentosRouteImport } from './routes/admin.pagamentos'
+import { Route as AdminPermissoesRouteImport } from './routes/admin.permissoes'
+import { Route as AdminProjetosRouteImport } from './routes/admin.projetos'
+import { Route as AdminRecuperarSenhaRouteImport } from './routes/admin.recuperar-senha'
+import { Route as AdminRedefinirSenhaRouteImport } from './routes/admin.redefinir-senha'
+import { Route as AdminRelatoriosRouteImport } from './routes/admin.relatorios'
+import { Route as AdminScrapersRouteImport } from './routes/admin.scrapers'
+import { Route as AdminSolicitacoesRouteImport } from './routes/admin.solicitacoes'
+import { Route as AdminUsuariosRouteImport } from './routes/admin.usuarios'
+import { Route as ConsultorIndexRouteImport } from './routes/consultor.index'
+import { Route as ConsultorAtividadesRouteImport } from './routes/consultor.atividades'
+import { Route as ConsultorClientesRouteImport } from './routes/consultor.clientes'
+import { Route as ConsultorPerfilRouteImport } from './routes/consultor.perfil'
+import { Route as ConsultorRevisoesRouteImport } from './routes/consultor.revisoes'
+import { Route as PortalIndexRouteImport } from './routes/portal.index'
+import { Route as PortalCandidaturasRouteImport } from './routes/portal.candidaturas'
+import { Route as PortalConhecimentoRouteImport } from './routes/portal.conhecimento'
+import { Route as PortalEditaisRouteImport } from './routes/portal.editais'
+import { Route as PortalLoginRouteImport } from './routes/portal.login'
+import { Route as PortalOnboardingRouteImport } from './routes/portal.onboarding'
+import { Route as PortalPerfilRouteImport } from './routes/portal.perfil'
+import { Route as PortalProjetosRouteImport } from './routes/portal.projetos'
 import { Route as ConsultorClientesIdRouteImport } from './routes/consultor.clientes.$id'
-import { Route as ApiPublicCronScrapeRouteImport } from './routes/api/public/cron/scrape'
-import { Route as ApiPublicCronNotificarRouteImport } from './routes/api/public/cron/notificar'
+import { Route as PortalCandidaturasIdRouteImport } from './routes/portal.candidaturas.$id'
+import { Route as PortalEditaisIdRouteImport } from './routes/portal.editais.$id'
 import { Route as ApiOgEditalIdRouteImport } from './routes/api/og.edital.$id'
+import { Route as ApiPublicCronNotificarRouteImport } from './routes/api/public/cron/notificar'
+import { Route as ApiPublicCronScrapeRouteImport } from './routes/api/public/cron/scrape'
 
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PortalRoute = PortalRouteImport.update({
-  id: '/portal',
-  path: '/portal',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EntrarRoute = EntrarRouteImport.update({
-  id: '/entrar',
-  path: '/entrar',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ConsultorRoute = ConsultorRouteImport.update({
-  id: '/consultor',
-  path: '/consultor',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -87,204 +73,29 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const ConsultorRoute = ConsultorRouteImport.update({
+  id: '/consultor',
+  path: '/consultor',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PortalIndexRoute = PortalIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => PortalRoute,
+const EntrarRoute = EntrarRouteImport.update({
+  id: '/entrar',
+  path: '/entrar',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const ConsultorIndexRoute = ConsultorIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => ConsultorRoute,
+const PortalRoute = PortalRouteImport.update({
+  id: '/portal',
+  path: '/portal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AdminRoute,
-} as any)
-const PortalProjetosRoute = PortalProjetosRouteImport.update({
-  id: '/projetos',
-  path: '/projetos',
-  getParentRoute: () => PortalRoute,
-} as any)
-const PortalPerfilRoute = PortalPerfilRouteImport.update({
-  id: '/perfil',
-  path: '/perfil',
-  getParentRoute: () => PortalRoute,
-} as any)
-const PortalOnboardingRoute = PortalOnboardingRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
-  getParentRoute: () => PortalRoute,
-} as any)
-const PortalLoginRoute = PortalLoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => PortalRoute,
-} as any)
-const PortalEditaisRoute = PortalEditaisRouteImport.update({
-  id: '/editais',
-  path: '/editais',
-  getParentRoute: () => PortalRoute,
-} as any)
-const PortalConhecimentoRoute = PortalConhecimentoRouteImport.update({
-  id: '/conhecimento',
-  path: '/conhecimento',
-  getParentRoute: () => PortalRoute,
-} as any)
-const PortalCandidaturasRoute = PortalCandidaturasRouteImport.update({
-  id: '/candidaturas',
-  path: '/candidaturas',
-  getParentRoute: () => PortalRoute,
-} as any)
-const ConsultorRevisoesRoute = ConsultorRevisoesRouteImport.update({
-  id: '/revisoes',
-  path: '/revisoes',
-  getParentRoute: () => ConsultorRoute,
-} as any)
-const ConsultorClientesRoute = ConsultorClientesRouteImport.update({
-  id: '/clientes',
-  path: '/clientes',
-  getParentRoute: () => ConsultorRoute,
-} as any)
-const ConsultorAtividadesRoute = ConsultorAtividadesRouteImport.update({
-  id: '/atividades',
-  path: '/atividades',
-  getParentRoute: () => ConsultorRoute,
-} as any)
-const AdminUsuariosRoute = AdminUsuariosRouteImport.update({
-  id: '/usuarios',
-  path: '/usuarios',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminSolicitacoesRoute = AdminSolicitacoesRouteImport.update({
-  id: '/solicitacoes',
-  path: '/solicitacoes',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminScrapersRoute = AdminScrapersRouteImport.update({
-  id: '/scrapers',
-  path: '/scrapers',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminRelatoriosRoute = AdminRelatoriosRouteImport.update({
-  id: '/relatorios',
-  path: '/relatorios',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminRedefinirSenhaRoute = AdminRedefinirSenhaRouteImport.update({
-  id: '/redefinir-senha',
-  path: '/redefinir-senha',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminRecuperarSenhaRoute = AdminRecuperarSenhaRouteImport.update({
-  id: '/recuperar-senha',
-  path: '/recuperar-senha',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminProjetosRoute = AdminProjetosRouteImport.update({
-  id: '/projetos',
-  path: '/projetos',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminPermissoesRoute = AdminPermissoesRouteImport.update({
-  id: '/permissoes',
-  path: '/permissoes',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminPagamentosRoute = AdminPagamentosRouteImport.update({
-  id: '/pagamentos',
-  path: '/pagamentos',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminMunicipiosRoute = AdminMunicipiosRouteImport.update({
-  id: '/municipios',
-  path: '/municipios',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminLogsRoute = AdminLogsRouteImport.update({
-  id: '/logs',
-  path: '/logs',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminLoginRoute = AdminLoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminInvestidoresRoute = AdminInvestidoresRouteImport.update({
-  id: '/investidores',
-  path: '/investidores',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminIntegracoesRoute = AdminIntegracoesRouteImport.update({
-  id: '/integracoes',
-  path: '/integracoes',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminInstituicoesRoute = AdminInstituicoesRouteImport.update({
-  id: '/instituicoes',
-  path: '/instituicoes',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminIndicadoresRoute = AdminIndicadoresRouteImport.update({
-  id: '/indicadores',
-  path: '/indicadores',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminIaRoute = AdminIaRouteImport.update({
-  id: '/ia',
-  path: '/ia',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminFontesRoute = AdminFontesRouteImport.update({
-  id: '/fontes',
-  path: '/fontes',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminFinanceiroRoute = AdminFinanceiroRouteImport.update({
-  id: '/financeiro',
-  path: '/financeiro',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminEstadosRoute = AdminEstadosRouteImport.update({
-  id: '/estados',
-  path: '/estados',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminEmpresasRoute = AdminEmpresasRouteImport.update({
-  id: '/empresas',
-  path: '/empresas',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminEditaisRoute = AdminEditaisRouteImport.update({
-  id: '/editais',
-  path: '/editais',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminConveniosRoute = AdminConveniosRouteImport.update({
-  id: '/convenios',
-  path: '/convenios',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminConsultoresRoute = AdminConsultoresRouteImport.update({
-  id: '/consultores',
-  path: '/consultores',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminConfiguracoesRoute = AdminConfiguracoesRouteImport.update({
-  id: '/configuracoes',
-  path: '/configuracoes',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminColetasRoute = AdminColetasRouteImport.update({
-  id: '/coletas',
-  path: '/coletas',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminApisRoute = AdminApisRouteImport.update({
@@ -292,24 +103,219 @@ const AdminApisRoute = AdminApisRouteImport.update({
   path: '/apis',
   getParentRoute: () => AdminRoute,
 } as any)
-const PortalEditaisIdRoute = PortalEditaisIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => PortalEditaisRoute,
+const AdminColetasRoute = AdminColetasRouteImport.update({
+  id: '/coletas',
+  path: '/coletas',
+  getParentRoute: () => AdminRoute,
 } as any)
-const PortalCandidaturasIdRoute = PortalCandidaturasIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => PortalCandidaturasRoute,
+const AdminConfiguracoesRoute = AdminConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminConsultoresRoute = AdminConsultoresRouteImport.update({
+  id: '/consultores',
+  path: '/consultores',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminConveniosRoute = AdminConveniosRouteImport.update({
+  id: '/convenios',
+  path: '/convenios',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminEditaisRoute = AdminEditaisRouteImport.update({
+  id: '/editais',
+  path: '/editais',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminEmpresasRoute = AdminEmpresasRouteImport.update({
+  id: '/empresas',
+  path: '/empresas',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminEstadosRoute = AdminEstadosRouteImport.update({
+  id: '/estados',
+  path: '/estados',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminFinanceiroRoute = AdminFinanceiroRouteImport.update({
+  id: '/financeiro',
+  path: '/financeiro',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminFontesRoute = AdminFontesRouteImport.update({
+  id: '/fontes',
+  path: '/fontes',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminIaRoute = AdminIaRouteImport.update({
+  id: '/ia',
+  path: '/ia',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminIndicadoresRoute = AdminIndicadoresRouteImport.update({
+  id: '/indicadores',
+  path: '/indicadores',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminInstituicoesRoute = AdminInstituicoesRouteImport.update({
+  id: '/instituicoes',
+  path: '/instituicoes',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminIntegracoesRoute = AdminIntegracoesRouteImport.update({
+  id: '/integracoes',
+  path: '/integracoes',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminInvestidoresRoute = AdminInvestidoresRouteImport.update({
+  id: '/investidores',
+  path: '/investidores',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLogsRoute = AdminLogsRouteImport.update({
+  id: '/logs',
+  path: '/logs',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMunicipiosRoute = AdminMunicipiosRouteImport.update({
+  id: '/municipios',
+  path: '/municipios',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPagamentosRoute = AdminPagamentosRouteImport.update({
+  id: '/pagamentos',
+  path: '/pagamentos',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPermissoesRoute = AdminPermissoesRouteImport.update({
+  id: '/permissoes',
+  path: '/permissoes',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminProjetosRoute = AdminProjetosRouteImport.update({
+  id: '/projetos',
+  path: '/projetos',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRecuperarSenhaRoute = AdminRecuperarSenhaRouteImport.update({
+  id: '/recuperar-senha',
+  path: '/recuperar-senha',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRedefinirSenhaRoute = AdminRedefinirSenhaRouteImport.update({
+  id: '/redefinir-senha',
+  path: '/redefinir-senha',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRelatoriosRoute = AdminRelatoriosRouteImport.update({
+  id: '/relatorios',
+  path: '/relatorios',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminScrapersRoute = AdminScrapersRouteImport.update({
+  id: '/scrapers',
+  path: '/scrapers',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSolicitacoesRoute = AdminSolicitacoesRouteImport.update({
+  id: '/solicitacoes',
+  path: '/solicitacoes',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminUsuariosRoute = AdminUsuariosRouteImport.update({
+  id: '/usuarios',
+  path: '/usuarios',
+  getParentRoute: () => AdminRoute,
+} as any)
+const ConsultorIndexRoute = ConsultorIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ConsultorRoute,
+} as any)
+const ConsultorAtividadesRoute = ConsultorAtividadesRouteImport.update({
+  id: '/atividades',
+  path: '/atividades',
+  getParentRoute: () => ConsultorRoute,
+} as any)
+const ConsultorClientesRoute = ConsultorClientesRouteImport.update({
+  id: '/clientes',
+  path: '/clientes',
+  getParentRoute: () => ConsultorRoute,
+} as any)
+const ConsultorPerfilRoute = ConsultorPerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => ConsultorRoute,
+} as any)
+const ConsultorRevisoesRoute = ConsultorRevisoesRouteImport.update({
+  id: '/revisoes',
+  path: '/revisoes',
+  getParentRoute: () => ConsultorRoute,
+} as any)
+const PortalIndexRoute = PortalIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalCandidaturasRoute = PortalCandidaturasRouteImport.update({
+  id: '/candidaturas',
+  path: '/candidaturas',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalConhecimentoRoute = PortalConhecimentoRouteImport.update({
+  id: '/conhecimento',
+  path: '/conhecimento',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalEditaisRoute = PortalEditaisRouteImport.update({
+  id: '/editais',
+  path: '/editais',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalLoginRoute = PortalLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalOnboardingRoute = PortalOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalPerfilRoute = PortalPerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalProjetosRoute = PortalProjetosRouteImport.update({
+  id: '/projetos',
+  path: '/projetos',
+  getParentRoute: () => PortalRoute,
 } as any)
 const ConsultorClientesIdRoute = ConsultorClientesIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => ConsultorClientesRoute,
 } as any)
-const ApiPublicCronScrapeRoute = ApiPublicCronScrapeRouteImport.update({
-  id: '/api/public/cron/scrape',
-  path: '/api/public/cron/scrape',
+const PortalCandidaturasIdRoute = PortalCandidaturasIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => PortalCandidaturasRoute,
+} as any)
+const PortalEditaisIdRoute = PortalEditaisIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => PortalEditaisRoute,
+} as any)
+const ApiOgEditalIdRoute = ApiOgEditalIdRouteImport.update({
+  id: '/api/og/edital/$id',
+  path: '/api/og/edital/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicCronNotificarRoute = ApiPublicCronNotificarRouteImport.update({
@@ -317,9 +323,9 @@ const ApiPublicCronNotificarRoute = ApiPublicCronNotificarRouteImport.update({
   path: '/api/public/cron/notificar',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiOgEditalIdRoute = ApiOgEditalIdRouteImport.update({
-  id: '/api/og/edital/$id',
-  path: '/api/og/edital/$id',
+const ApiPublicCronScrapeRoute = ApiPublicCronScrapeRouteImport.update({
+  id: '/api/public/cron/scrape',
+  path: '/api/public/cron/scrape',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -359,6 +365,7 @@ export interface FileRoutesByFullPath {
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/consultor/atividades': typeof ConsultorAtividadesRoute
   '/consultor/clientes': typeof ConsultorClientesRouteWithChildren
+  '/consultor/perfil': typeof ConsultorPerfilRoute
   '/consultor/revisoes': typeof ConsultorRevisoesRoute
   '/portal/candidaturas': typeof PortalCandidaturasRouteWithChildren
   '/portal/conhecimento': typeof PortalConhecimentoRoute
@@ -410,6 +417,7 @@ export interface FileRoutesByTo {
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/consultor/atividades': typeof ConsultorAtividadesRoute
   '/consultor/clientes': typeof ConsultorClientesRouteWithChildren
+  '/consultor/perfil': typeof ConsultorPerfilRoute
   '/consultor/revisoes': typeof ConsultorRevisoesRoute
   '/portal/candidaturas': typeof PortalCandidaturasRouteWithChildren
   '/portal/conhecimento': typeof PortalConhecimentoRoute
@@ -465,6 +473,7 @@ export interface FileRoutesById {
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/consultor/atividades': typeof ConsultorAtividadesRoute
   '/consultor/clientes': typeof ConsultorClientesRouteWithChildren
+  '/consultor/perfil': typeof ConsultorPerfilRoute
   '/consultor/revisoes': typeof ConsultorRevisoesRoute
   '/portal/candidaturas': typeof PortalCandidaturasRouteWithChildren
   '/portal/conhecimento': typeof PortalConhecimentoRoute
@@ -521,6 +530,7 @@ export interface FileRouteTypes {
     | '/admin/usuarios'
     | '/consultor/atividades'
     | '/consultor/clientes'
+    | '/consultor/perfil'
     | '/consultor/revisoes'
     | '/portal/candidaturas'
     | '/portal/conhecimento'
@@ -572,6 +582,7 @@ export interface FileRouteTypes {
     | '/admin/usuarios'
     | '/consultor/atividades'
     | '/consultor/clientes'
+    | '/consultor/perfil'
     | '/consultor/revisoes'
     | '/portal/candidaturas'
     | '/portal/conhecimento'
@@ -626,6 +637,7 @@ export interface FileRouteTypes {
     | '/admin/usuarios'
     | '/consultor/atividades'
     | '/consultor/clientes'
+    | '/consultor/perfil'
     | '/consultor/revisoes'
     | '/portal/candidaturas'
     | '/portal/conhecimento'
@@ -659,32 +671,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/portal': {
-      id: '/portal'
-      path: '/portal'
-      fullPath: '/portal'
-      preLoaderRoute: typeof PortalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/entrar': {
-      id: '/entrar'
-      path: '/entrar'
-      fullPath: '/entrar'
-      preLoaderRoute: typeof EntrarRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/consultor': {
-      id: '/consultor'
-      path: '/consultor'
-      fullPath: '/consultor'
-      preLoaderRoute: typeof ConsultorRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -694,284 +685,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/consultor': {
+      id: '/consultor'
+      path: '/consultor'
+      fullPath: '/consultor'
+      preLoaderRoute: typeof ConsultorRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/portal/': {
-      id: '/portal/'
-      path: '/'
-      fullPath: '/portal/'
-      preLoaderRoute: typeof PortalIndexRouteImport
-      parentRoute: typeof PortalRoute
+    '/entrar': {
+      id: '/entrar'
+      path: '/entrar'
+      fullPath: '/entrar'
+      preLoaderRoute: typeof EntrarRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/consultor/': {
-      id: '/consultor/'
-      path: '/'
-      fullPath: '/consultor/'
-      preLoaderRoute: typeof ConsultorIndexRouteImport
-      parentRoute: typeof ConsultorRoute
+    '/portal': {
+      id: '/portal'
+      path: '/portal'
+      fullPath: '/portal'
+      preLoaderRoute: typeof PortalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/admin/': {
       id: '/admin/'
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/portal/projetos': {
-      id: '/portal/projetos'
-      path: '/projetos'
-      fullPath: '/portal/projetos'
-      preLoaderRoute: typeof PortalProjetosRouteImport
-      parentRoute: typeof PortalRoute
-    }
-    '/portal/perfil': {
-      id: '/portal/perfil'
-      path: '/perfil'
-      fullPath: '/portal/perfil'
-      preLoaderRoute: typeof PortalPerfilRouteImport
-      parentRoute: typeof PortalRoute
-    }
-    '/portal/onboarding': {
-      id: '/portal/onboarding'
-      path: '/onboarding'
-      fullPath: '/portal/onboarding'
-      preLoaderRoute: typeof PortalOnboardingRouteImport
-      parentRoute: typeof PortalRoute
-    }
-    '/portal/login': {
-      id: '/portal/login'
-      path: '/login'
-      fullPath: '/portal/login'
-      preLoaderRoute: typeof PortalLoginRouteImport
-      parentRoute: typeof PortalRoute
-    }
-    '/portal/editais': {
-      id: '/portal/editais'
-      path: '/editais'
-      fullPath: '/portal/editais'
-      preLoaderRoute: typeof PortalEditaisRouteImport
-      parentRoute: typeof PortalRoute
-    }
-    '/portal/conhecimento': {
-      id: '/portal/conhecimento'
-      path: '/conhecimento'
-      fullPath: '/portal/conhecimento'
-      preLoaderRoute: typeof PortalConhecimentoRouteImport
-      parentRoute: typeof PortalRoute
-    }
-    '/portal/candidaturas': {
-      id: '/portal/candidaturas'
-      path: '/candidaturas'
-      fullPath: '/portal/candidaturas'
-      preLoaderRoute: typeof PortalCandidaturasRouteImport
-      parentRoute: typeof PortalRoute
-    }
-    '/consultor/revisoes': {
-      id: '/consultor/revisoes'
-      path: '/revisoes'
-      fullPath: '/consultor/revisoes'
-      preLoaderRoute: typeof ConsultorRevisoesRouteImport
-      parentRoute: typeof ConsultorRoute
-    }
-    '/consultor/clientes': {
-      id: '/consultor/clientes'
-      path: '/clientes'
-      fullPath: '/consultor/clientes'
-      preLoaderRoute: typeof ConsultorClientesRouteImport
-      parentRoute: typeof ConsultorRoute
-    }
-    '/consultor/atividades': {
-      id: '/consultor/atividades'
-      path: '/atividades'
-      fullPath: '/consultor/atividades'
-      preLoaderRoute: typeof ConsultorAtividadesRouteImport
-      parentRoute: typeof ConsultorRoute
-    }
-    '/admin/usuarios': {
-      id: '/admin/usuarios'
-      path: '/usuarios'
-      fullPath: '/admin/usuarios'
-      preLoaderRoute: typeof AdminUsuariosRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/solicitacoes': {
-      id: '/admin/solicitacoes'
-      path: '/solicitacoes'
-      fullPath: '/admin/solicitacoes'
-      preLoaderRoute: typeof AdminSolicitacoesRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/scrapers': {
-      id: '/admin/scrapers'
-      path: '/scrapers'
-      fullPath: '/admin/scrapers'
-      preLoaderRoute: typeof AdminScrapersRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/relatorios': {
-      id: '/admin/relatorios'
-      path: '/relatorios'
-      fullPath: '/admin/relatorios'
-      preLoaderRoute: typeof AdminRelatoriosRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/redefinir-senha': {
-      id: '/admin/redefinir-senha'
-      path: '/redefinir-senha'
-      fullPath: '/admin/redefinir-senha'
-      preLoaderRoute: typeof AdminRedefinirSenhaRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/recuperar-senha': {
-      id: '/admin/recuperar-senha'
-      path: '/recuperar-senha'
-      fullPath: '/admin/recuperar-senha'
-      preLoaderRoute: typeof AdminRecuperarSenhaRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/projetos': {
-      id: '/admin/projetos'
-      path: '/projetos'
-      fullPath: '/admin/projetos'
-      preLoaderRoute: typeof AdminProjetosRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/permissoes': {
-      id: '/admin/permissoes'
-      path: '/permissoes'
-      fullPath: '/admin/permissoes'
-      preLoaderRoute: typeof AdminPermissoesRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/pagamentos': {
-      id: '/admin/pagamentos'
-      path: '/pagamentos'
-      fullPath: '/admin/pagamentos'
-      preLoaderRoute: typeof AdminPagamentosRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/municipios': {
-      id: '/admin/municipios'
-      path: '/municipios'
-      fullPath: '/admin/municipios'
-      preLoaderRoute: typeof AdminMunicipiosRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/logs': {
-      id: '/admin/logs'
-      path: '/logs'
-      fullPath: '/admin/logs'
-      preLoaderRoute: typeof AdminLogsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/login': {
-      id: '/admin/login'
-      path: '/login'
-      fullPath: '/admin/login'
-      preLoaderRoute: typeof AdminLoginRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/investidores': {
-      id: '/admin/investidores'
-      path: '/investidores'
-      fullPath: '/admin/investidores'
-      preLoaderRoute: typeof AdminInvestidoresRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/integracoes': {
-      id: '/admin/integracoes'
-      path: '/integracoes'
-      fullPath: '/admin/integracoes'
-      preLoaderRoute: typeof AdminIntegracoesRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/instituicoes': {
-      id: '/admin/instituicoes'
-      path: '/instituicoes'
-      fullPath: '/admin/instituicoes'
-      preLoaderRoute: typeof AdminInstituicoesRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/indicadores': {
-      id: '/admin/indicadores'
-      path: '/indicadores'
-      fullPath: '/admin/indicadores'
-      preLoaderRoute: typeof AdminIndicadoresRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/ia': {
-      id: '/admin/ia'
-      path: '/ia'
-      fullPath: '/admin/ia'
-      preLoaderRoute: typeof AdminIaRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/fontes': {
-      id: '/admin/fontes'
-      path: '/fontes'
-      fullPath: '/admin/fontes'
-      preLoaderRoute: typeof AdminFontesRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/financeiro': {
-      id: '/admin/financeiro'
-      path: '/financeiro'
-      fullPath: '/admin/financeiro'
-      preLoaderRoute: typeof AdminFinanceiroRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/estados': {
-      id: '/admin/estados'
-      path: '/estados'
-      fullPath: '/admin/estados'
-      preLoaderRoute: typeof AdminEstadosRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/empresas': {
-      id: '/admin/empresas'
-      path: '/empresas'
-      fullPath: '/admin/empresas'
-      preLoaderRoute: typeof AdminEmpresasRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/editais': {
-      id: '/admin/editais'
-      path: '/editais'
-      fullPath: '/admin/editais'
-      preLoaderRoute: typeof AdminEditaisRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/convenios': {
-      id: '/admin/convenios'
-      path: '/convenios'
-      fullPath: '/admin/convenios'
-      preLoaderRoute: typeof AdminConveniosRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/consultores': {
-      id: '/admin/consultores'
-      path: '/consultores'
-      fullPath: '/admin/consultores'
-      preLoaderRoute: typeof AdminConsultoresRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/configuracoes': {
-      id: '/admin/configuracoes'
-      path: '/configuracoes'
-      fullPath: '/admin/configuracoes'
-      preLoaderRoute: typeof AdminConfiguracoesRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/coletas': {
-      id: '/admin/coletas'
-      path: '/coletas'
-      fullPath: '/admin/coletas'
-      preLoaderRoute: typeof AdminColetasRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/apis': {
@@ -981,19 +727,278 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminApisRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/portal/editais/$id': {
-      id: '/portal/editais/$id'
-      path: '/$id'
-      fullPath: '/portal/editais/$id'
-      preLoaderRoute: typeof PortalEditaisIdRouteImport
-      parentRoute: typeof PortalEditaisRoute
+    '/admin/coletas': {
+      id: '/admin/coletas'
+      path: '/coletas'
+      fullPath: '/admin/coletas'
+      preLoaderRoute: typeof AdminColetasRouteImport
+      parentRoute: typeof AdminRoute
     }
-    '/portal/candidaturas/$id': {
-      id: '/portal/candidaturas/$id'
-      path: '/$id'
-      fullPath: '/portal/candidaturas/$id'
-      preLoaderRoute: typeof PortalCandidaturasIdRouteImport
-      parentRoute: typeof PortalCandidaturasRoute
+    '/admin/configuracoes': {
+      id: '/admin/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/admin/configuracoes'
+      preLoaderRoute: typeof AdminConfiguracoesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/consultores': {
+      id: '/admin/consultores'
+      path: '/consultores'
+      fullPath: '/admin/consultores'
+      preLoaderRoute: typeof AdminConsultoresRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/convenios': {
+      id: '/admin/convenios'
+      path: '/convenios'
+      fullPath: '/admin/convenios'
+      preLoaderRoute: typeof AdminConveniosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/editais': {
+      id: '/admin/editais'
+      path: '/editais'
+      fullPath: '/admin/editais'
+      preLoaderRoute: typeof AdminEditaisRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/empresas': {
+      id: '/admin/empresas'
+      path: '/empresas'
+      fullPath: '/admin/empresas'
+      preLoaderRoute: typeof AdminEmpresasRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/estados': {
+      id: '/admin/estados'
+      path: '/estados'
+      fullPath: '/admin/estados'
+      preLoaderRoute: typeof AdminEstadosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/financeiro': {
+      id: '/admin/financeiro'
+      path: '/financeiro'
+      fullPath: '/admin/financeiro'
+      preLoaderRoute: typeof AdminFinanceiroRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/fontes': {
+      id: '/admin/fontes'
+      path: '/fontes'
+      fullPath: '/admin/fontes'
+      preLoaderRoute: typeof AdminFontesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/ia': {
+      id: '/admin/ia'
+      path: '/ia'
+      fullPath: '/admin/ia'
+      preLoaderRoute: typeof AdminIaRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/indicadores': {
+      id: '/admin/indicadores'
+      path: '/indicadores'
+      fullPath: '/admin/indicadores'
+      preLoaderRoute: typeof AdminIndicadoresRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/instituicoes': {
+      id: '/admin/instituicoes'
+      path: '/instituicoes'
+      fullPath: '/admin/instituicoes'
+      preLoaderRoute: typeof AdminInstituicoesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/integracoes': {
+      id: '/admin/integracoes'
+      path: '/integracoes'
+      fullPath: '/admin/integracoes'
+      preLoaderRoute: typeof AdminIntegracoesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/investidores': {
+      id: '/admin/investidores'
+      path: '/investidores'
+      fullPath: '/admin/investidores'
+      preLoaderRoute: typeof AdminInvestidoresRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/logs': {
+      id: '/admin/logs'
+      path: '/logs'
+      fullPath: '/admin/logs'
+      preLoaderRoute: typeof AdminLogsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/municipios': {
+      id: '/admin/municipios'
+      path: '/municipios'
+      fullPath: '/admin/municipios'
+      preLoaderRoute: typeof AdminMunicipiosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/pagamentos': {
+      id: '/admin/pagamentos'
+      path: '/pagamentos'
+      fullPath: '/admin/pagamentos'
+      preLoaderRoute: typeof AdminPagamentosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/permissoes': {
+      id: '/admin/permissoes'
+      path: '/permissoes'
+      fullPath: '/admin/permissoes'
+      preLoaderRoute: typeof AdminPermissoesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/projetos': {
+      id: '/admin/projetos'
+      path: '/projetos'
+      fullPath: '/admin/projetos'
+      preLoaderRoute: typeof AdminProjetosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/recuperar-senha': {
+      id: '/admin/recuperar-senha'
+      path: '/recuperar-senha'
+      fullPath: '/admin/recuperar-senha'
+      preLoaderRoute: typeof AdminRecuperarSenhaRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/redefinir-senha': {
+      id: '/admin/redefinir-senha'
+      path: '/redefinir-senha'
+      fullPath: '/admin/redefinir-senha'
+      preLoaderRoute: typeof AdminRedefinirSenhaRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/relatorios': {
+      id: '/admin/relatorios'
+      path: '/relatorios'
+      fullPath: '/admin/relatorios'
+      preLoaderRoute: typeof AdminRelatoriosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/scrapers': {
+      id: '/admin/scrapers'
+      path: '/scrapers'
+      fullPath: '/admin/scrapers'
+      preLoaderRoute: typeof AdminScrapersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/solicitacoes': {
+      id: '/admin/solicitacoes'
+      path: '/solicitacoes'
+      fullPath: '/admin/solicitacoes'
+      preLoaderRoute: typeof AdminSolicitacoesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/usuarios': {
+      id: '/admin/usuarios'
+      path: '/usuarios'
+      fullPath: '/admin/usuarios'
+      preLoaderRoute: typeof AdminUsuariosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/consultor/': {
+      id: '/consultor/'
+      path: '/'
+      fullPath: '/consultor/'
+      preLoaderRoute: typeof ConsultorIndexRouteImport
+      parentRoute: typeof ConsultorRoute
+    }
+    '/consultor/atividades': {
+      id: '/consultor/atividades'
+      path: '/atividades'
+      fullPath: '/consultor/atividades'
+      preLoaderRoute: typeof ConsultorAtividadesRouteImport
+      parentRoute: typeof ConsultorRoute
+    }
+    '/consultor/clientes': {
+      id: '/consultor/clientes'
+      path: '/clientes'
+      fullPath: '/consultor/clientes'
+      preLoaderRoute: typeof ConsultorClientesRouteImport
+      parentRoute: typeof ConsultorRoute
+    }
+    '/consultor/perfil': {
+      id: '/consultor/perfil'
+      path: '/perfil'
+      fullPath: '/consultor/perfil'
+      preLoaderRoute: typeof ConsultorPerfilRouteImport
+      parentRoute: typeof ConsultorRoute
+    }
+    '/consultor/revisoes': {
+      id: '/consultor/revisoes'
+      path: '/revisoes'
+      fullPath: '/consultor/revisoes'
+      preLoaderRoute: typeof ConsultorRevisoesRouteImport
+      parentRoute: typeof ConsultorRoute
+    }
+    '/portal/': {
+      id: '/portal/'
+      path: '/'
+      fullPath: '/portal/'
+      preLoaderRoute: typeof PortalIndexRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/candidaturas': {
+      id: '/portal/candidaturas'
+      path: '/candidaturas'
+      fullPath: '/portal/candidaturas'
+      preLoaderRoute: typeof PortalCandidaturasRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/conhecimento': {
+      id: '/portal/conhecimento'
+      path: '/conhecimento'
+      fullPath: '/portal/conhecimento'
+      preLoaderRoute: typeof PortalConhecimentoRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/editais': {
+      id: '/portal/editais'
+      path: '/editais'
+      fullPath: '/portal/editais'
+      preLoaderRoute: typeof PortalEditaisRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/login': {
+      id: '/portal/login'
+      path: '/login'
+      fullPath: '/portal/login'
+      preLoaderRoute: typeof PortalLoginRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/onboarding': {
+      id: '/portal/onboarding'
+      path: '/onboarding'
+      fullPath: '/portal/onboarding'
+      preLoaderRoute: typeof PortalOnboardingRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/perfil': {
+      id: '/portal/perfil'
+      path: '/perfil'
+      fullPath: '/portal/perfil'
+      preLoaderRoute: typeof PortalPerfilRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/projetos': {
+      id: '/portal/projetos'
+      path: '/projetos'
+      fullPath: '/portal/projetos'
+      preLoaderRoute: typeof PortalProjetosRouteImport
+      parentRoute: typeof PortalRoute
     }
     '/consultor/clientes/$id': {
       id: '/consultor/clientes/$id'
@@ -1002,11 +1007,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsultorClientesIdRouteImport
       parentRoute: typeof ConsultorClientesRoute
     }
-    '/api/public/cron/scrape': {
-      id: '/api/public/cron/scrape'
-      path: '/api/public/cron/scrape'
-      fullPath: '/api/public/cron/scrape'
-      preLoaderRoute: typeof ApiPublicCronScrapeRouteImport
+    '/portal/candidaturas/$id': {
+      id: '/portal/candidaturas/$id'
+      path: '/$id'
+      fullPath: '/portal/candidaturas/$id'
+      preLoaderRoute: typeof PortalCandidaturasIdRouteImport
+      parentRoute: typeof PortalCandidaturasRoute
+    }
+    '/portal/editais/$id': {
+      id: '/portal/editais/$id'
+      path: '/$id'
+      fullPath: '/portal/editais/$id'
+      preLoaderRoute: typeof PortalEditaisIdRouteImport
+      parentRoute: typeof PortalEditaisRoute
+    }
+    '/api/og/edital/$id': {
+      id: '/api/og/edital/$id'
+      path: '/api/og/edital/$id'
+      fullPath: '/api/og/edital/$id'
+      preLoaderRoute: typeof ApiOgEditalIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/cron/notificar': {
@@ -1016,11 +1035,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCronNotificarRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/og/edital/$id': {
-      id: '/api/og/edital/$id'
-      path: '/api/og/edital/$id'
-      fullPath: '/api/og/edital/$id'
-      preLoaderRoute: typeof ApiOgEditalIdRouteImport
+    '/api/public/cron/scrape': {
+      id: '/api/public/cron/scrape'
+      path: '/api/public/cron/scrape'
+      fullPath: '/api/public/cron/scrape'
+      preLoaderRoute: typeof ApiPublicCronScrapeRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -1104,6 +1123,7 @@ const ConsultorClientesRouteWithChildren =
 interface ConsultorRouteChildren {
   ConsultorAtividadesRoute: typeof ConsultorAtividadesRoute
   ConsultorClientesRoute: typeof ConsultorClientesRouteWithChildren
+  ConsultorPerfilRoute: typeof ConsultorPerfilRoute
   ConsultorRevisoesRoute: typeof ConsultorRevisoesRoute
   ConsultorIndexRoute: typeof ConsultorIndexRoute
 }
@@ -1111,6 +1131,7 @@ interface ConsultorRouteChildren {
 const ConsultorRouteChildren: ConsultorRouteChildren = {
   ConsultorAtividadesRoute: ConsultorAtividadesRoute,
   ConsultorClientesRoute: ConsultorClientesRouteWithChildren,
+  ConsultorPerfilRoute: ConsultorPerfilRoute,
   ConsultorRevisoesRoute: ConsultorRevisoesRoute,
   ConsultorIndexRoute: ConsultorIndexRoute,
 }
