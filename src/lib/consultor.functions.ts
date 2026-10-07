@@ -326,3 +326,77 @@ export const chamarConsultor = createServerFn({ method: "POST" })
 
     return { ok: true, atribuido: Boolean(contrato?.consultor_id) };
   });
+
+export const meuPerfilConsultor = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase
+      .from("consultores")
+      .select("nome, email, telefone, especialidade, bio, links")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    return data;
+  });
+
+export const salvarPerfilConsultor = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    (i: { nome: string; telefone?: string; especialidade?: string; bio?: string; links?: string[] }) => {
+      if (!i.nome?.trim()) throw new Error("Informe seu nome.");
+      const links = (i.links ?? []).map((l) => l.trim()).filter(Boolean).slice(0, 5);
+      for (const l of links) if (!/^https?:\/\//i.test(l)) throw new Error(`Link inválido: ${l}`);
+      return { ...i, links };
+    },
+  )
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.rpc("atualizar_meu_perfil_consultor", {
+      _nome: data.nome,
+      _telefone: data.telefone ?? "",
+      _especialidade: data.especialidade ?? "",
+      _bio: data.bio ?? "",
+      _links: data.links,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+// Ações do dia + indicadores operacionais.
+export const acoesConsultor = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const consultor = await assertConsultor(context.supabase, context.userId);
+    const [{ data: ativs }, { data: contratos }] = await Promise.all([
+      context.supabase
+        .from("atividades_consultor")
+        .select("id, tipo, descricao, status, data_vencimento, empresa_id, empresa:empresas_perfil(nome_empresa)")
+        .eq("consultor_id", consultor.id),
+      context.supabase
+        .from("consultor_clientes")
+        .select("status, creditos_contratados, creditos_utilizados")
+        .eq("consultor_id", consultor.id),
+    ]);
+    const lista = ativs ?? [];
+    const hoje = new Date().toISOString().slice(0, 10);
+    const prioritarias = lista
+      .filter((a) => a.status !== "concluida" && a.tipo !== "parecer" && a.tipo !== "revisao_proposta")
+      .map((a) => ({
+        id: a.id,
+        tipo: a.tipo,
+        descricao: a.descricao,
+        vencimento: a.data_vencimento,
+        atrasada: !!a.data_vencimento && a.data_vencimento < hoje,
+        empresaId: a.empresa_id,
+        empresa: (a.empresa as { nome_empresa: string } | null)?.nome_empresa ?? "—",
+      }))
+      .sort((x, y) => Number(y.tipo === "chamado_cliente") - Number(x.tipo === "chamado_cliente") || (x.vencimento ?? "9").localeCompare(y.vencimento ?? "9"))
+      .slice(0, 8);
+    const ativos = (contratos ?? []).filter((c) => c.status === "ativo");
+    return {
+      prioritarias,
+      clientesVinculados: ativos.length,
+      revisoesEntregues: lista.filter((a) => a.tipo === "parecer" || a.tipo === "revisao_proposta").length,
+      creditosContratados: ativos.reduce((s, c) => s + c.creditos_contratados, 0),
+      creditosUtilizados: ativos.reduce((s, c) => s + c.creditos_utilizados, 0),
+    };
+  });
